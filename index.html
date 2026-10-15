@@ -574,6 +574,7 @@ const liveOf=id=>LIVE?(LIVE.live||[]).find(m=>m.t1[0]===id||m.t2[0]===id):null;
 const mapMn=s=>s==='-'?'–':s;
 const tLink=(t,inner)=>teamsById[t.id]?`<a href="#team-${t.id}">${inner}</a>`:inner;
 function liveCard(m){
+  {const q=snapOf(m.id);if(q)m={...m,f1:m.f1||q.f1,f2:m.f2||q.f2,lineups:(m.lineups&&m.lineups.length)?m.lineups:q.lineups,veto:(m.veto&&m.veto.length)?m.veto:q.veto,info:m.info||q.info}}
   const a=LT(m.t1),b=LT(m.t2);const ra=rankById[a.id],rb=rankById[b.id];
   const lu=m.lineups||[];
   const sm=snapOf(m.id);const fin=(+(m.mw&&m.mw[0])||0)+(+(m.mw&&m.mw[1])||0);
@@ -586,7 +587,7 @@ function liveCard(m){
   const team=(t,r,side)=>`<div class="lm-team ${side}">${logo(t.logo,'',t.name)}<div style="min-width:0">${tLink(t,`<b>${esc(t.name)}</b>`)}<div class="rk2 num">${[r?'HLTV #'+r[0]:(lu[side?1:0]?.hltv?'HLTV '+esc(lu[side?1:0].hltv):''),vrsById[t.id]?'VRS #'+vrsById[t.id][0]:(lu[side?1:0]?.vrs?'VRS '+esc(lu[side?1:0].vrs):'')].filter(Boolean).join(' · ')}</div></div></div>`;
   return `<div class="panel lm">
    <div class="lm-top"><span><span class="badge live"><span class="pulse"></span>ШУУД</span> <a href="#event-${m.ev}"><b>${esc(evNameOf(m))}</b></a></span><span class="sub">${esc((m.bo||'').toUpperCase())}${m.lan?' · LAN':' · Онлайн'}</span></div>
-   <div class="lm-score flagged">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}${team(a,ra,'')}<div class="lm-mid"><div class="ser num">${esc(m.mw?.[0]??'0')} : ${esc(m.mw?.[1]??'0')}</div><div class="cur">${esc(curOf(m).map||'Одоогийн газрын зураг')} ${esc(curOf(m).a)}:${esc(curOf(m).b)}</div></div>${team(b,rb,'r')}</div>
+   <div class="lm-score flagged">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}${team(a,ra,'')}<div class="lm-mid"><div class="ser num">${esc(m.mw?.[0]??'0')} : ${esc(m.mw?.[1]??'0')}</div><div class="cur">${esc(curOf(m).map||'Одоогийн газрын зураг')} ${esc(curOf(m).a)}:${esc(curOf(m).b)}</div></div>${team(b,rb,'r')}</div>
    ${mapsHtml?`<div class="maps">${mapsHtml}</div>`:''}
    <div class="lm-foot">
     ${lu.length?`<div><b>Бүрэлдэхүүн</b>${lu.map((l,i)=>`<div class="lineup-row"><span class="sub">${esc(i?b.name:a.name)}:</span>${l.players.map(p=>`${PL[p.id]?`<a class="ext" href="#player-${p.id}">${esc(p.nick)}</a>`:`<span>${esc(p.nick)}</span>`}`).join('')}</div>`).join('')}</div>`:''}
@@ -606,9 +607,9 @@ function viewLive(){
   ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:'<div class="panel empty">Товлогдсон тоглолт алга.</div>'}`;
 }
 function liveBar(id){const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
-  return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Газрын зураг ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
+  return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Газрын зураг ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
 function liveStrip(){const lv=dedupe(LIVE?.live);if(!lv.length)return '';
-  return `<div class="stack">${lv.slice(0,3).map(m=>{const a=LT(m.t1),b=LT(m.t2);return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span>${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b>${logo(b.logo,'sm',b.name)}<span class="sub">${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Үзэх →</span></a>`}).join('')}</div>`}
+  return `<div class="stack">${lv.slice(0,3).map(m=>{const a=LT(m.t1),b=LT(m.t2);return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span>${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b>${logo(b.logo,'sm',b.name)}<span class="sub">${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Үзэх →</span></a>`}).join('')}</div>`}
 function setLive(data){LIVE=data;const n=dedupe(LIVE?.live).length;const c=document.getElementById('livecount');c.textContent=n;c.hidden=!n;rerender()}
 setLive(LIVE);
 (async()=>{try{const db=window.claude&&await window.claude.use('db');if(!db)return;db.doc('live/now').onSnapshot(s=>{if(s.exists)setLive(s.data())},()=>{});db.collection('matches').onSnapshot(qs=>{qs.docs.forEach(d=>{MATCH[d.id]=d.data()});rerender()},()=>{});db.doc('news/latest').onSnapshot(s=>{if(s.exists){NEWS=s.data();if(route.last==='news')rerender()}},()=>{})}catch(e){}})();

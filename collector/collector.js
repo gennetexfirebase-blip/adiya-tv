@@ -74,7 +74,16 @@
         }) };
     }
     const maps = window.__fbMaps || readMaps(document);
-    return { id: +se.dataset.scorebotId, maps, t1: se.dataset.team1Name, t2: se.dataset.team2Name,
+    const fc = sel => ((document.querySelector(sel)?.getAttribute('src') || '').match(/flags\/\d+x\d+\/(\w+)\./) || [])[1] || '';
+    const vb = [...document.querySelectorAll('.veto-box')];
+    const lineups = [...document.querySelectorAll('.lineups .lineup')].map(lu => {
+      const seen = new Set();
+      return { hltv: T(lu.querySelector('.hltv-ranking')).replace('HLTV:', '').trim(), vrs: T(lu.querySelector('.vrs-ranking')).replace('VRS:', '').trim(),
+        players: [...lu.querySelectorAll('.player-compare')].map(pc => ({ id: +pc.dataset.playerId, nick: (pc.querySelector('img')?.title || '').match(/'([^']+)'/)?.[1] || T(pc) }))
+          .filter(p => p.id && !seen.has(p.id) && seen.add(p.id)) };
+    });
+    return { id: +se.dataset.scorebotId, maps, f1: fc('.teamsBox img.team1'), f2: fc('.teamsBox img.team2'), lineups,
+      info: T(vb[0]), veto: vb[1] ? [...vb[1].querySelectorAll('div > div')].map(T).filter(x => /^\d\./.test(x) && !/\d\..*\d\./.test(x)) : [], t1: se.dataset.team1Name, t2: se.dataset.team2Name,
       round: T(top?.querySelector('.currentRoundText')), ct: T(top?.querySelector('.ctScore')), t: T(top?.querySelector('.tScore')),
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
   }
