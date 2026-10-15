@@ -48,7 +48,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backgroun
 .top-in{max-width:1120px;margin:0 auto;padding-inline:16px;display:flex;align-items:center;gap:22px;height:62px}
 .brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .brand i{display:inline-block;width:9px;height:22px;background:linear-gradient(180deg,var(--hltv),color-mix(in srgb,var(--hltv) 50%,var(--accent-2)));transform:skewX(-16deg);border-radius:2px;box-shadow:0 0 14px color-mix(in srgb,var(--hltv) 55%,transparent)}
-.brand b{font-weight:700;margin-left:6px;padding:2px 7px;border-radius:6px;background:linear-gradient(135deg,var(--hltv),var(--accent-2));color:#fff;font-size:12px;letter-spacing:.1em;vertical-align:2px}
+.brand .tv{color:var(--accent)}
 .brand i+i{background:linear-gradient(180deg,var(--vrs),color-mix(in srgb,var(--vrs) 60%,#ff6a3d));margin-left:-6px;box-shadow:0 0 14px color-mix(in srgb,var(--vrs) 45%,transparent)}
 nav.main{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px}
 nav.main a{padding:6px 14px;border-radius:999px;color:var(--muted);font-weight:600;font-size:13px;display:inline-flex;align-items:center;transition:color .15s,background .15s}
@@ -324,7 +324,7 @@ a.nitem:hover h3{color:var(--accent)}
   .thead{grid-template-columns:minmax(0,1fr)}
   .thead h1{font-size:28px}
   nav.main a{padding:6px 8px}
-  .brand span{display:none}
+  .brand{font-size:15px}
   .top-in{gap:10px}
 }
 @media (prefers-reduced-motion:no-preference){.rk,.ev,.evr{transition:background .12s,border-color .12s}}
@@ -333,7 +333,7 @@ a.nitem:hover h3{color:var(--accent)}
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <a class="brand" href="#ranking"><i></i><i></i><span>ADIYA<b>TV</b></span></a>
+  <a class="brand" href="#ranking" aria-label="ADIYA TV нүүр">ADIYA <span class="tv">TV</span></a>
   <nav class="main">
     <a href="#ranking" data-nav="ranking">Рэнкинг</a>
     <a href="#events" data-nav="events">Тэмцээн</a>
