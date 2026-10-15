@@ -482,6 +482,30 @@ header.top::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height
 /* light theme: many team/event logos are white artwork, so give them a thin dark outline */
 :root[data-theme="light"] .logo:not(.ph){filter:drop-shadow(0 0 .6px rgba(8,20,40,.9)) drop-shadow(0 0 1.4px rgba(8,20,40,.45))}
 :root[data-theme="light"] .ev .logo:not(.ph),:root[data-theme="light"] .logo.lg:not(.ph){filter:drop-shadow(0 0 1px rgba(8,20,40,.85)) drop-shadow(0 0 2.5px rgba(8,20,40,.35))}
+/* ---------- stronger ornaments + flowing alkhan khee under the header ---------- */
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:18px;opacity:1;
+  background:linear-gradient(90deg,#8a5d10,#e3b04b 20%,#ffe9b0 50%,#e3b04b 80%,#8a5d10);
+  -webkit-mask:var(--khee) repeat-x 0 center/36px 18px;mask:var(--khee) repeat-x 0 center/36px 18px;
+  filter:drop-shadow(0 0 4px rgba(227,176,75,.45));animation:khee-flow 2.4s linear infinite;pointer-events:none}
+@keyframes khee-flow{to{-webkit-mask-position:36px center;mask-position:36px center}}
+@media (prefers-reduced-motion:reduce){header.top::after{animation:none}}
+h2::after{opacity:.8;background:linear-gradient(90deg,#c48f2a,rgba(196,143,42,.15))}
+.hero::before{opacity:.7}
+.hero::after,.article::after{opacity:.55}
+.hero .orn-cloud{opacity:.2}
+footer::before{opacity:.85}
+body::before{opacity:.12}
+body::after{opacity:.1}
+.empty.tsam::before{opacity:.8}
+:root[data-theme="light"] .hero::after,:root[data-theme="light"] .article::after{opacity:.6;background:linear-gradient(180deg,#c48f2a,#7a520c)}
+:root[data-theme="light"] body::before,:root[data-theme="light"] body::after{background:linear-gradient(180deg,#c48f2a,#7a520c)}
+:root[data-theme="light"]{--gold:linear-gradient(180deg,#c48f2a,#7a520c);--orn:#9a6a14}
+:root[data-theme="light"] h2::after{background:linear-gradient(90deg,#9a6a14,rgba(154,106,20,.15))}
+:root[data-theme="light"] .hero::before,:root[data-theme="light"] footer::before{background:linear-gradient(90deg,transparent,#9a6a14 15%,#c48f2a 50%,#9a6a14 85%,transparent)}
+:root[data-theme="light"] .hero::after,:root[data-theme="light"] .article::after{opacity:.95}
+:root[data-theme="light"] .hero::before{opacity:.95}
+:root[data-theme="light"] h2::after{opacity:1}
+:root[data-theme="light"] .hero .orn-cloud{opacity:.28}
 /* ---------- responsive: tablet ---------- */
 @media (max-width:1024px){
   .top-in{gap:12px}
