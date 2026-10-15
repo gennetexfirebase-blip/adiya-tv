@@ -15,6 +15,22 @@
   });
   const del = k => fetch(cfg.url + '/rest/v1/live?k=eq.' + encodeURIComponent(k), { method: 'DELETE', headers: H });
 
+  // per-map results in team1/team2 order. HLTV does not update this block live, so the page is re-read every 45 s
+  // and whenever the map changes; finished maps then carry their final score.
+  const readMaps = doc => [...doc.querySelectorAll('.mapholder')].map(mh => {
+    const l = mh.querySelector('.results-left'), r = mh.querySelector('.results-right');
+    return { n: T(mh.querySelector('.mapname')), s1: T(l?.querySelector('.results-team-score')), s2: T(r?.querySelector('.results-team-score')),
+      w: l?.classList.contains('won') ? 1 : r?.classList.contains('won') ? 2 : 0,
+      pick: l?.classList.contains('pick') ? 1 : r?.classList.contains('pick') ? 2 : 0,
+      half: T(mh.querySelector('.results-center-half-score')) };
+  });
+  const refreshMaps = async () => {
+    try {
+      const html = await fetch(location.pathname, { cache: 'no-store' }).then(r => r.text());
+      window.__fbMaps = readMaps(new DOMParser().parseFromString(html, 'text/html'));
+    } catch (e) {}
+  };
+
   function snap() {
     const se = document.getElementById('scoreboardElement'); if (!se) return null;
     const top = document.querySelector('.scoreboard .topbarBg');
@@ -57,14 +73,7 @@
           return [x.classList.contains('terrorist') ? 'T' : 'CT', +((L + s / 2) / r.width).toFixed(4), +((Tp + s / 2) / r.height).toFixed(4), x.classList.contains('fading') ? 1 : 0];
         }) };
     }
-    // per-map results in team1/team2 order (finished maps are final; the live one may lag)
-    const maps = [...document.querySelectorAll('.mapholder')].map(mh => {
-      const l = mh.querySelector('.results-left'), r = mh.querySelector('.results-right');
-      return { n: T(mh.querySelector('.mapname')), s1: T(l?.querySelector('.results-team-score')), s2: T(r?.querySelector('.results-team-score')),
-        w: l?.classList.contains('won') ? 1 : r?.classList.contains('won') ? 2 : 0,
-        pick: l?.classList.contains('pick') ? 1 : r?.classList.contains('pick') ? 2 : 0,
-        half: T(mh.querySelector('.results-center-half-score')) };
-    });
+    const maps = window.__fbMaps || readMaps(document);
     return { id: +se.dataset.scorebotId, maps, t1: se.dataset.team1Name, t2: se.dataset.team2Name,
       round: T(top?.querySelector('.currentRoundText')), ct: T(top?.querySelector('.ctScore')), t: T(top?.querySelector('.tScore')),
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
@@ -84,7 +93,15 @@
       try { await put('m:' + s.id, s); } catch (e) {} finally { busy = false; }
       if (pending) { pending = false; push(); }
     };
-    const onChange = () => { if (Date.now() - lastAt >= 700) push(); else pending = true; };
+    let mapName = '';
+    const onChange = () => {
+      const now = (T(document.querySelector('.scoreboard .currentRoundText')).split(' - ')[1]) || '';
+      if (now && now !== mapName) { mapName = now; refreshMaps().then(() => { last = ''; push(); }); }
+      if (Date.now() - lastAt >= 700) push(); else pending = true;
+    };
+    clearInterval(window.__fbMapTimer);
+    window.__fbMapTimer = setInterval(() => refreshMaps().then(() => { last = ''; push(); }), 45000);
+    refreshMaps().then(() => { last = ''; push(); });
     const target = document.getElementById('scoreboardElement')?.parentElement || document.body;
     window.__fbObs = new MutationObserver(onChange);
     window.__fbObs.observe(target, { subtree: true, childList: true, characterData: true, attributes: true });
