@@ -125,7 +125,13 @@
   } else {
     let liveIds = [];
     const list = async () => {
-      const d = new DOMParser().parseFromString(await fetch('/matches', { cache: 'no-store' }).then(r => r.text()), 'text/html');
+      let d;
+      try {
+        const r = await fetch('/matches', { cache: 'no-store' });
+        if (!r.ok) return;                                   // blocked or rate-limited: keep the last good list
+        d = new DOMParser().parseFromString(await r.text(), 'text/html');
+      } catch (e) { return; }
+      if (!d.querySelector('.match-wrapper')) return;        // a challenge page, not the match list
       const live = [], up = [], now = Date.now();
       for (const w of d.querySelectorAll('.match-wrapper')) {
         const id = +w.dataset.matchId; if (live.concat(up).some(x => x.id === id)) continue;
@@ -154,8 +160,20 @@
       const ids = live.map(m => m.id);
       for (const old of liveIds) if (!ids.includes(old)) await del('m:' + old); // finished matches leave the table
       liveIds = ids;
+      // in a userscript on hltv.org/matches: keep a hidden same-origin frame per live match so its scoreboard streams too
+      if (window.__fbFrames) {
+        const want = new Set(live.map(m => String(m.id)));
+        document.querySelectorAll('iframe[data-fb-match]').forEach(f => { if (!want.has(f.dataset.fbMatch)) f.remove(); });
+        for (const m of live) {
+          if (document.querySelector(`iframe[data-fb-match="${m.id}"]`)) continue;
+          const f = document.createElement('iframe');
+          f.dataset.fbMatch = String(m.id); f.src = '/matches/' + m.path;
+          f.style.cssText = 'position:fixed;left:0;bottom:0;width:640px;height:480px;opacity:0;pointer-events:none;border:0;z-index:-1';
+          document.body.appendChild(f);
+        }
+      }
     };
-    list(); window.__fbTimer = setInterval(list, 10000);
+    list(); window.__fbTimer = setInterval(list, 20000);
     console.log('ADIYA TV: pushing the live match list');
   }
 })();
