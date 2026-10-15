@@ -62,14 +62,27 @@
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
   }
 
-  clearInterval(window.__fbTimer); let last = '';
+  clearInterval(window.__fbTimer); if (window.__fbObs) window.__fbObs.disconnect(); let last = '';
   if (/^\/matches\/\d+/.test(location.pathname)) {
-    window.__fbTimer = setInterval(() => {
+    // Push the moment HLTV's scorebot changes the page. Mutation callbacks are not throttled in background
+    // tabs the way timers are, so this stays live even when the tab is hidden.
+    let lastAt = 0, pending = false, busy = false;
+    const push = async () => {
+      if (busy) { pending = true; return; }
       const s = snap(); if (!s) return;
       const { updated, ...rest } = s; const sig = JSON.stringify(rest);
-      if (sig !== last) { last = sig; put('m:' + s.id, s); }
-    }, 2500);
-    console.log('ADIYA TV: pushing this match');
+      if (sig === last) return;
+      last = sig; lastAt = Date.now(); busy = true;
+      try { await put('m:' + s.id, s); } catch (e) {} finally { busy = false; }
+      if (pending) { pending = false; push(); }
+    };
+    const onChange = () => { if (Date.now() - lastAt >= 700) push(); else pending = true; };
+    const target = document.getElementById('scoreboardElement')?.parentElement || document.body;
+    window.__fbObs = new MutationObserver(onChange);
+    window.__fbObs.observe(target, { subtree: true, childList: true, characterData: true, attributes: true });
+    window.__fbTimer = setInterval(() => { if (pending) { pending = false; push(); } }, 1000);
+    push();
+    console.log('ADIYA TV: pushing this match on every scoreboard change');
   } else {
     let liveIds = [];
     const list = async () => {
