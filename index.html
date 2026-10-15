@@ -845,7 +845,7 @@ const TROPHY=(cls,size)=>`<svg class="trophy-ic ${cls||''}" width="${size||22}" 
 const placeCls=p=>/^1st/.test(p)?'gold':/^2nd/.test(p)?'silver':/^3/.test(p)?'bronze':'black';
 const placeMn=p=>{if(!p)return '';return p.replace(/^1st$/,'1-р байр').replace(/^2nd$/,'2-р байр').replace(/^3rd$/,'3-р байр').replace(/^(\d+)-(\d+)th$/,'$1–$2-р байр').replace(/^(\d+)th$/,'$1-р байр').replace('1/4 final','1/4 финал').replace('1/2 final','1/2 финал').replace('Group stage','Хэсгийн шат')};
 
-document.getElementById('foot').innerHTML=`<div class="foot-seal"><i aria-hidden="true"></i><div>© 2026 COREX TV · Монгол киберспорт</div></div>`;
+document.getElementById('foot').innerHTML=`<div class="foot-seal"><i aria-hidden="true"></i><div>© 2026 · Хөгжүүлсэн Adiya</div></div>`;
 
 /* ---------- ranking ---------- */
 let rankMode='hltv',rankReg='all';
