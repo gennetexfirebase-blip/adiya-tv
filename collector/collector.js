@@ -103,6 +103,55 @@
     const jsons = [...doc.querySelectorAll('*')].flatMap(el => [...el.attributes].filter(a => /json|bracket/i.test(a.name) && a.value.length > 50).map(a => ({ tag: el.className || el.tagName, attr: a.name, value: a.value.slice(0, 120000) }))).slice(0, 6);
     return { id: eid, blocks: blocks.map(clean).map(h => h.slice(0, 150000)), jsons, updated: new Date().toISOString() };
   };
+  // ---- team map stats: one HLTV stats request per team per 12 h (marked before the request, so a block is never retried) ----
+  const TM_TTL = 12 * 3600e3;
+  const ymd = d => d.toISOString().slice(0, 10);
+  const parseMapStats = doc => {
+    const out = [], seen = new Set();
+    doc.querySelectorAll('.map-pool-map-name').forEach(nm => {
+      const name = T(nm).replace(/\s*-\s*[\d.]+%\s*$/, '');
+      if (!name || seen.has(name)) return;
+      let box = nm.parentElement;
+      while (box && box !== doc.body && !box.querySelector('.stats-row')) box = box.parentElement;
+      if (!box || box === doc.body) return;
+      const rows = {};
+      box.querySelectorAll('.stats-row').forEach(r => { const s = r.querySelectorAll('span'); if (s.length >= 2) rows[T(s[0]).toLowerCase()] = T(s[s.length - 1]); });
+      const wdl = (rows['wins / draws / losses'] || '').split('/').map(x => parseInt(x, 10));
+      if (wdl.length !== 3 || wdl.some(isNaN)) return;
+      seen.add(name);
+      out.push({ n: name, w: wdl[0], d: wdl[1], l: wdl[2], wr: rows['win rate'] || '',
+        fk: rows['round win-% after getting first kill'] || '', fd: rows['round win-% after receiving first death'] || '' });
+    });
+    return out;
+  };
+  const pushTeamMaps = async (tid, slug) => {
+    const key = 'corexTm:' + tid;
+    if (Date.now() - (+localStorage[key] || 0) < TM_TTL) return;
+    localStorage[key] = Date.now();
+    const to = new Date(), from = new Date(to - 90 * 864e5);
+    try {
+      const r = await fetch(`/stats/teams/maps/${tid}/${slug || 'team'}?startDate=${ymd(from)}&endDate=${ymd(to)}`, { credentials: 'include' });
+      if (!r.ok) return;
+      const maps = parseMapStats(new DOMParser().parseFromString(await r.text(), 'text/html'));
+      if (!maps.length) return;
+      await put('tm:' + tid, { id: tid, maps, from: ymd(from), to: ymd(to), updated: new Date().toISOString() });
+      console.log('COREX TV: map stats sent for team', tid);
+    } catch (e) {}
+  };
+  const tmPage = location.pathname.match(/^\/stats\/teams\/maps\/(\d+)/);
+  if (tmPage) {
+    const maps = parseMapStats(document);
+    if (maps.length) {
+      const q = new URLSearchParams(location.search);
+      localStorage['corexTm:' + tmPage[1]] = Date.now();
+      put('tm:' + tmPage[1], { id: +tmPage[1], maps, from: q.get('startDate') || '', to: q.get('endDate') || '', updated: new Date().toISOString() });
+      console.log('COREX TV: map stats sent from this page');
+    }
+    return;
+  }
+  const teamPage = location.pathname.match(/^\/team\/(\d+)\/([^/?#]+)/);
+  if (teamPage) { setTimeout(() => pushTeamMaps(+teamPage[1], teamPage[2]), 3000); return; }
+
   if (/^\/events\/\d+/.test(location.pathname)) {
     const eid = +location.pathname.split('/')[2];
     let lastE = '';
@@ -113,6 +162,10 @@
   }
   clearInterval(window.__fbTimer); if (window.__fbObs) window.__fbObs.disconnect(); let last = '';
   if (/^\/matches\/\d+/.test(location.pathname)) {
+    // both teams' map stats, once per 12 h each, only from the visible top-level tab (not the hidden list iframes)
+    if (window.top === window) [...document.querySelectorAll('.team1-gradient a[href^="/team/"], .team2-gradient a[href^="/team/"]')]
+      .map(a => a.getAttribute('href').match(/^\/team\/(\d+)\/([^/?#]+)/)).filter(Boolean).slice(0, 2)
+      .forEach((m, i) => setTimeout(() => pushTeamMaps(+m[1], m[2]), 8000 + i * 6000));
     // Push the moment HLTV's scorebot changes the page. Mutation callbacks are not throttled in background
     // tabs the way timers are, so this stays live even when the tab is hidden.
     let lastAt = 0, pending = false, busy = false;
