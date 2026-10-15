@@ -865,6 +865,25 @@ h2::after{display:none!important}
 .foot-credit{display:inline-flex;align-items:center;gap:10px}
 .foot-credit::before,.foot-credit::after{content:"";width:14px;height:18px;background:var(--gold);-webkit-mask:var(--o-knot) center/contain no-repeat;mask:var(--o-knot) center/contain no-repeat}
 :root[data-theme="light"] .foot-credit::before,:root[data-theme="light"] .foot-credit::after{background:#8E3B2B}
+.mapbd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.mb-h{font:700 13px "PT Serif",Georgia,serif;letter-spacing:.04em;margin-bottom:12px;color:var(--fg)}
+.mb-dist,.mb-hl{padding:16px}
+.mb-chart{display:grid;gap:8px}
+.mb-row,.mb-axis{display:grid;grid-template-columns:78px minmax(0,1fr);align-items:center;gap:10px}
+.mb-n{text-align:right;font-size:13px;color:var(--muted)}
+.mb-track{position:relative;height:22px;background:repeating-linear-gradient(90deg,transparent 0 calc(25% - 1px),var(--line) calc(25% - 1px) 25%)}
+.mb-track i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;min-width:3px}
+.mb-track b{position:absolute;top:50%;transform:translateY(-50%);left:calc(var(--x,0%) + 6px);font-size:13px}
+.mb-ticks{position:relative;height:16px;border-top:1px solid var(--line)}
+.mb-ticks i{position:absolute;top:3px;transform:translateX(-50%);font-style:normal;font-size:11px;color:var(--muted)}
+.mb-hl{display:grid;gap:6px;align-content:start}
+.mb-strip{position:relative;height:34px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:2px;background:color-mix(in srgb,var(--mc) 70%,#1d1712);color:#fff}
+.mb-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.35;mix-blend-mode:luminosity}
+.mb-strip::before{content:"";position:absolute;inset:0 20%;background:color-mix(in srgb,var(--mc) 85%,transparent);filter:blur(10px)}
+.mb-lbl{position:relative;font-weight:800;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.mb-wl{position:absolute;right:10px;font-size:11px;opacity:.85}
+.mb-strip.best{outline:2px solid var(--primary,#8E3B2B);outline-offset:1px}
+@media (max-width:860px){.mapbd{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 </head>
@@ -1202,17 +1221,20 @@ function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
   return `<div class="mrow ${isMnMatch(m)?'mnm':''}"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)} ${m.stars?`<span class="stars">${'★'.repeat(m.stars)}</span>`:''}</span>${tl(a,1)}<span class="sc sub" style="font-size:12px">${esc(m.bo||'vs')}</span>${tl(b,0)}<a class="evn" href="#event-${m.ev}">${esc(evNameOf(m))}</a></div>`}
 const liveFresh=()=>{if(!LIVE||!LIVE.updated)return false;const sn=Object.values(MATCH).map(x=>Date.parse(x.updated||0)).concat([Date.parse(LIVE.updated)]);return Date.now()-Math.max(...sn)<15*60e3};
 let liveMode='all';
+const liveOld=()=>!!LIVE&&Date.now()-Date.parse(LIVE.updated||0)>2*3600e3;
 function viewLive(){
   let lv=dedupe(LIVE?.live),up=dedupe(LIVE?.up).sort((x,y)=>x.time-y.time);
+  /* a feed that stopped hours ago is not "live": drop its cards and past fixtures, fall back to today's schedule */
+  if(liveOld()){lv=[];up=up.filter(m=>m.time*6e4>Date.now()-3*3600e3)}
   const mnLv=lv.filter(isMnMatch),mnUp=up.filter(isMnMatch);
   if(liveMode==='mn'){lv=mnLv;up=mnUp}
   app.innerHTML=`<div class="row-head"><div><div class="eyebrow"><span class="pulse"></span>Шууд · HLTV</div><h1>Шууд тоглолтууд</h1>
    <div class="sub">${LIVE?`Сүүлд шинэчилсэн: <span class="num">${esc(fmtDY(new Date(LIVE.updated)))} ${esc(fmtT(new Date(LIVE.updated)))}</span> (${ago(LIVE.updated)}). Шинэ оноо ирэхэд хуудас өөрөө шинэчлэгдэнэ.`:'Шууд мэдээлэл хараахан ирээгүй байна.'}</div></div>
-   ${LIVE&&!liveFresh()?'<div class="stalebar">Шууд мэдээлэл түр зогссон байна (HLTV-ээс өгөгдөл ирэхгүй байна). Доорх оноо хамгийн сүүлд ирсэн төлөв.</div>':''}
+   ${liveOld()?`<div class="stalebar">HLTV-ээс шууд мэдээлэл хамгийн сүүлд ${ago(LIVE.updated)} ирсэн. Collector ажиллаж эхлэхэд шууд тоглолтууд энд автоматаар гарна. Доор өнөөдрийн хуваарь.</div>`:LIVE&&!liveFresh()?'<div class="stalebar">Шууд мэдээлэл түр зогссон байна (HLTV-ээс өгөгдөл ирэхгүй байна). Доорх оноо хамгийн сүүлд ирсэн төлөв.</div>':''}
    <div class="seg" id="liveseg"><button data-l="all" class="${liveMode==='all'?'on':''}">Бүх тоглолт</button><button data-l="mn" class="${liveMode==='mn'?'on':''}">Монгол багууд <span class="num sub">${mnLv.length+mnUp.length}</span></button></div></div>
   ${lv.length?lv.map(liveCard).join(''):'<div class="panel empty tsam">Яг одоо явагдаж буй тоглолт алга. Доорх удахгүй болох тоглолтуудыг харна уу.</div>'}
   ${todayEventsHtml()}
-  <details class="panel mlist upfold" id="upfold" ${upOpen?'open':''}><summary>Удахгүй болох тоглолтууд <span class="cnt">${(up.length||(liveMode==='all'?todayMatches().length:0))}</span></summary><div class="upfold-b">
+  <details class="panel mlist upfold" id="upfold" ${(upOpen||!lv.length)?'open':''}><summary>Удахгүй болох тоглолтууд <span class="cnt">${(up.length||(liveMode==='all'?todayMatches().length:0))}</span></summary><div class="upfold-b">
   ${!up.length&&liveMode==='all'?(()=>{const t=todayMatches();return t.length?`<div class="panel upl">${t.map(upRow).join('')}</div><div class="sub" style="font-size:12px">Багуудын хуваариас. Цаг нь Улаанбаатарын цагаар.</div>`:''})():''}
   ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:(liveMode==='all'&&todayMatches().length?'':`<div class="panel empty tsam">${liveMode==='mn'?'Монгол багуудын товлогдсон тоглолт одоогоор алга.':'Товлогдсон тоглолт алга.'}</div>`)}
   </div></details>`;
@@ -1220,9 +1242,9 @@ function viewLive(){
   const uf=document.getElementById('upfold');if(uf)uf.addEventListener('toggle',()=>{upOpen=uf.open});
 }
 let upOpen=false;
-function liveBar(id){const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
+function liveBar(id){if(liveOld())return '';const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
   return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Мап ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
-function liveStrip(){const lv=dedupe(LIVE?.live);if(!lv.length)return '';
+function liveStrip(){if(liveOld())return '';const lv=dedupe(LIVE?.live);if(!lv.length)return '';
   return `<div class="stack">${lv.slice(0,3).map(m=>{const a=LT(m.t1),b=LT(m.t2);return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span>${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b>${logo(b.logo,'sm',b.name)}<span class="sub">${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Үзэх →</span></a>`}).join('')}</div>`}
 function setLive(data){LIVE=data;const n=dedupe(LIVE?.live).length;const c=document.getElementById('livecount');c.textContent=n;c.hidden=!n;rerender()}
 setLive(LIVE);
@@ -1266,7 +1288,7 @@ function viewPlayer(id){
 
 /* ---------- match (scorebot) ---------- */
 let EVB={};
-let TMAP={};
+let TMAP=Object.assign({},D.tmaps||{});
 let MATCH={},matchSub=null,matchSubId=0;
 const wpnMn={ak47:'AK-47',awp:'AWP',m4a1_silencer:'M4A1-S',m4a1:'M4A4',deagle:'Deagle',glock:'Glock',usp_silencer:'USP-S',hkp2000:'P2000',galilar:'Galil',famas:'FAMAS',ssg08:'Scout',p250:'P250',tec9:'Tec-9',fiveseven:'Five-SeveN',cz75a:'CZ75',mac10:'MAC-10',mp9:'MP9',mp7:'MP7',ump45:'UMP',p90:'P90',sg556:'SG 553',aug:'AUG',hegrenade:'HE',inferno:'Молотов',molotov:'Молотов',incgrenade:'Инк.',knife:'Хутга',taser:'Zeus',revolver:'R8',xm1014:'XM1014',mag7:'MAG-7',nova:'Nova',negev:'Negev',m249:'M249',elite:'Dualies',buy:''};
 const wpn=w=>w?(wpnMn[w]??w.toUpperCase()):'';
@@ -1499,13 +1521,21 @@ const mapRows=id=>{const v=TMAP[id];if(!v||!v.maps)return [];
 const bestMap=rows=>{const ok=rows.filter(m=>m.p>=3);const pool=ok.length?ok:rows;return pool.slice().sort((a,b)=>b.wr-a.wr||b.p-a.p)[0]};
 const mapPeriod=v=>v&&v.from?`${esc(v.from)} – ${esc(v.to)}`:'бүх хугацаа';
 const mapEmpty=`<div class="panel empty">Мапын статистик хараахан ирээгүй байна. HLTV дээр энэ багийн хуудсыг нээхэд COREX TV collector автоматаар илгээнэ.</div>`;
+const MAPC={mirage:'#2f6fae',dust2:'#2a8f8a',nuke:'#2f8f5b',ancient:'#3f9a54',anubis:'#6c9a3a',overpass:'#9a9a32',vertigo:'#b8962e',train:'#c98a24',cache:'#c46a1e',inferno:'#a8321f'};
+const mapKey=n=>String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'').replace('de_','');
 function mapStatsHtml(id){
   const rows=mapRows(id);if(!rows.length)return `<h2>Мап</h2>${mapEmpty}`;
-  const best=bestMap(rows);rows.sort((a,b)=>b.p-a.p||b.wr-a.wr);
-  return `<h2>Мап</h2><div class="panel mapstats">
-   <div class="ms-best"><span class="sub">Хамгийн сайн мап</span><b>${esc(best.n)}</b><span class="num">${best.wr}% · ${best.w}-${best.l} (${best.p} мап)</span></div>
-   <div class="ms-list">${rows.map(m=>`<div class="ms-row ${m===best?'best':''}"><span class="ms-n">${esc(m.n)}</span><span class="ms-bar"><i style="width:${m.wr}%"></i></span><span class="num ms-wr">${m.wr}%</span><span class="num sub ms-wl">${m.w}-${m.d?m.d+'-':''}${m.l}</span><span class="num sub ms-p">${m.p} мап</span></div>`).join('')}</div>
-   <div class="sub" style="font-size:12px">Хугацаа: ${mapPeriod(TMAP[id])}. Хувь нь хожсон мапын эзлэх хувь.</div></div>`}
+  const best=bestMap(rows);const byP=rows.slice().sort((a,b)=>b.p-a.p);const byW=rows.slice().sort((a,b)=>b.wr-a.wr||b.p-a.p);
+  const max=Math.max(...byP.map(m=>m.p));const step=max>100?50:max>40?20:max>20?10:5;const top=Math.ceil(max/step)*step||step;
+  const ticks=[];for(let v=0;v<=top;v+=step)ticks.push(v);
+  return `<h2>Мап</h2><div class="mapbd">
+   <div class="panel mb-dist"><div class="mb-h">Тоглосон мапын тархалт</div>
+    <div class="mb-chart">${byP.map(m=>`<div class="mb-row"><span class="mb-n">${esc(m.n)}</span><span class="mb-track" style="--x:${m.p/top*100}%"><i style="width:${m.p/top*100}%;background:${MAPC[mapKey(m.n)]||'var(--accent)'}"></i><b class="num">${m.p}</b></span></div>`).join('')}
+     <div class="mb-axis"><span></span><span class="mb-ticks">${ticks.map(v=>`<i class="num" style="left:${v/top*100}%">${v}</i>`).join('')}</span></div></div></div>
+   <div class="panel mb-hl"><div class="mb-h">Мапын онцлох · ялалтын хувь</div>
+    ${byW.map(m=>{const r=D.radar&&D.radar[mapKey(m.n)];const c=MAPC[mapKey(m.n)]||'#8E3B2B';
+      return `<div class="mb-strip ${m===best?'best':''}" style="--mc:${c}">${r&&r.src?`<span class="mb-img" style="background-image:url('${esc(r.src)}')"></span>`:''}<span class="mb-lbl"><b>${esc(m.n)}</b> – <span class="num">${m.wr.toFixed?m.wr.toFixed(1):m.wr}%</span></span><span class="mb-wl num">${m.w}-${m.d?m.d+'-':''}${m.l}</span></div>`}).join('')}</div>
+  </div><div class="sub" style="font-size:12px">Хугацаа: ${mapPeriod(TMAP[id])}. Хамгийн сайн мап: <b>${esc(best.n)}</b> (${best.wr}%, ${best.p} мап).</div>`}
 function mapCompareHtml(aId,bId,aName,bName){
   if(!aId||!bId)return '';const A=mapRows(aId),B=mapRows(bId);
   if(!A.length&&!B.length)return `<h2>Мапын харьцуулалт</h2>${mapEmpty.replace('энэ багийн хуудсыг','энэ тоглолтын хуудсыг')}`;
@@ -1538,7 +1568,7 @@ function renderRails(){
     return `<a class="rm ${live?'on':''} ${isMnMatch(m)?'mn':''}" href="${m.id?'#match-'+m.id:'#team-'+a.id}"><span class="rm-t">${live?'<span class="pulse"></span>ШУУД':esc(fmtT(dt))}</span>
       <span class="rm-r">${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><i class="num">${live?esc(c.a):''}</i></span>
       <span class="rm-r">${logo(b.logo,'sm',b.name)}<b>${esc(b.name)}</b><i class="num">${live?esc(c.b):''}</i></span></a>`};
-  const lv=dedupe(LIVE?.live);const up=dedupe(LIVE?.up).length?dedupe(LIVE?.up):todayMatches();
+  const old=liveOld();const lv=old?[]:dedupe(LIVE?.live);const fu=dedupe(LIVE?.up).filter(m=>!old||m.time*6e4>Date.now()-3*3600e3);const up=fu.length?fu:todayMatches().filter(m=>m.time*6e4>Date.now()-3*3600e3);
   L.innerHTML=`<div class="rail-h">Шууд</div>${lv.length?lv.slice(0,6).map(m=>mini(m,1)).join(''):'<div class="rail-e">Яг одоо тоглолт алга</div>'}
     <div class="rail-h">Удахгүй</div>${up.slice(0,8).map(m=>mini(m,0)).join('')||'<div class="rail-e">Товлогдсон тоглолт алга</div>'}
     <a class="rail-more" href="#live">Бүх тоглолт →</a>`;
