@@ -802,6 +802,20 @@ h2::after{display:none!important}
   background:linear-gradient(90deg,#6E2B1F,#8E3B2B 50%,#6E2B1F);-webkit-mask:var(--hkey) repeat-x left center/26px 12px;mask:var(--hkey) repeat-x left center/26px 12px}
 :root[data-theme="dark"] header.top::after{background:linear-gradient(90deg,#9a6a14,#e3b04b 50%,#9a6a14)}
 @media (max-width:760px){:root[data-theme] header.top::after{height:10px;bottom:-12px;-webkit-mask-size:22px 10px;mask-size:22px 10px}}
+/* wide screens: use the width, keep the meanders a clear gutter away from the text */
+:root{--wrap:1120px}
+@media (min-width:1260px){
+  main{padding-inline:36px}
+  .side-key.l{left:calc(50% - var(--wrap)/2 - 4px)!important}
+  .side-key.r{right:calc(50% - var(--wrap)/2 - 4px)!important}
+}
+@media (min-width:1480px){
+  :root{--wrap:1360px}
+  main,.top-in{max-width:var(--wrap)}
+}
+@media (min-width:1760px){
+  :root{--wrap:1560px}
+}
 </style>
 
 </head>
