@@ -213,9 +213,18 @@
       } catch (e) {}
       delete lastSeen[id];
     };
-    const list = async () => {
+    const onList = /^\/matches\/?$/.test(location.pathname);
+    let listBusy = false, listAgain = false;
+    const list = async (fromPage) => {
+      if (listBusy) { listAgain = true; return; }
+      listBusy = true;
+      try { await listOnce(fromPage); } finally { listBusy = false; }
+      if (listAgain) { listAgain = false; list(true); }
+    };
+    const listOnce = async (fromPage) => {
       let d;
-      try {
+      if (fromPage && onList && document.querySelector('.match-wrapper')) d = document;   // HLTV's own live page: no request at all
+      else try {
         const r = await fetch('/matches', { cache: 'no-store' });
         if (!r.ok) return;                                   // blocked or rate-limited: keep the last good list
         d = new DOMParser().parseFromString(await r.text(), 'text/html');
@@ -263,7 +272,16 @@
         }
       }
     };
-    list(); window.__fbTimer = setInterval(list, 20000);
+    list(true);
+    // HLTV pushes live changes into /matches itself: react to them at once (a match going live shows up within ~1 s)
+    if (onList) {
+      let t = 0;
+      const obs = new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => list(true), 700); });
+      obs.observe(document.querySelector('.matches-list-column, .mainContent, main') || document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['live', 'data-livescore-maps-won-for'] });
+      // a fresh copy of the page now and then, so matches HLTV adds later are picked up too
+      window.__fbTimer = setInterval(() => list(false), 15000);
+      setTimeout(() => location.reload(), 30 * 60e3);
+    } else window.__fbTimer = setInterval(list, 15000);
     console.log('COREX TV: pushing the live match list');
   }
 })();
