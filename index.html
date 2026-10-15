@@ -636,6 +636,12 @@ footer::before{height:18px;-webkit-mask:var(--hkey) repeat-x left center/38px 18
 }
 /* background clouds removed on request */
 body::before,body::after,.hero .orn-cloud{display:none!important}
+/* header band: solid, even gold across the whole width (no faded ends or pale middle) */
+header.top{background:var(--bg)}
+header.top::after{opacity:1;background:linear-gradient(180deg,#e0a93a,#b07a1a 55%,#8a5a0a)}
+:root[data-theme="light"] header.top::after{background:linear-gradient(180deg,#c48f2a,#9a6a14 55%,#714a08)}
+footer::before{opacity:1;background:linear-gradient(180deg,#e0a93a,#b07a1a 55%,#8a5a0a)}
+:root[data-theme="light"] footer::before{background:linear-gradient(180deg,#c48f2a,#9a6a14 55%,#714a08)}
 </style>
 
 </head>
