@@ -576,8 +576,13 @@ const tLink=(t,inner)=>teamsById[t.id]?`<a href="#team-${t.id}">${inner}</a>`:in
 function liveCard(m){
   const a=LT(m.t1),b=LT(m.t2);const ra=rankById[a.id],rb=rankById[b.id];
   const lu=m.lineups||[];
-  const mapsHtml=(m.maps||[]).map((x,i)=>{const st=x.live?'<span class="pulse"></span>Явагдаж буй':x.w?'Дууссан':'Тоглогдоогүй';const pk=x.pick===1?a.name:x.pick===2?b.name:'Үлдсэн';
-    const art=D.radar&&D.radar[String(x.n||'').toLowerCase().replace(/\s+/g,'')];return `<div class="map ${x.live?'now':''}">${art?`<span class="mapart" style="background-image:url('${art.src}')"></span>`:''}<span class="mn">${i+1}. ${esc(x.n)}</span><span class="ms"><span class="${x.w===1?'w':x.w===2?'l':''}">${esc(mapMn(x.live?curOf(m).a:x.s1))}</span> : <span class="${x.w===2?'w':x.w===1?'l':''}">${esc(mapMn(x.live?curOf(m).b:x.s2))}</span></span><span class="sub" style="font-size:12px">${st} · ${esc(pk)} сонгосон</span></div>`}).join('');
+  const sm=snapOf(m.id);const fin=(+(m.mw&&m.mw[0])||0)+(+(m.mw&&m.mw[1])||0);
+  const base=(m.maps&&m.maps.length?m.maps:((sm&&sm.maps)||[]).map((y,i)=>({n:y.n,s1:'-',s2:'-',w:0,live:i===fin?1:0})));
+  const maps=base.map((x,i)=>{const y=sm&&sm.maps&&sm.maps[i];const done=i<fin;
+    if(!y)return x;const ws=(+y.s1>+y.s2)?1:(+y.s2>+y.s1)?2:0;
+    return {...x,n:x.n||y.n,pick:y.pick||x.pick||0,s1:done?y.s1:x.s1,s2:done?y.s2:x.s2,w:done?(ws||y.w):0,half:done?y.half:'',live:done?0:x.live}});
+  const mapsHtml=maps.map((x,i)=>{const st=x.live?'<span class="pulse"></span>Явагдаж буй':x.w?'Дууссан':'Тоглогдоогүй';const pk=x.pick===1?a.name:x.pick===2?b.name:'Үлдсэн';
+    const art=D.radar&&D.radar[String(x.n||'').toLowerCase().replace(/\s+/g,'')];return `<div class="map ${x.live?'now':''}">${art?`<span class="mapart" style="background-image:url('${art.src}')"></span>`:''}<span class="mn">${i+1}. ${esc(x.n)}</span><span class="ms"><span class="${x.w===1?'w':x.w===2?'l':''}">${esc(mapMn(x.live?curOf(m).a:x.s1))}</span> : <span class="${x.w===2?'w':x.w===1?'l':''}">${esc(mapMn(x.live?curOf(m).b:x.s2))}</span></span><span class="sub" style="font-size:12px">${st} · ${esc(pk)} сонгосон${x.half&&!x.live?` · <span class="num">${esc(x.half.replace(/[()]/g,"").replace(/;\s*-:-/,""))}</span>`:""}</span></div>`}).join('');
   const team=(t,r,side)=>`<div class="lm-team ${side}">${logo(t.logo,'',t.name)}<div style="min-width:0">${tLink(t,`<b>${esc(t.name)}</b>`)}<div class="rk2 num">${[r?'HLTV #'+r[0]:(lu[side?1:0]?.hltv?'HLTV '+esc(lu[side?1:0].hltv):''),vrsById[t.id]?'VRS #'+vrsById[t.id][0]:(lu[side?1:0]?.vrs?'VRS '+esc(lu[side?1:0].vrs):'')].filter(Boolean).join(' · ')}</div></div></div>`;
   return `<div class="panel lm">
    <div class="lm-top"><span><span class="badge live"><span class="pulse"></span>ШУУД</span> <a href="#event-${m.ev}"><b>${esc(evNameOf(m))}</b></a></span><span class="sub">${esc((m.bo||'').toUpperCase())}${m.lan?' · LAN':' · Онлайн'}</span></div>

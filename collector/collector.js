@@ -57,7 +57,15 @@
           return [x.classList.contains('terrorist') ? 'T' : 'CT', +((L + s / 2) / r.width).toFixed(4), +((Tp + s / 2) / r.height).toFixed(4), x.classList.contains('fading') ? 1 : 0];
         }) };
     }
-    return { id: +se.dataset.scorebotId, t1: se.dataset.team1Name, t2: se.dataset.team2Name,
+    // per-map results in team1/team2 order (finished maps are final; the live one may lag)
+    const maps = [...document.querySelectorAll('.mapholder')].map(mh => {
+      const l = mh.querySelector('.results-left'), r = mh.querySelector('.results-right');
+      return { n: T(mh.querySelector('.mapname')), s1: T(l?.querySelector('.results-team-score')), s2: T(r?.querySelector('.results-team-score')),
+        w: l?.classList.contains('won') ? 1 : r?.classList.contains('won') ? 2 : 0,
+        pick: l?.classList.contains('pick') ? 1 : r?.classList.contains('pick') ? 2 : 0,
+        half: T(mh.querySelector('.results-center-half-score')) };
+    });
+    return { id: +se.dataset.scorebotId, maps, t1: se.dataset.team1Name, t2: se.dataset.team2Name,
       round: T(top?.querySelector('.currentRoundText')), ct: T(top?.querySelector('.ctScore')), t: T(top?.querySelector('.tScore')),
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
   }
