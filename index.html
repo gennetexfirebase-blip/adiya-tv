@@ -107,6 +107,17 @@ h3{font-size:16px;font-family:var(--f-body)}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 /* events */
+.mrow.mnm{box-shadow:inset 3px 0 0 var(--mn)}
+.mnteams{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.mnteam{display:flex;align-items:center;gap:12px;padding:14px 16px;transition:transform .18s,border-color .18s}
+.mnteam:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--mn) 50%,var(--line))}
+.mnteam .flagbg{left:0;top:0;bottom:0;width:60%;-webkit-mask-image:linear-gradient(90deg,#000,transparent);mask-image:linear-gradient(90deg,#000,transparent)}
+.mnteam .logo{width:34px;height:34px}
+.mnteam .sub{margin-left:auto;font-size:12px}
+.mnrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mnchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;border:1px solid color-mix(in srgb,var(--mn) 45%,var(--line));background:color-mix(in srgb,var(--mn) 10%,transparent);font-size:13px}
+.mnchip:hover{background:color-mix(in srgb,var(--mn) 18%,transparent)}
+.ev.mnev{border-color:color-mix(in srgb,var(--mn) 30%,var(--line))}
 .ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .ev{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;padding:16px;cursor:pointer;align-content:start;transition:transform .18s cubic-bezier(.2,.8,.2,1),border-color .18s}
 .ev:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -399,6 +410,9 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const BLANK='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const img=i=>{if(i==null||i<0)return '';if(D.imgData)return D.imgData[i]||'';const p=D.imgs[i];return /^https?:/.test(p)?p:'https://img-cdn.hltv.org/'+p};
 const pimg=i=>img(i)||BLANK;
+const MN_TEAMS=new Set((D.mnTeams||[]).concat([6248]));
+const isMnTeam=id=>MN_TEAMS.has(+id)||(D.teamFlag&&D.teamFlag[id]==='MN');
+const isMnMatch=m=>isMnTeam(m.t1[0])||isMnTeam(m.t2[0])||m.f1==='MN'||m.f2==='MN';
 const FL=D.flags||{},TF=D.teamFlag||{},CC=D.countryCode||{};
 const flagOfTeam=(id,code)=>FL[code]||FL[TF[id]]||'';
 const flagOfCountry=n=>FL[CC[n]]||'';
@@ -448,7 +462,7 @@ function viewRanking(){
     const ob=rankMode==='hltv'
       ?`<span class="badge h num">${r.pts} оноо</span>${r.other?`<span class="badge v num" title="Valve рэнк">VRS #${r.other}</span>`:'<span class="badge num" title="Valve рэнкийн эхний 60-д байхгүй">VRS –</span>'}`
       :`<span class="badge v num">${r.pts} оноо</span>${r.region?`<span class="badge num">${esc(regionMn[r.region]||r.region)}</span>`:''}${r.other?`<span class="badge h num" title="HLTV рэнк">HLTV #${r.other}</span>`:''}`;
-    return `<div class="rk flagged ${mn?'mnrow':''} ${teamsById[r.t.id]?'':'nolink'}" data-id="${r.t.id}" ${teamsById[r.t.id]?'tabindex="0" role="link"':''}>${fbg(flagOfTeam(r.t.id))}
+    return `<div class="rk flagged ${mn?'mnrow':''} " data-id="${r.t.id}" tabindex="0" role="link">${fbg(flagOfTeam(r.t.id))}
       <div class="pos num" style="color:${rankMode==='hltv'?'var(--hltv)':'var(--vrs)'}">#${rankReg==='all'?r.pos:ri+1}${rankReg!=='all'?`<div class="sub" style="font:500 11px var(--f-mono)">дэлхий #${r.pos}</div>`:''}</div>
       <div class="chg num">${rankMode==='hltv'?chg(r.change):''}</div>
       ${logo(r.t.logo,'',r.t.name)}
@@ -460,7 +474,7 @@ function viewRanking(){
   app.querySelectorAll('.rk').forEach(el=>{const go=()=>openTeam(+el.dataset.id);el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter')go()}});
 }
 function openTeam(id){
-  if(teamsById[id])location.hash='team-'+id;
+  if(id)location.hash='team-'+id;
 
 }
 
@@ -485,9 +499,27 @@ function viewEvents(){
   let body='';
   if(evMode==='ongoing')body=on.length?`<div class="ev-grid">${on.map(evCard).join('')}</div>`:'<div class="panel empty">Одоогоор явагдаж буй тэмцээн алга.</div>';
   if(evMode==='upcoming')body=`<h2>Томоохон тэмцээнүүд</h2><div class="ev-grid">${big.map(evCard).join('')}</div><h2>Бусад удахгүй болох</h2><div class="ev-grid">${small.map(evCard).join('')}</div>`;
+  if(evMode==='mn'){
+    const evs=new Map();
+    Object.values(D.teams).forEach(t=>{const id=D.tms[t.t][0];if(!isMnTeam(id))return;
+      t.evUp.forEach(([ei,teams])=>{const e=D.ev[ei];if(!e)return;const x=evs.get(e[0])||{ei,mn:new Set(),teams:new Set(teams||[]),done:false};x.mn.add(id);(teams||[]).forEach(n=>x.teams.add(n));evs.set(e[0],x)});
+      t.evEnd.slice(0,4).forEach(([ei,pl])=>{const e=D.ev[ei];if(!e)return;const x=evs.get(e[0])||{ei,mn:new Set(),teams:new Set(),done:true,pl:{}};x.mn.add(id);x.pl=x.pl||{};x.pl[id]=pl;evs.set(e[0],x)})});
+    dedupe([...(LIVE?.live||[]),...(LIVE?.up||[])]).filter(isMnMatch).forEach(m=>{const ei=evById[m.ev];if(ei==null)return;const x=evs.get(m.ev)||{ei,mn:new Set(),teams:new Set(),done:false};[m.t1,m.t2].forEach(t=>{if(isMnTeam(t[0])||m.f1==='MN'&&t===m.t1||m.f2==='MN'&&t===m.t2)x.mn.add(t[0]);x.teams.add(t[1])});evs.set(m.ev,x)});
+    const card=x=>{const ev=EV(x.ei);const mnNames=[...x.mn].map(id=>{const i=tIdxById[id];return i!=null?TM(i).name:''}).filter(Boolean);
+      const others=[...x.teams].filter(n=>!mnNames.includes(n));
+      return `<div class="panel ev mnev" data-ev="${ev.id}" tabindex="0" role="link">${logo(ev.logo,'',ev.name)}<div style="min-width:0"><h3>${esc(ev.name)}</h3>
+        <div class="meta"><span class="num">${range(ev.start,ev.end)}</span>${x.done?'<span>Дууссан</span>':''}</div>
+        <div class="mnrow">${[...x.mn].map(id=>{const t=tIdxById[id]!=null?TM(tIdxById[id]):{name:'?',logo:''};const pl=x.pl&&x.pl[id];return `<a class="mnchip" href="#team-${id}">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b>${pl?` <span class="place ${placeCls(pl)}">${esc(placeMn(pl))}</span>`:''}</a>`}).join('')}</div>
+        ${others.length?`<div class="sub" style="font-size:12px;margin-top:6px">Бусад багууд: ${others.slice(0,10).map(esc).join(', ')}${others.length>10?' …':''}</div>`:''}</div></div>`};
+    const list=[...evs.values()].sort((a,b)=>(a.done-b.done)||((D.ev[a.ei][4]||0)-(D.ev[b.ei][4]||0)));
+    const cur=list.filter(x=>!x.done),past=list.filter(x=>x.done);
+    body=`<div class="mnteams">${[...MN_TEAMS].map(id=>{const i=tIdxById[id];if(i==null)return '';const t=TM(i);const r=rankById[id];return `<a class="panel mnteam flagged" href="#team-${id}">${fbg(FL.MN,'')}${logo(t.logo,'',t.name)}<b>${esc(t.name)}</b><span class="sub num">${r?'HLTV #'+r[0]:''}</span></a>`}).join('')}</div>
+      <h2>Оролцох тэмцээнүүд</h2>${cur.length?`<div class="ev-grid">${cur.map(card).join('')}</div>`:'<div class="panel empty">Монгол багуудын удахгүй болох тэмцээн бүртгэгдээгүй байна.</div>'}
+      ${past.length?`<h2>Сүүлд оролцсон</h2><div class="ev-grid">${past.slice(0,12).map(card).join('')}</div>`:''}`;
+  }
   if(evMode==='past')body=`<div class="panel ev-list">${D.past.map(p=>{const ev=EV(p[0]);return `<div class="evr" data-ev="${ev.id}" tabindex="0" role="link">${logo(ev.logo,'',ev.name)}<div style="min-width:0"><b>${esc(ev.name)}</b><div class="meta"><span>${esc(p[1]||'')}</span>${p[5]?`<span>${esc(p[5]==='Online'?'Онлайн':p[5])}</span>`:''}${p[4]?`<span>${esc(p[4])} баг</span>`:''}${p[3]&&p[3]!=='Other'?`<span class="num">${esc(p[3])}</span>`:''}</div></div><div class="num sub">${range(ev.start,ev.end)}</div></div>`}).join('')}</div>`;
   app.innerHTML=`<div class="row-head"><div><div class="eyebrow">HLTV дээрх тэмцээнүүд</div><h1>Тэмцээнүүд</h1><div class="sub">Тэмцээн дээр дарж ямар багууд оролцож буйг харна.</div></div>
-  <div class="seg"><button data-m="ongoing" class="${evMode==='ongoing'?'on':''}">Явагдаж буй (${on.length})</button><button data-m="upcoming" class="${evMode==='upcoming'?'on':''}">Удахгүй (${up.length})</button><button data-m="past" class="${evMode==='past'?'on':''}">Дууссан (${D.past.length})</button></div></div>${body}`;
+  <div class="seg"><button data-m="ongoing" class="${evMode==='ongoing'?'on':''}">Явагдаж буй (${on.length})</button><button data-m="upcoming" class="${evMode==='upcoming'?'on':''}">Удахгүй (${up.length})</button><button data-m="past" class="${evMode==='past'?'on':''}">Дууссан (${D.past.length})</button><button data-m="mn" class="${evMode==='mn'?'on':''}">Монгол багууд</button></div></div>${body}`;
   app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{evMode=b.dataset.m;viewEvents()});
   bindEv();
 }
@@ -541,7 +573,7 @@ function rankChart(pts){
    ${line(2,'var(--vrs)')}${line(1,'var(--hltv)')}</svg>`;
 }
 function viewTeam(id){
-  const t=teamsById[id];if(!t){app.innerHTML='<div class="panel empty">Баг олдсонгүй.</div>';return}
+  const t=teamsById[id];if(!t){viewTeamLite(id);return}
   const me=TM(t.t);const r=rankById[id],v=vrsById[id];
   const stat=k=>{for(const s in t.stats)if(s.startsWith(k))return t.stats[s];return ''};
   const vrsTxt=stat('Valve');const vrsRank=v?v[0]:(vrsTxt.match(/#(\d+)/)||[])[1];
@@ -603,6 +635,19 @@ function viewTeam(id){
   bindEv();
 }
 
+function viewTeamLite(id){
+  const i=tIdxById[id];const tm=i!=null?TM(i):null;
+  const lm=LIVE?dedupe([...(LIVE.live||[]),...(LIVE.up||[])]).filter(m=>m.t1[0]===id||m.t2[0]===id):[];
+  const name=tm?tm.name:(lm[0]?(lm[0].t1[0]===id?lm[0].t1[1]:lm[0].t2[1]):'Баг');
+  const r=rankById[id],v=vrsById[id];const live=lm.filter(m=>m.cur);const up=lm.filter(m=>!m.cur).sort((a,b)=>a.time-b.time);
+  app.innerHTML=`<a class="back" href="#ranking">← Рэнкинг</a>
+  <div class="panel hero flagged">${fbg(flagOfTeam(id))}<div class="thead">${logo(tm&&tm.logo,'lg',name)}<div style="min-width:0"><div class="eyebrow">${isMnTeam(id)?'<span class="badge mn">Монгол баг</span>':'Баг'}</div><h1>${esc(name)}</h1></div></div>
+   <div class="kpis"><div class="kpi"><div class="k">HLTV рэнк</div><div class="v num" style="color:var(--hltv)">${r?'#'+r[0]:'–'}</div></div><div class="kpi"><div class="k">Valve рэнк (VRS)</div><div class="v num" style="color:var(--vrs)">${v?'#'+v[0]:'–'}</div></div></div></div>
+  ${live.map(liveCard).join('')}
+  <h2>Удахгүй болох тоглолтууд</h2>${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div>`:'<div class="panel empty">Энэ багийн товлогдсон тоглолт одоогоор алга.</div>'}
+  <div class="sub" style="font-size:12px">Энэ багийн дэлгэрэнгүй профайл (ростер, түүх, амжилт) хараахан цуглуулагдаагүй байна.</div>`;
+}
+
 /* ---------- live ---------- */
 let LIVE=D.live||null;
 const dedupe=a=>{const s=new Set();return (a||[]).filter(m=>!s.has(m.id)&&s.add(m.id))};
@@ -614,7 +659,7 @@ const snapOf=id=>MATCH[id]||(D.matches&&D.matches[id])||null;
 function curOf(m){const s=snapOf(m.id);if(s&&s.teams&&s.teams.length&&s.ct!==''){const t1=s.teams.find(t=>t.name===m.t1[1]);const side=t1?t1.side:'CT';const a=side==='CT'?s.ct:s.t,b=side==='CT'?s.t:s.ct;const mn=(s.round||'').split(' - ')[1]||'';return {a,b,map:mn}}return {a:m.cur?.[0]??'-',b:m.cur?.[1]??'-',map:''}}
 const liveOf=id=>LIVE?(LIVE.live||[]).find(m=>m.t1[0]===id||m.t2[0]===id):null;
 const mapMn=s=>s==='-'?'–':s;
-const tLink=(t,inner)=>teamsById[t.id]?`<a href="#team-${t.id}">${inner}</a>`:inner;
+const tLink=(t,inner)=>t.id?`<a href="#team-${t.id}">${inner}</a>`:inner;
 function liveCard(m){
   {const q=snapOf(m.id);if(q)m={...m,f1:m.f1||q.f1,f2:m.f2||q.f2,lineups:(m.lineups&&m.lineups.length)?m.lineups:q.lineups,veto:(m.veto&&m.veto.length)?m.veto:q.veto,info:m.info||q.info}}
   const a=LT(m.t1),b=LT(m.t2);const ra=rankById[a.id],rb=rankById[b.id];
@@ -638,15 +683,20 @@ function liveCard(m){
    </div></div>`;
 }
 function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
-  const tl=(t,r)=>{const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return teamsById[t.id]?`<a class="t ${r?'r':''}" href="#team-${t.id}">${inner}</a>`:`<span class="t ${r?'r':''}">${inner}</span>`};
-  return `<div class="mrow"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)} ${m.stars?`<span class="stars">${'★'.repeat(m.stars)}</span>`:''}</span>${tl(a,1)}<span class="sc sub" style="font-size:12px">${esc(m.bo||'vs')}</span>${tl(b,0)}<a class="evn" href="#event-${m.ev}">${esc(evNameOf(m))}</a></div>`}
+  const tl=(t,r)=>{const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return t.id?`<a class="t ${r?'r':''}" href="#team-${t.id}">${inner}</a>`:`<span class="t ${r?'r':''}">${inner}</span>`};
+  return `<div class="mrow ${isMnMatch(m)?'mnm':''}"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)} ${m.stars?`<span class="stars">${'★'.repeat(m.stars)}</span>`:''}</span>${tl(a,1)}<span class="sc sub" style="font-size:12px">${esc(m.bo||'vs')}</span>${tl(b,0)}<a class="evn" href="#event-${m.ev}">${esc(evNameOf(m))}</a></div>`}
+let liveMode='all';
 function viewLive(){
-  const lv=dedupe(LIVE?.live),up=dedupe(LIVE?.up).sort((x,y)=>x.time-y.time);
+  let lv=dedupe(LIVE?.live),up=dedupe(LIVE?.up).sort((x,y)=>x.time-y.time);
+  const mnLv=lv.filter(isMnMatch),mnUp=up.filter(isMnMatch);
+  if(liveMode==='mn'){lv=mnLv;up=mnUp}
   app.innerHTML=`<div class="row-head"><div><div class="eyebrow"><span class="pulse"></span>Шууд · HLTV</div><h1>Шууд тоглолтууд</h1>
-   <div class="sub">${LIVE?`Сүүлд шинэчилсэн: <span class="num">${esc(fmtDY(new Date(LIVE.updated)))} ${esc(fmtT(new Date(LIVE.updated)))}</span> (${ago(LIVE.updated)}). Шинэ оноо ирэхэд хуудас өөрөө шинэчлэгдэнэ.`:'Шууд мэдээлэл хараахан ирээгүй байна.'}</div></div></div>
+   <div class="sub">${LIVE?`Сүүлд шинэчилсэн: <span class="num">${esc(fmtDY(new Date(LIVE.updated)))} ${esc(fmtT(new Date(LIVE.updated)))}</span> (${ago(LIVE.updated)}). Шинэ оноо ирэхэд хуудас өөрөө шинэчлэгдэнэ.`:'Шууд мэдээлэл хараахан ирээгүй байна.'}</div></div>
+   <div class="seg" id="liveseg"><button data-l="all" class="${liveMode==='all'?'on':''}">Бүх тоглолт</button><button data-l="mn" class="${liveMode==='mn'?'on':''}">Монгол багууд <span class="num sub">${mnLv.length+mnUp.length}</span></button></div></div>
   ${lv.length?lv.map(liveCard).join(''):'<div class="panel empty">Яг одоо явагдаж буй тоглолт алга. Доорх удахгүй болох тоглолтуудыг харна уу.</div>'}
   <h2>Удахгүй болох тоглолтууд</h2>
-  ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:'<div class="panel empty">Товлогдсон тоглолт алга.</div>'}`;
+  ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:`<div class="panel empty">${liveMode==='mn'?'Монгол багуудын товлогдсон тоглолт одоогоор алга.':'Товлогдсон тоглолт алга.'}</div>`}`;
+  app.querySelectorAll('#liveseg button').forEach(b=>b.onclick=()=>{liveMode=b.dataset.l;viewLive()});
 }
 function liveBar(id){const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
   return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Газрын зураг ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
@@ -662,7 +712,13 @@ function playerHref(id,nick){return PL[id]?'#player-'+id:`${H}/player/${id}/${St
 const attrMn={Firepower:'Галын хүч',Entrying:'Эхэлж орох',Trading:'Солилцоо',Opening:'Нээлтийн килл',Clutching:'Клатч',Sniping:'Снайпер',Utility:'Утилити'};
 const monMn=s=>String(s||'').replace(/Present/,'одоо').replace(/(\w{3}) (\d{4})/g,(m,mo,y)=>y+'.'+String(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(mo)+1).padStart(2,'0'));
 function viewPlayer(id){
-  const p=PL[id];if(!p){app.innerHTML='<div class="panel empty">Тоглогч олдсонгүй.</div>';return}
+  const p=PL[id];if(!p){
+    let hit=null,team=null;for(const t of Object.values(D.teams)){const r=t.roster.find(x=>String(x[1]).split('/')[0]===String(id));if(r){hit=r;team=t;break}}
+    if(!hit){app.innerHTML='<div class="panel empty">Тоглогч олдсонгүй.</div>';return}
+    const tm=TM(team.t);
+    app.innerHTML=`<a class="back" href="#team-${tm.id}">← ${esc(tm.name)}</a><div class="panel hero flagged">${fbg(flagOfCountry(hit[4]))}<div class="phead"><img class="body" src="${esc(pimg(hit[2]))}" alt="${esc(hit[0])}"><div style="min-width:0"><div class="eyebrow">${esc(hit[4]||'')}</div><h1 style="font-size:40px">${esc(hit[0])}</h1><div class="sub" style="font-size:15px">${esc((hit[3]||'').replace(/'[^']*' /,''))}</div></div></div>
+     <div class="kpis"><div class="kpi"><div class="k">Баг</div><div class="v" style="font-size:18px"><a href="#team-${tm.id}">${esc(tm.name)}</a></div></div><div class="kpi"><div class="k">Rating 3.0</div><div class="v num">${esc(hit[8]||'–')}</div></div><div class="kpi"><div class="k">Газрын зураг</div><div class="v num">${esc(hit[7]||'–')}</div></div><div class="kpi"><div class="k">Багт</div><div class="v" style="font-size:16px">${esc(hit[6]||'–')}</div></div></div></div>`;
+    return}
   const team=p.team?TM(tIdxById[p.team[0]]??-1):null;
   const tn=p.team?p.team[1]:'Багагүй';
   const soc=(p.social||[]).map(u=>{const n=/twitter|x\.com/.test(u)?'X':/twitch/.test(u)?'Twitch':/faceit/.test(u)?'FACEIT':/instagram/.test(u)?'Instagram':/youtube/.test(u)?'YouTube':/kick/.test(u)?'Kick':'Сайт';return `<a class="ext" href="${esc(u)}" target="_blank" rel="noopener">${n} ↗</a>`}).join(' · ');
