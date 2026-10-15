@@ -822,6 +822,49 @@ h2::after{display:none!important}
 .blane{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
 .brk{overflow-x:auto}
 @media (max-width:760px){.bcolumn{width:200px}.brk2{padding:12px}}
+/* header meander stops at the two side meanders instead of running edge to edge */
+@media (min-width:1260px){
+  :root[data-theme] header.top::after{left:calc(50% - var(--wrap)/2 + 18px);right:calc(50% - var(--wrap)/2 + 18px)}
+}
+@media (max-width:1259px){
+  :root[data-theme] header.top::after{left:16px;right:16px}
+}
+/* ---------- side rails ---------- */
+.rail{display:none}
+@media (min-width:1700px){
+  :root{--wrap:1180px}
+  main{max-width:var(--wrap)}
+  .top-in{max-width:calc(var(--wrap) + 2 * var(--railw) + 120px)}
+  :root{--railw:min(300px,calc(50vw - var(--wrap)/2 - 70px))}
+  .rail{display:grid;align-content:start;gap:6px;position:fixed;top:104px;bottom:24px;width:var(--railw);overflow:auto;scrollbar-width:thin;z-index:4;padding:14px;
+    background:var(--panel);border:1px solid var(--line);border-radius:2px;box-shadow:inset 0 0 0 3px var(--panel),inset 0 0 0 4px rgba(107,83,64,.3)}
+  .rl{right:calc(50% + var(--wrap)/2 + 40px)}
+  .rr{left:calc(50% + var(--wrap)/2 + 40px)}
+}
+.rail-h{display:flex;align-items:center;gap:8px;margin:10px 0 4px;font:700 13px "PT Serif",Georgia,serif;letter-spacing:.08em;text-transform:uppercase;color:var(--primary,#8E3B2B)}
+.rail-h:first-child{margin-top:0}
+.rail-h::before{content:"";width:7px;height:7px;background:currentColor;transform:rotate(45deg);flex:none}
+.rail-h::after{content:"";flex:1;border-top:1px solid var(--line)}
+.rail-e{font-size:12px;color:var(--muted);padding:4px 2px}
+.rm{display:grid;gap:3px;padding:8px 10px;border:1px solid var(--line);border-radius:2px;background:var(--panel-solid);font-size:13px}
+.rm:hover{border-color:var(--accent)}
+.rm.mn{box-shadow:inset 3px 0 0 var(--mn)}
+.rm-t{display:flex;align-items:center;gap:6px;font:700 11px var(--f-mono);color:var(--muted)}
+.rm.on .rm-t{color:var(--live)}
+.rm-r{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:7px}
+.rm-r b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm-r i{font-style:normal;font-weight:800}
+.rm .logo.sm,.rt .logo.sm{width:18px;height:18px}
+.rt{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed var(--line);font-size:13px}
+.rt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt span{font-weight:700;color:var(--primary,var(--accent))}
+.rt:hover b,.rn:hover{color:var(--accent)}
+.rn{display:block;padding:7px 2px;border-bottom:1px dashed var(--line);font-size:13px;line-height:1.35}
+.rail-more{margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);text-align:right}
+/* footer credit framed by two small knots */
+.foot-credit{display:inline-flex;align-items:center;gap:10px}
+.foot-credit::before,.foot-credit::after{content:"";width:14px;height:18px;background:var(--gold);-webkit-mask:var(--o-knot) center/contain no-repeat;mask:var(--o-knot) center/contain no-repeat}
+:root[data-theme="light"] .foot-credit::before,:root[data-theme="light"] .foot-credit::after{background:#8E3B2B}
 </style>
 
 </head>
@@ -846,6 +889,7 @@ h2::after{display:none!important}
   </a>
 </div></header>
 <div class="side-key l" aria-hidden="true"></div><div class="side-key r" aria-hidden="true"></div>
+<aside class="rail rl" id="railL" aria-label="Шууд ба өнөөдөр"></aside><aside class="rail rr" id="railR" aria-label="Монгол багууд ба мэдээ"></aside>
 <main id="app"><div class="empty">Ачаалж байна…</div></main>
 <footer id="foot"></footer>
 
@@ -898,7 +942,7 @@ const TROPHY=(cls,size)=>`<svg class="trophy-ic ${cls||''}" width="${size||22}" 
 const placeCls=p=>/^1st/.test(p)?'gold':/^2nd/.test(p)?'silver':/^3/.test(p)?'bronze':'black';
 const placeMn=p=>{if(!p)return '';return p.replace(/^1st$/,'1-р байр').replace(/^2nd$/,'2-р байр').replace(/^3rd$/,'3-р байр').replace(/^(\d+)-(\d+)th$/,'$1–$2-р байр').replace(/^(\d+)th$/,'$1-р байр').replace('1/4 final','1/4 финал').replace('1/2 final','1/2 финал').replace('Group stage','Хэсгийн шат')};
 
-document.getElementById('foot').innerHTML=`<div class="foot-seal"><i aria-hidden="true"></i><div>© 2026 · Хөгжүүлсэн Adiya</div></div>`;
+document.getElementById('foot').innerHTML=`<div class="foot-seal"><i aria-hidden="true"></i><div><span class="foot-credit">© 2026 · Хөгжүүлсэн Adiya</span></div></div>`;
 
 /* ---------- ranking ---------- */
 let rankMode='hltv',rankReg='all';
@@ -1487,7 +1531,27 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search'))sres.hidde
 
 /* ---------- router ---------- */
 function rerender(){if(!route.last)return;const y=window.scrollY;const gl=document.querySelector('.glog2');const gy=gl?gl.scrollTop:0;const h=route.last;if(h==='live'||h==='news'||/^(team|match|event)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y);const g2=document.querySelector('.glog2');if(g2)g2.scrollTop=gy}}
+/* ---------- side rails (wide screens): live + today on the left, Mongolian teams + news on the right ---------- */
+function renderRails(){
+  const L=document.getElementById('railL'),R=document.getElementById('railR');if(!L||!R||!matchMedia('(min-width:1700px)').matches)return;
+  const mini=(m,live)=>{const a=LT(m.t1),b=LT(m.t2);const c=live?curOf(m):null;const dt=new Date(m.time*6e4);
+    return `<a class="rm ${live?'on':''} ${isMnMatch(m)?'mn':''}" href="${m.id?'#match-'+m.id:'#team-'+a.id}"><span class="rm-t">${live?'<span class="pulse"></span>ШУУД':esc(fmtT(dt))}</span>
+      <span class="rm-r">${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><i class="num">${live?esc(c.a):''}</i></span>
+      <span class="rm-r">${logo(b.logo,'sm',b.name)}<b>${esc(b.name)}</b><i class="num">${live?esc(c.b):''}</i></span></a>`};
+  const lv=dedupe(LIVE?.live);const up=dedupe(LIVE?.up).length?dedupe(LIVE?.up):todayMatches();
+  L.innerHTML=`<div class="rail-h">Шууд</div>${lv.length?lv.slice(0,6).map(m=>mini(m,1)).join(''):'<div class="rail-e">Яг одоо тоглолт алга</div>'}
+    <div class="rail-h">Удахгүй</div>${up.slice(0,8).map(m=>mini(m,0)).join('')||'<div class="rail-e">Товлогдсон тоглолт алга</div>'}
+    <a class="rail-more" href="#live">Бүх тоглолт →</a>`;
+  const mn=[...MN_TEAMS].map(id=>({id,r:rankById[id]})).filter(x=>tIdxById[x.id]!=null).sort((a,b)=>(a.r?.[0]||999)-(b.r?.[0]||999));
+  const items=((NEWS&&NEWS.items)||[]).slice(0,5);
+  R.innerHTML=`<div class="rail-h">Монгол багууд</div>${mn.map(x=>{const t=TM(tIdxById[x.id]);return `<a class="rt" href="#team-${t.id}">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="num">${x.r?'#'+x.r[0]:'—'}</span></a>`}).join('')}
+    <div class="rail-h">Сүүлийн мэдээ</div>${items.map(n=>`<a class="rn" href="#news-${esc(n.href.split('/')[2])}">${esc(n.mn)}</a>`).join('')||'<div class="rail-e">Мэдээ алга</div>'}
+    <a class="rail-more" href="#news">Бүх мэдээ →</a>`;
+}
+addEventListener('resize',()=>renderRails());
+setInterval(renderRails,20000);
 function render(h){
+  setTimeout(renderRails,0);
   let m;
   if((m=h.match(/^team-(\d+)$/)))viewTeam(+m[1]);
   else if((m=h.match(/^event-(\d+)$/)))viewEvent(+m[1]);
