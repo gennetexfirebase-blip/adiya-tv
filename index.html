@@ -2,20 +2,21 @@
 <html lang="mn">
 <head>
 <meta charset="utf-8">
-<title>ADIYA TV</title>
+<title>COREX TV</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22emb-sky%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%232f7be6%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230b3f8f%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22emb-gold%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ffe29a%22/%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23e3b04b%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b07a1a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2221%22%20fill%3D%22url%28%23emb-sky%29%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2221%22%20fill%3D%22none%22%20stroke%3D%22url%28%23emb-gold%29%22%20stroke-width%3D%222.4%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2217.2%22%20fill%3D%22none%22%20stroke%3D%22url%28%23emb-gold%29%22%20stroke-width%3D%22.8%22%20stroke-dasharray%3D%222.2%201.6%22%20opacity%3D%22.8%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22url%28%23emb-gold%29%22%20stroke-width%3D%221.9%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M24%2011%2037%2024%2024%2037%2011%2024Z%22/%3E%3Cpath%20d%3D%22M19.7%2015.3%2032.7%2028.3M15.3%2019.7%2028.3%2032.7M28.3%2015.3%2015.3%2028.3M32.7%2019.7%2019.7%2032.7%22/%3E%3Cpath%20d%3D%22M24%2011c2.4%200%203.6%201.4%203.6%203.4M37%2024c0%202.4-1.4%203.6-3.4%203.6M24%2037c-2.4%200-3.6-1.4-3.6-3.4M11%2024c0-2.4%201.4-3.6%203.4-3.6%22/%3E%3C/g%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%222.3%22%20fill%3D%22%23e0313b%22%20stroke%3D%22%23ffe29a%22%20stroke-width%3D%22.8%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Mongolian&display=swap">
 <style>
 /* Layout: glass top bar over a night-arena backdrop; one centered column (max 1120px); list rows for rankings, card grid for events, hero + tabs for profiles. Teams sit on faded flag backdrops. */
 :root{
-  --bg:#eef1f6; --bg-glow-1:rgba(42,111,196,.10); --bg-glow-2:rgba(176,122,18,.08);
+  --bg:#eef2f8; --bg-glow-1:rgba(11,91,181,.12); --bg-glow-2:rgba(227,176,75,.14);
   --panel:rgba(255,255,255,.86); --panel-solid:#ffffff; --panel-2:#f2f5f9; --line:#dbe1ea;
   --fg:#111823; --muted:#5b6678; --shadow:0 1px 2px rgba(16,24,35,.06),0 8px 24px rgba(16,24,35,.06);
-  --hltv:#2563c9; --vrs:#b2780c; --accent:#2563c9; --accent-2:#7c4dff;
-  --win:#1b8a4a; --loss:#c93a3a; --live:#e0362c;
+  --hltv:#0b5bb5; --vrs:#a8790d; --accent:#0b5bb5; --accent-2:#c4272f;
+  --win:#1b8a4a; --loss:#c93a3a; --live:#c4272f;
   --gold:#c9971c; --silver:#8a97a8; --bronze:#b06a3b;
-  --mn:#c8102e; --ct:#2f6fae; --tside:#b8790c; --flag-op:.55;
+  --mn:#c4272f; --ct:#2f6fae; --tside:#b8790c; --flag-op:.55;
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Manrope",system-ui,"Segoe UI",Arial,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
@@ -23,20 +24,20 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#080b10; --bg-glow-1:rgba(64,140,255,.16); --bg-glow-2:rgba(255,170,40,.07);
-  --panel:rgba(20,26,36,.72); --panel-solid:#131a24; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
+  --bg:#060a12; --bg-glow-1:rgba(47,123,230,.20); --bg-glow-2:rgba(227,176,75,.10);
+  --panel:rgba(16,24,40,.74); --panel-solid:#0f1726; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
   --fg:#eef2f8; --muted:#8e9bb0; --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px rgba(0,0,0,.35);
-  --hltv:#5ea2ff; --vrs:#ffb547; --accent:#5ea2ff; --accent-2:#a78bfa;
-  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4d43;
-  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4d63; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.45;
+  --hltv:#4f8ef0; --vrs:#e3b04b; --accent:#4f8ef0; --accent-2:#e0313b;
+  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4650;
+  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4650; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.45;
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#080b10; --bg-glow-1:rgba(64,140,255,.16); --bg-glow-2:rgba(255,170,40,.07);
-  --panel:rgba(20,26,36,.72); --panel-solid:#131a24; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
+  --bg:#060a12; --bg-glow-1:rgba(47,123,230,.20); --bg-glow-2:rgba(227,176,75,.10);
+  --panel:rgba(16,24,40,.74); --panel-solid:#0f1726; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
   --fg:#eef2f8; --muted:#8e9bb0; --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px rgba(0,0,0,.35);
-  --hltv:#5ea2ff; --vrs:#ffb547; --accent:#5ea2ff; --accent-2:#a78bfa;
-  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4d43;
-  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4d63; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.45;
+  --hltv:#4f8ef0; --vrs:#e3b04b; --accent:#4f8ef0; --accent-2:#e0313b;
+  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4650;
+  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4650; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.45;
   color-scheme:dark}
 *{box-sizing:border-box}
 html{background:var(--bg)}
@@ -46,9 +47,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visibl
 .num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--line)}
 .top-in{max-width:1120px;margin:0 auto;padding-inline:16px;display:flex;align-items:center;gap:22px;height:62px}
-.brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap;line-height:1}
 .brand i{display:inline-block;width:9px;height:22px;background:linear-gradient(180deg,var(--hltv),color-mix(in srgb,var(--hltv) 50%,var(--accent-2)));transform:skewX(-16deg);border-radius:2px;box-shadow:0 0 14px color-mix(in srgb,var(--hltv) 55%,transparent)}
-.brand .tv{color:var(--accent)}
+.brand .emblem{width:38px;height:38px;flex:none;filter:drop-shadow(0 2px 8px rgba(227,176,75,.35));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.brand:hover .emblem{transform:rotate(45deg)}
+.brand .wm{display:grid;gap:3px}
+.brand .wm-main{font:700 19px var(--f-display);letter-spacing:.08em;color:var(--fg)}
+.brand .wm-main .tv{margin-left:6px;background:linear-gradient(180deg,#ffe29a,#e3b04b 55%,#b07a1a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .wm-sub{font:700 9px var(--f-body);letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
+.brand .mgl{font-family:"Noto Sans Mongolian",serif;writing-mode:vertical-lr;font-size:13px;line-height:1;color:var(--orn);opacity:.85;height:38px;border-left:1px solid color-mix(in srgb,var(--orn) 40%,transparent);padding-left:6px}
+@media (max-width:760px){.brand .wm-sub,.brand .mgl{display:none}.brand .emblem{width:32px;height:32px}.brand .wm-main{font-size:16px}}
+
 .brand i+i{background:linear-gradient(180deg,var(--vrs),color-mix(in srgb,var(--vrs) 60%,#ff6a3d));margin-left:-6px;box-shadow:0 0 14px color-mix(in srgb,var(--vrs) 45%,transparent)}
 nav.main{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px}
 nav.main a{padding:6px 14px;border-radius:999px;color:var(--muted);font-weight:600;font-size:13px;display:inline-flex;align-items:center;transition:color .15s,background .15s}
@@ -209,7 +218,6 @@ h2::after{content:"";flex:1;height:10px;min-width:40px;background:var(--orn);opa
 .article{position:relative}
 .hero::before{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--orn);opacity:.25;-webkit-mask:var(--khee) repeat-x left center/20px 10px;mask:var(--khee) repeat-x left center/20px 10px;z-index:1;pointer-events:none}
 .ulzii-mark{display:inline-block;width:1em;height:1em;background:currentColor;-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat;vertical-align:-.12em}
-.brand .tv{position:relative}
 footer{position:relative;padding-top:28px!important}
 footer::before{content:"";position:absolute;left:16px;right:16px;top:0;height:12px;background:var(--orn);opacity:.3;-webkit-mask:var(--khee) repeat-x left center/24px 12px;mask:var(--khee) repeat-x left center/24px 12px}
 body::before{content:"";position:fixed;right:-120px;bottom:-120px;width:420px;height:420px;background:var(--orn);opacity:.035;-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat;pointer-events:none;z-index:0}
@@ -407,7 +415,6 @@ a.nitem:hover h3{color:var(--accent)}
   .thead{grid-template-columns:minmax(0,1fr)}
   .thead h1{font-size:28px}
   nav.main a{padding:6px 8px}
-  .brand{font-size:15px}
   .top-in{gap:10px}
 }
 @media (prefers-reduced-motion:no-preference){.rk,.ev,.evr{transition:background .12s,border-color .12s}}
@@ -416,7 +423,7 @@ a.nitem:hover h3{color:var(--accent)}
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <a class="brand" href="#ranking" aria-label="ADIYA TV нүүр">ADIYA <span class="tv">TV</span></a>
+  <a class="brand" href="#ranking" aria-label="COREX TV нүүр"><svg class="emblem" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="emb-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7be6"/><stop offset="1" stop-color="#0b3f8f"/></linearGradient><linearGradient id="emb-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe29a"/><stop offset=".55" stop-color="#e3b04b"/><stop offset="1" stop-color="#b07a1a"/></linearGradient></defs><circle cx="24" cy="24" r="21" fill="url(#emb-sky)"/><circle cx="24" cy="24" r="21" fill="none" stroke="url(#emb-gold)" stroke-width="2.4"/><circle cx="24" cy="24" r="17.2" fill="none" stroke="url(#emb-gold)" stroke-width=".8" stroke-dasharray="2.2 1.6" opacity=".8"/><g fill="none" stroke="url(#emb-gold)" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M24 11 37 24 24 37 11 24Z"/><path d="M19.7 15.3 32.7 28.3M15.3 19.7 28.3 32.7M28.3 15.3 15.3 28.3M32.7 19.7 19.7 32.7"/><path d="M24 11c2.4 0 3.6 1.4 3.6 3.4M37 24c0 2.4-1.4 3.6-3.4 3.6M24 37c-2.4 0-3.6-1.4-3.6-3.4M11 24c0-2.4 1.4-3.6 3.4-3.6"/></g><circle cx="24" cy="24" r="2.3" fill="#e0313b" stroke="#ffe29a" stroke-width=".8"/></svg><span class="wm"><span class="wm-main">COREX<span class="tv">TV</span></span><span class="wm-sub">Монгол киберспорт</span></span><span class="mgl" lang="mn-Mong" aria-hidden="true">ᠮᠣᠩᠭᠣᠯ</span></a>
   <nav class="main">
     <a href="#ranking" data-nav="ranking">Рэнкинг</a>
     <a href="#events" data-nav="events">Тэмцээн</a>
@@ -448,6 +455,8 @@ const MN_TEAMS=new Set((D.mnTeams||[]).concat([6248,12878]));
 (D.ranking||[]).forEach(r=>{if((r[7]||[]).filter(p=>p[3]==='Mongolia').length>=2)MN_TEAMS.add(D.tms[r[1]][0])});
 const isMnTeam=id=>MN_TEAMS.has(+id)||(D.teamFlag&&D.teamFlag[id]==='MN');
 const isMnMatch=m=>isMnTeam(m.t1[0])||isMnTeam(m.t2[0])||m.f1==='MN'||m.f2==='MN';
+const CMN={"Mongolia": "Монгол", "Russia": "Орос", "Ukraine": "Украин", "Belarus": "Беларусь", "Kazakhstan": "Казахстан", "Brazil": "Бразил", "Argentina": "Аргентин", "Chile": "Чили", "Uruguay": "Уругвай", "Peru": "Перу", "Colombia": "Колумб", "Mexico": "Мексик", "United States": "АНУ", "Canada": "Канад", "France": "Франц", "Germany": "Герман", "Denmark": "Дани", "Sweden": "Швед", "Norway": "Норвеги", "Finland": "Финланд", "Estonia": "Эстони", "Latvia": "Латви", "Lithuania": "Литва", "Poland": "Польш", "Czech Republic": "Чех", "Czechia": "Чех", "Slovakia": "Словак", "Hungary": "Унгар", "Romania": "Румын", "Bulgaria": "Болгар", "Serbia": "Серби", "Bosnia and Herzegovina": "Босни", "Croatia": "Хорват", "Slovenia": "Словени", "Montenegro": "Монтенегро", "North Macedonia": "Хойд Македон", "Albania": "Албани", "Kosovo": "Косово", "Greece": "Грек", "Turkey": "Турк", "Israel": "Израиль", "Portugal": "Португал", "Spain": "Испани", "Italy": "Итали", "Switzerland": "Швейцари", "Austria": "Австри", "Belgium": "Бельги", "Netherlands": "Нидерланд", "United Kingdom": "Их Британи", "Ireland": "Ирланд", "China": "Хятад", "Japan": "Япон", "South Korea": "Өмнөд Солонгос", "Korea": "Солонгос", "Taiwan": "Тайвань", "Hong Kong": "Хонконг", "Singapore": "Сингапур", "Malaysia": "Малайз", "Indonesia": "Индонез", "Thailand": "Тайланд", "Vietnam": "Вьетнам", "Philippines": "Филиппин", "India": "Энэтхэг", "Pakistan": "Пакистан", "Bangladesh": "Бангладеш", "Australia": "Австрали", "New Zealand": "Шинэ Зеланд", "Saudi Arabia": "Саудын Араб", "United Arab Emirates": "АНЭУ", "Jordan": "Иордан", "Lebanon": "Ливан", "Egypt": "Египет", "South Africa": "Өмнөд Африк", "Morocco": "Марокко", "Tunisia": "Тунис", "Uzbekistan": "Узбекистан", "Kyrgyzstan": "Киргиз", "Georgia": "Гүрж", "Armenia": "Армен", "Azerbaijan": "Азербайжан", "Moldova": "Молдав", "Iceland": "Исланд", "Malta": "Мальта", "Cyprus": "Кипр", "Luxembourg": "Люксембург", "Europe": "Европ", "Asia": "Ази", "Other": "Дэлхий", "World": "Дэлхий", "North America": "Хойд Америк", "South America": "Өмнөд Америк", "Oceania": "Далайн орнууд", "CIS": "ТУХН", "Venezuela": "Венесуэл", "Paraguay": "Парагвай", "Bolivia": "Боливи", "Ecuador": "Эквадор", "Guatemala": "Гватемал", "Costa Rica": "Коста Рика", "Dominican Republic": "Доминикан", "Puerto Rico": "Пуэрто Рико", "Iran": "Иран", "Iraq": "Ирак", "Syria": "Сири", "Kuwait": "Кувейт", "Qatar": "Катар", "Tajikistan": "Тажикистан", "Turkmenistan": "Туркменистан", "Afghanistan": "Афганистан", "Nepal": "Балба", "Sri Lanka": "Шри Ланка", "Myanmar": "Мьянмар", "Cambodia": "Камбож", "Laos": "Лаос", "Macau": "Макао"};
+const cMn=n=>CMN[n]||n||'';
 const FL=D.flags||{},TF=D.teamFlag||{},CC=D.countryCode||{};
 const flagOfTeam=(id,code)=>FL[code]||FL[TF[id]]||'';
 const flagOfCountry=n=>FL[CC[n]]||'';
@@ -633,13 +642,13 @@ function viewTeam(id){
       ${(t.ms||[]).map(m=>`<div style="display:flex;justify-content:space-between;gap:8px"><span class="sub">${esc({'Current win streak':'Одоогийн ялалтын цуврал','Win rate':'Ялалтын хувь'}[m[1]]||m[1])}${m[2]?' ('+esc(m[2]==='Last 3 months'?'сүүлийн 3 сар':m[2])+')':''}</span><b class="num">${esc(m[0])}</b></div>`).join('')}</div>
       <div class="panel compact"><div class="evhdr">Дараагийн тоглолт</div>${t.up.length?t.up.slice(0,3).map(m=>matchRow(t.t,m[2],'','',m[0],m[3],0)).join(''):'<div class="empty">Товлогдсон тоглолт алга.</div>'}</div>
      </div></div>
-     <h2>Тоглогчид</h2><div class="shots">${t.roster.filter(p=>p[5]==='STARTER').map(p=>`<a class="panel shot" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="${esc(p[0])}" loading="lazy"><b>${esc(p[0])}</b><div class="r">${esc(p[4]||'')}${p[9]?' · '+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP')):''}</div></a>`).join('')}</div>`;
+     <h2>Тоглогчид</h2><div class="shots">${t.roster.filter(p=>p[5]==='STARTER').map(p=>`<a class="panel shot" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="${esc(p[0])}" loading="lazy"><b>${esc(p[0])}</b><div class="r">${esc(cMn(p[4]))}${p[9]?' · '+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP')):''}</div></a>`).join('')}</div>`;
   }
   if(teamTab==='roster'){
     const c=t.coach,cs=t.coachStats||[];
     body=`${c?`<h2>Дасгалжуулагч</h2><div class="panel tbl-wrap"><table><thead><tr><th>Дасгалжуулагч</th><th>Багт</th><th class="r">Газрын зураг</th><th class="r">Цом</th><th class="r">Ялалт %</th></tr></thead><tbody><tr><td><b>${esc(c[0])}</b> <span class="sub">${esc(c[2]||'')}</span></td><td>${esc(cs[0]||'')}</td><td class="r num">${esc(cs[1]||'')}</td><td class="r num">${esc(cs[2]||'')}</td><td class="r num">${esc(cs[3]||'')}</td></tr></tbody></table></div>`:''}
     <h2>Тоглогчид</h2><div class="panel tbl-wrap"><table><thead><tr><th>Тоглогч</th><th>Төлөв</th><th>Багт</th><th class="r">Газрын зураг</th><th class="r">Rating 3.0</th></tr></thead><tbody>
-    ${t.roster.map(p=>`<tr><td><a class="pcell" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="" loading="lazy"><span><b>${esc(p[0])}</b><br><span class="sub" style="font-size:12px">${esc((p[3]||'').replace(/'[^']*' /,''))} · ${esc(p[4]||'')}</span></span></a></td><td><span class="st ${esc(p[5])}">${esc({STARTER:'ҮНДСЭН',BENCHED:'СЭЛГЭЭ',SUBSTITUTE:'НӨӨЦ'}[p[5]]||p[5])}</span>${p[9]?' <span class="sub" style="font-size:12px">'+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP'))+'</span>':''}</td><td style="white-space:nowrap">${esc((p[6]||'').replace(/years?/,'жил').replace(/months?/,' сар').replace(/days?/,' өдөр'))}</td><td class="r num">${esc(p[7])}</td><td class="r num" style="color:${+p[8]>=1.05?'var(--win)':+p[8]<0.98?'var(--loss)':'var(--fg)'}">${esc(p[8])}</td></tr>`).join('')}
+    ${t.roster.map(p=>`<tr><td><a class="pcell" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="" loading="lazy"><span><b>${esc(p[0])}</b><br><span class="sub" style="font-size:12px">${esc((p[3]||'').replace(/'[^']*' /,''))} · ${esc(cMn(p[4]))}</span></span></a></td><td><span class="st ${esc(p[5])}">${esc({STARTER:'ҮНДСЭН',BENCHED:'СЭЛГЭЭ',SUBSTITUTE:'НӨӨЦ'}[p[5]]||p[5])}</span>${p[9]?' <span class="sub" style="font-size:12px">'+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP'))+'</span>':''}</td><td style="white-space:nowrap">${esc((p[6]||'').replace(/years?/,'жил').replace(/months?/,' сар').replace(/days?/,' өдөр'))}</td><td class="r num">${esc(p[7])}</td><td class="r num" style="color:${+p[8]>=1.05?'var(--win)':+p[8]<0.98?'var(--loss)':'var(--fg)'}">${esc(p[8])}</td></tr>`).join('')}
     </tbody></table></div><div class="sub" style="font-size:12px">Статистик нь тоглогчийн энэ багт байсан бүх хугацаанд.</div>`;
   }
   if(teamTab==='matches'){
@@ -663,7 +672,7 @@ function viewTeam(id){
   }
   const soc=(t.social||[]).map(u=>{const n=/twitter|x\.com/.test(u)?'X':/instagram/.test(u)?'Instagram':/youtube/.test(u)?'YouTube':/twitch/.test(u)?'Twitch':/facebook/.test(u)?'Facebook':/tiktok/.test(u)?'TikTok':'Сайт';return `<a class="ext" href="${esc(u)}" target="_blank" rel="noopener">${n} ↗</a>`}).join(' · ');
   app.innerHTML=`<a class="back" href="#ranking">← Рэнкинг</a>${liveBar(id)}
-  <div class="panel hero flagged">${fbg(flagOfTeam(id)||flagOfCountry(t.country))}<div class="thead">${logo(me.logo,'lg',me.name)}<div style="min-width:0"><div class="eyebrow">${esc(t.country)}${id===MONGOLZ?' · <span class="badge mn">Монгол баг</span>':''}</div><h1>${esc(me.name)}</h1>
+  <div class="panel hero flagged">${fbg(flagOfTeam(id)||flagOfCountry(t.country))}<div class="thead">${logo(me.logo,'lg',me.name)}<div style="min-width:0"><div class="eyebrow">${esc(cMn(t.country))}${id===MONGOLZ?' · <span class="badge mn">Монгол баг</span>':''}</div><h1>${esc(me.name)}</h1>
     <div class="meta" style="font-size:13px;margin-top:4px">${soc}</div></div></div>
    <div class="kpis">
     <div class="kpi"><div class="k">HLTV рэнк</div><div class="v num" style="color:var(--hltv)">${r?'#'+r[0]:'–'}<small>${r?r[2]+' оноо':''}</small></div></div>
@@ -761,7 +770,7 @@ function viewPlayer(id){
     let hit=null,team=null;for(const t of Object.values(D.teams)){const r=t.roster.find(x=>String(x[1]).split('/')[0]===String(id));if(r){hit=r;team=t;break}}
     if(!hit){app.innerHTML='<div class="panel empty">Тоглогч олдсонгүй.</div>';return}
     const tm=TM(team.t);
-    app.innerHTML=`<a class="back" href="#team-${tm.id}">← ${esc(tm.name)}</a><div class="panel hero flagged">${fbg(flagOfCountry(hit[4]))}<div class="phead"><img class="body" src="${esc(pimg(hit[2]))}" alt="${esc(hit[0])}"><div style="min-width:0"><div class="eyebrow">${esc(hit[4]||'')}</div><h1 style="font-size:40px">${esc(hit[0])}</h1><div class="sub" style="font-size:15px">${esc((hit[3]||'').replace(/'[^']*' /,''))}</div></div></div>
+    app.innerHTML=`<a class="back" href="#team-${tm.id}">← ${esc(tm.name)}</a><div class="panel hero flagged">${fbg(flagOfCountry(hit[4]))}<div class="phead"><img class="body" src="${esc(pimg(hit[2]))}" alt="${esc(hit[0])}"><div style="min-width:0"><div class="eyebrow">${esc(cMn(hit[4]))}</div><h1 style="font-size:40px">${esc(hit[0])}</h1><div class="sub" style="font-size:15px">${esc((hit[3]||'').replace(/'[^']*' /,''))}</div></div></div>
      <div class="kpis"><div class="kpi"><div class="k">Баг</div><div class="v" style="font-size:18px"><a href="#team-${tm.id}">${esc(tm.name)}</a></div></div><div class="kpi"><div class="k">Rating 3.0</div><div class="v num">${esc(hit[8]||'–')}</div></div><div class="kpi"><div class="k">Газрын зураг</div><div class="v num">${esc(hit[7]||'–')}</div></div><div class="kpi"><div class="k">Багт</div><div class="v" style="font-size:16px">${esc(hit[6]||'–')}</div></div></div></div>`;
     return}
   const team=p.team?TM(tIdxById[p.team[0]]??-1):null;
@@ -769,7 +778,7 @@ function viewPlayer(id){
   const soc=(p.social||[]).map(u=>{const n=/twitter|x\.com/.test(u)?'X':/twitch/.test(u)?'Twitch':/faceit/.test(u)?'FACEIT':/instagram/.test(u)?'Instagram':/youtube/.test(u)?'YouTube':/kick/.test(u)?'Kick':'Сайт';return `<a class="ext" href="${esc(u)}" target="_blank" rel="noopener">${n} ↗</a>`}).join(' · ');
   const r=+p.rating;
   app.innerHTML=`${p.team&&teamsById[p.team[0]]?`<a class="back" href="#team-${p.team[0]}">← ${esc(tn)}</a>`:'<a class="back" href="#ranking">← Рэнкинг</a>'}
-  <div class="panel hero flagged">${fbg(flagOfCountry(p.country))}<div class="phead"><img class="body" src="${esc(pimg(p.img))}" alt="${esc(p.nick)}"><div style="min-width:0"><div class="eyebrow">${esc(p.country)}${p.age?' · '+esc(p.age)+' настай':''}</div><h1 style="font-size:40px">${esc(p.nick)}</h1><div class="sub" style="font-size:15px">${esc(p.real)}</div>
+  <div class="panel hero flagged">${fbg(flagOfCountry(p.country))}<div class="phead"><img class="body" src="${esc(pimg(p.img))}" alt="${esc(p.nick)}"><div style="min-width:0"><div class="eyebrow">${esc(cMn(p.country))}${p.age?' · '+esc(p.age)+' настай':''}</div><h1 style="font-size:40px">${esc(p.nick)}</h1><div class="sub" style="font-size:15px">${esc(p.real)}</div>
    <div class="meta" style="font-size:13px;margin-top:8px">${soc}</div></div></div>
    <div class="kpis">
     <div class="kpi"><div class="k">Баг</div><div class="v" style="font-size:18px">${p.team&&teamsById[p.team[0]]?`<a href="#team-${p.team[0]}">${esc(tn)}</a>`:esc(tn)}</div></div>
@@ -865,7 +874,7 @@ const flagMn={Europe:'Европ','North America':'Хойд Америк','South
 function viewNews(){
   const items=(NEWS&&NEWS.items)||[];
   app.innerHTML=`<div class="row-head"><div><div class="eyebrow">HLTV.org-ийн мэдээ · Монголоор</div><h1>Мэдээ</h1><div class="sub">${NEWS?`Сүүлд шинэчилсэн: ${esc(fmtDY(new Date(NEWS.updated)))} ${esc(fmtT(new Date(NEWS.updated)))} (${ago(NEWS.updated)}). Гарчиг болон товч агуулгыг монгол хэлээр хөрвүүлсэн; бүтэн нийтлэлийг эх сурвалжаас уншина уу.`:'Мэдээ хараахан ирээгүй байна.'}</div></div></div>
-  <div class="panel news">${items.map(n=>`<a class="nitem" href="#news-${esc(n.href.split('/')[2])}"><div style="min-width:0"><h3>${esc(n.mn)}</h3>${n.sum?`<p>${esc(n.sum)}</p>`:''}<div class="meta" style="margin-top:6px"><span>${esc(flagMn[n.flag]||n.flag||'')}</span><span>Эх гарчиг: ${esc(n.en)}</span>${n.comments?`<span>${esc(n.comments)} сэтгэгдэл</span>`:''}</div></div><div class="when">${n.ts?esc(ago(n.ts)):''}</div></a>`).join('')||'<div class="empty">Мэдээ алга.</div>'}</div>`;
+  <div class="panel news">${items.map(n=>`<a class="nitem" href="#news-${esc(n.href.split('/')[2])}"><div style="min-width:0"><h3>${esc(n.mn)}</h3>${n.sum?`<p>${esc(n.sum)}</p>`:''}<div class="meta" style="margin-top:6px"><span>${esc(cMn(n.flag))}</span><span>Эх гарчиг: ${esc(n.en)}</span>${n.comments?`<span>${esc(n.comments)} сэтгэгдэл</span>`:''}</div></div><div class="when">${n.ts?esc(ago(n.ts)):''}</div></a>`).join('')||'<div class="empty">Мэдээ алга.</div>'}</div>`;
 }
 
 function viewNewsItem(id){
@@ -873,7 +882,7 @@ function viewNewsItem(id){
   if(!n){app.innerHTML='<a class="back" href="#news">← Мэдээ</a><div class="panel empty">Мэдээ олдсонгүй.</div>';return}
   const d=n.detail||null;const idx=items.indexOf(n);const more=items.filter(x=>x!==n).slice(0,5);
   app.innerHTML=`<a class="back" href="#news">← Мэдээ</a>
-  <article class="panel article"><div class="eyebrow">${esc(flagMn[n.flag]||n.flag||'')}${n.ts?' · '+esc(ago(n.ts)):''}${n.comments?' · '+esc(n.comments)+' сэтгэгдэл':''}</div>
+  <article class="panel article"><div class="eyebrow">${esc(cMn(n.flag))}${n.ts?' · '+esc(ago(n.ts)):''}${n.comments?' · '+esc(n.comments)+' сэтгэгдэл':''}</div>
    <h1>${esc(n.mn)}</h1>${n.sum?`<p class="lede">${esc(n.sum)}</p>`:''}
    ${d&&d.k&&d.k.length?`<ul class="keys">${d.k.map(k=>`<li>${esc(k)}</li>`).join('')}</ul>`:''}
    <div class="abody">${d&&d.p?d.p.map(p=>`<p>${esc(p)}</p>`).join(''):'<p class="sub">Энэ мэдээний дэлгэрэнгүй тойм хараахан бэлэн болоогүй байна.</p>'}</div>
@@ -909,10 +918,10 @@ function streamBlock(list,isLive){
   const feat=(streamPick&&all.find(x=>x.url===streamPick))||all[0];
   const src=CAN_EMBED&&isLive?streamEmbed(feat):'';
   const prov=x=>`<span class="prov ${['twitch','kick','youtube'].includes(x.prov)?x.prov:'other'}">${esc(x.prov||'link')}</span>`;
-  const row=x=>`<button class="stream ${x===feat?'on':''}" data-url="${esc(x.url)}" type="button"><span class="sname"><b>${esc(x.name)}</b>${mn(x)?' <span class="badge mn">МОНГОЛ</span>':` <span class="sub" style="font-size:12px">${esc(x.flag)}</span>`}</span><span class="vw num sub">${x.viewers?x.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(x)}</button>`;
+  const row=x=>`<button class="stream ${x===feat?'on':''}" data-url="${esc(x.url)}" type="button"><span class="sname"><b>${esc(x.name)}</b>${mn(x)?' <span class="badge mn">МОНГОЛ</span>':` <span class="sub" style="font-size:12px">${esc(cMn(x.flag))}</span>`}</span><span class="vw num sub">${x.viewers?x.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(x)}</button>`;
   const others=all.filter(x=>x!==feat);
   return `<h2>Шууд дамжуулалт</h2><div class="panel featured">
-    <div class="feat-head"><span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(feat.name)}</b>${mn(feat)?'<span class="badge mn">МОНГОЛ ТАЙЛБАР</span>':''}<span class="sub">${esc(feat.flag)}${feat.viewers?' · '+feat.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(feat)}<a class="ext" href="${esc(feat.url)}" target="_blank" rel="noopener" style="margin-left:auto">${esc((feat.prov||'').replace(/^./,c=>c.toUpperCase()))} дээр нээх ↗</a></div>
+    <div class="feat-head"><span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(feat.name)}</b>${mn(feat)?'<span class="badge mn">МОНГОЛ ТАЙЛБАР</span>':''}<span class="sub">${esc(cMn(feat.flag))}${feat.viewers?' · '+feat.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(feat)}<a class="ext" href="${esc(feat.url)}" target="_blank" rel="noopener" style="margin-left:auto">${esc((feat.prov||'').replace(/^./,c=>c.toUpperCase()))} дээр нээх ↗</a></div>
     ${src?`<div class="player"><iframe src="${esc(src)}" title="${esc(feat.name)} шууд дамжуулалт" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:`<a class="player ph-player" href="${esc(feat.url)}" target="_blank" rel="noopener"><span class="playbtn" aria-hidden="true"></span><span>${isLive?`${esc(feat.name)}-г ${esc(feat.prov||'')} дээр үзэх`:`Тоглолт шууд явагдаагүй байна · ${esc(feat.name)} сувгийг ${esc(feat.prov||'')} дээр нээх`}</span></a>`}
     ${src?`<div class="sub" style="font-size:12px;padding:8px 16px">Хар дэлгэц гарвал суваг одоогоор дамжуулаагүй байна. «${esc((feat.prov||'').replace(/^./,c=>c.toUpperCase()))} дээр нээх» дээр дарна уу.</div>`:''}
     ${others.length?`<details class="more"><summary>Бусад сувгууд (${others.length})</summary><div class="streams">${others.map(row).join('')}</div></details>`:''}

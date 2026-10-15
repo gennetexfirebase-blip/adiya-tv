@@ -1,11 +1,11 @@
-// ADIYA TV collector: run on an open hltv.org page (DevTools console or a userscript).
+// COREX TV collector: run on an open hltv.org page (DevTools console or a userscript).
 // On a /matches/<id>/... page it pushes that match's scoreboard, log and radar every 2.5 s (only when something changed).
 // On any other hltv.org page it pushes the live-match list every 10 s.
 // Settings live in localStorage, never in this file:
 //   localStorage.FB_CFG = JSON.stringify({url:"https://<ref>.supabase.co", anonKey:"<anon key>", writerKey:"<writer key>"})
 (() => {
   const cfg = JSON.parse(localStorage.FB_CFG || '{}');
-  if (!cfg.url || !cfg.anonKey || !cfg.writerKey) return console.warn('ADIYA TV: FB_CFG missing');
+  if (!cfg.url || !cfg.anonKey || !cfg.writerKey) return console.warn('COREX TV: FB_CFG missing');
   const T = x => x ? x.textContent.replace(/\s+/g, ' ').trim() : '';
   const H = { apikey: cfg.anonKey, Authorization: 'Bearer ' + cfg.anonKey, 'x-fb-key': cfg.writerKey };
   const put = (k, v) => fetch(cfg.url + '/rest/v1/live?on_conflict=k', {
@@ -121,7 +121,7 @@
     window.__fbObs.observe(target, { subtree: true, childList: true, characterData: true, attributes: true });
     window.__fbTimer = setInterval(() => { if (pending) { pending = false; push(); } }, 1000);
     push();
-    console.log('ADIYA TV: pushing this match on every scoreboard change');
+    console.log('COREX TV: pushing this match on every scoreboard change');
   } else {
     let liveIds = [];
     const list = async () => {
@@ -174,6 +174,6 @@
       }
     };
     list(); window.__fbTimer = setInterval(list, 20000);
-    console.log('ADIYA TV: pushing the live match list');
+    console.log('COREX TV: pushing the live match list');
   }
 })();
