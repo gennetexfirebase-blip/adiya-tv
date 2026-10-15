@@ -354,6 +354,7 @@ footer{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 36px;c
 .katt{font:600 9px/1 var(--f-mono);padding:2px 4px;border-radius:3px;background:rgba(255,255,255,.12);color:#fff}
 .c-CT{color:var(--ct);font-weight:600}.c-T{color:var(--tside);font-weight:600}
 .featured{overflow:hidden;display:grid}
+.stalebar{flex-basis:100%;padding:10px 14px;border-radius:10px;border:1px solid color-mix(in srgb,var(--vrs) 45%,var(--line));background:color-mix(in srgb,var(--vrs) 10%,transparent);font-size:13px;font-weight:600}
 .feat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
 .player{position:relative;aspect-ratio:16/9;width:100%;max-width:100%;background:#000;display:block}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -727,6 +728,7 @@ function liveCard(m){
 function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
   const tl=(t,r)=>{const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return t.id?`<a class="t ${r?'r':''}" href="#team-${t.id}">${inner}</a>`:`<span class="t ${r?'r':''}">${inner}</span>`};
   return `<div class="mrow ${isMnMatch(m)?'mnm':''}"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)} ${m.stars?`<span class="stars">${'★'.repeat(m.stars)}</span>`:''}</span>${tl(a,1)}<span class="sc sub" style="font-size:12px">${esc(m.bo||'vs')}</span>${tl(b,0)}<a class="evn" href="#event-${m.ev}">${esc(evNameOf(m))}</a></div>`}
+const liveFresh=()=>{if(!LIVE||!LIVE.updated)return false;const sn=Object.values(MATCH).map(x=>Date.parse(x.updated||0)).concat([Date.parse(LIVE.updated)]);return Date.now()-Math.max(...sn)<15*60e3};
 let liveMode='all';
 function viewLive(){
   let lv=dedupe(LIVE?.live),up=dedupe(LIVE?.up).sort((x,y)=>x.time-y.time);
@@ -734,6 +736,7 @@ function viewLive(){
   if(liveMode==='mn'){lv=mnLv;up=mnUp}
   app.innerHTML=`<div class="row-head"><div><div class="eyebrow"><span class="pulse"></span>Шууд · HLTV</div><h1>Шууд тоглолтууд</h1>
    <div class="sub">${LIVE?`Сүүлд шинэчилсэн: <span class="num">${esc(fmtDY(new Date(LIVE.updated)))} ${esc(fmtT(new Date(LIVE.updated)))}</span> (${ago(LIVE.updated)}). Шинэ оноо ирэхэд хуудас өөрөө шинэчлэгдэнэ.`:'Шууд мэдээлэл хараахан ирээгүй байна.'}</div></div>
+   ${LIVE&&!liveFresh()?'<div class="stalebar">Шууд мэдээлэл түр зогссон байна (HLTV-ээс өгөгдөл ирэхгүй байна). Доорх оноо хамгийн сүүлд ирсэн төлөв.</div>':''}
    <div class="seg" id="liveseg"><button data-l="all" class="${liveMode==='all'?'on':''}">Бүх тоглолт</button><button data-l="mn" class="${liveMode==='mn'?'on':''}">Монгол багууд <span class="num sub">${mnLv.length+mnUp.length}</span></button></div></div>
   ${lv.length?lv.map(liveCard).join(''):'<div class="panel empty">Яг одоо явагдаж буй тоглолт алга. Доорх удахгүй болох тоглолтуудыг харна уу.</div>'}
   <h2>Удахгүй болох тоглолтууд</h2>
@@ -847,7 +850,8 @@ function viewMatch(id){
   const rd=s&&s.radar&&D.radar&&D.radar[s.radar.map]&&D.radar[s.radar.map].src?D.radar[s.radar.map]:null;
   const radar=rd?`<div class="radar"><div class="rmap" style="aspect-ratio:${rd.w}/${rd.h}"><img src="${esc(rd.src)}" alt="${esc(s.radar.map)} газрын зургийн радар">${(s.radar.kills||[]).map(k=>`<svg class="kx ${k[0]==='CT'?'ct':'t'} ${k[3]?'old':''}" viewBox="0 0 10 10" style="left:${(k[1]*100).toFixed(2)}%;top:${(k[2]*100).toFixed(2)}%" aria-hidden="true"><path d="M1.5 1.5 8.5 8.5M8.5 1.5 1.5 8.5"/></svg>`).join('')}</div></div>`:'';
   const gl=s&&s.log&&s.log.length?`<h2>Тоглолтын лог ба радар</h2><div class="scorebot logbox"><div class="lb-head"><span class="lb-map">${esc(mapName)}</span><span class="sub">${esc(s.round?'Раунд '+s.round.split(' - ')[0]:'')}</span><span class="rleg"><span><i class="ct"></i>CT үхсэн</span><span><i class="t"></i>T үхсэн</span><span>бүдэг = өмнөх раунд</span></span></div><div class="lb-body ${radar?'':'noradar'}"><div class="glog2">${s.log.map(logLine).join('')}</div>${radar}</div></div>`:'';
-  const st=streamBlock(s&&s.streams);
+  const isLiveNow=!!(LIVE&&(LIVE.live||[]).some(m=>m.id===id))&&liveFresh();
+  const st=streamBlock(s&&s.streams,isLiveNow);
   const dyn=`${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}${pr}`;
   const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+((s&&s.streams||[]).map(x=>x.url).join(','));
   const ex=document.getElementById('mstream');
@@ -898,18 +902,19 @@ function streamEmbed(x){
     if(x.prov==='youtube'){const id=u.searchParams.get('v')||u.pathname.split('/').pop();return id?`https://www.youtube.com/embed/${encodeURIComponent(id)}?autoplay=1&mute=1`:''}
   }catch(e){}return ''}
 let streamPick=null;
-function streamBlock(list){
+function streamBlock(list,isLive){
   if(!list||!list.length)return '';
   const mn=x=>x.flag==='Mongolia';
   const all=list.slice().sort((a,b)=>(mn(b)-mn(a))||(b.viewers-a.viewers));
   const feat=(streamPick&&all.find(x=>x.url===streamPick))||all[0];
-  const src=CAN_EMBED?streamEmbed(feat):'';
+  const src=CAN_EMBED&&isLive?streamEmbed(feat):'';
   const prov=x=>`<span class="prov ${['twitch','kick','youtube'].includes(x.prov)?x.prov:'other'}">${esc(x.prov||'link')}</span>`;
   const row=x=>`<button class="stream ${x===feat?'on':''}" data-url="${esc(x.url)}" type="button"><span class="sname"><b>${esc(x.name)}</b>${mn(x)?' <span class="badge mn">МОНГОЛ</span>':` <span class="sub" style="font-size:12px">${esc(x.flag)}</span>`}</span><span class="vw num sub">${x.viewers?x.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(x)}</button>`;
   const others=all.filter(x=>x!==feat);
   return `<h2>Шууд дамжуулалт</h2><div class="panel featured">
     <div class="feat-head"><span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(feat.name)}</b>${mn(feat)?'<span class="badge mn">МОНГОЛ ТАЙЛБАР</span>':''}<span class="sub">${esc(feat.flag)}${feat.viewers?' · '+feat.viewers.toLocaleString('en-US')+' үзэгч':''}</span>${prov(feat)}<a class="ext" href="${esc(feat.url)}" target="_blank" rel="noopener" style="margin-left:auto">${esc((feat.prov||'').replace(/^./,c=>c.toUpperCase()))} дээр нээх ↗</a></div>
-    ${src?`<div class="player"><iframe src="${esc(src)}" title="${esc(feat.name)} шууд дамжуулалт" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:`<a class="player ph-player" href="${esc(feat.url)}" target="_blank" rel="noopener"><span class="playbtn" aria-hidden="true"></span><span>${esc(feat.name)}-г ${esc(feat.prov||'')} дээр үзэх</span></a>`}
+    ${src?`<div class="player"><iframe src="${esc(src)}" title="${esc(feat.name)} шууд дамжуулалт" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:`<a class="player ph-player" href="${esc(feat.url)}" target="_blank" rel="noopener"><span class="playbtn" aria-hidden="true"></span><span>${isLive?`${esc(feat.name)}-г ${esc(feat.prov||'')} дээр үзэх`:`Тоглолт шууд явагдаагүй байна · ${esc(feat.name)} сувгийг ${esc(feat.prov||'')} дээр нээх`}</span></a>`}
+    ${src?`<div class="sub" style="font-size:12px;padding:8px 16px">Хар дэлгэц гарвал суваг одоогоор дамжуулаагүй байна. «${esc((feat.prov||'').replace(/^./,c=>c.toUpperCase()))} дээр нээх» дээр дарна уу.</div>`:''}
     ${others.length?`<details class="more"><summary>Бусад сувгууд (${others.length})</summary><div class="streams">${others.map(row).join('')}</div></details>`:''}
   </div>`;
 }
