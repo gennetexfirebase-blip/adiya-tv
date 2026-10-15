@@ -82,7 +82,9 @@
         players: [...lu.querySelectorAll('.player-compare')].map(pc => ({ id: +pc.dataset.playerId, nick: (pc.querySelector('img')?.title || '').match(/'([^']+)'/)?.[1] || T(pc) }))
           .filter(p => p.id && !seen.has(p.id) && seen.add(p.id)) };
     });
-    return { id: +se.dataset.scorebotId, maps, f1: fc('.teamsBox img.team1'), f2: fc('.teamsBox img.team2'), lineups,
+    const history = [...document.querySelectorAll('.scoreboard .roundHistory > div')].map(h => [...h.querySelectorAll('.roundHistoryLine')].map(l =>
+      [/CT/.test(l.className) ? 'CT' : 'T', [...l.querySelectorAll('.historyIcon img')].map(i => (i.getAttribute('src') || '').split('/').pop().replace(/\.(svg|png)$/, '').replace('emptyHistory', ''))]));
+    return { id: +se.dataset.scorebotId, maps, history, f1: fc('.teamsBox img.team1'), f2: fc('.teamsBox img.team2'), lineups,
       info: T(vb[0]), veto: vb[1] ? [...vb[1].querySelectorAll('div > div')].map(T).filter(x => /^\d\./.test(x) && !/\d\..*\d\./.test(x)) : [], t1: se.dataset.team1Name, t2: se.dataset.team2Name,
       round: T(top?.querySelector('.currentRoundText')), ct: T(top?.querySelector('.ctScore')), t: T(top?.querySelector('.tScore')),
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
@@ -103,10 +105,13 @@
       if (pending) { pending = false; push(); }
     };
     let mapName = '';
+    // microtasks are never throttled in hidden tabs, so every scorebot change goes out right away;
+    // the busy/pending pair coalesces bursts into back-to-back requests
+    let queued = false;
     const onChange = () => {
       const now = (T(document.querySelector('.scoreboard .currentRoundText')).split(' - ')[1]) || '';
       if (now && now !== mapName) { mapName = now; refreshMaps().then(() => { last = ''; push(); }); }
-      if (Date.now() - lastAt >= 700) push(); else pending = true;
+      if (!queued) { queued = true; queueMicrotask(() => { queued = false; push(); }); }
     };
     clearInterval(window.__fbMapTimer);
     window.__fbMapTimer = setInterval(() => refreshMaps().then(() => { last = ''; push(); }), 45000);
