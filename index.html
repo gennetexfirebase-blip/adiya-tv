@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>COREX TV</title>
-<script>(function(){var t="dark";try{t=localStorage.getItem("corex-theme")||"dark"}catch(e){}document.documentElement.setAttribute("data-theme",t)})();</script>
+<script>(function(){var t="light";try{t=localStorage.getItem("corex-theme")||"light"}catch(e){}document.documentElement.setAttribute("data-theme",t)})();</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20350%20350%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22lg-bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%230b5f8f%22/%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23062b45%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2301080f%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22350%22%20height%3D%22350%22%20rx%3D%2272%22%20fill%3D%22url%28%23lg-bg%29%22/%3E%3Cpath%20fill%3D%22%2300b2f0%22%20d%3D%22M148%2072H283L245%20140H175L135%20210H68Z%22/%3E%3Cpath%20fill%3D%22%2300b2f0%22%20d%3D%22M135%20210H272L232%20278H97Z%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,13 +11,15 @@
 <style>
 /* Layout: glass top bar over a night-arena backdrop; one centered column (max 1120px); list rows for rankings, card grid for events, hero + tabs for profiles. Teams sit on faded flag backdrops. */
 :root{
-  --bg:#eef2f8; --bg-glow-1:rgba(11,91,181,.12); --bg-glow-2:rgba(227,176,75,.14);
-  --panel:rgba(255,255,255,.86); --panel-solid:#ffffff; --panel-2:#f2f5f9; --line:#dbe1ea;
-  --fg:#111823; --muted:#5b6678; --shadow:0 1px 2px rgba(16,24,35,.06),0 8px 24px rgba(16,24,35,.06);
-  --hltv:#0b5bb5; --vrs:#a8790d; --accent:#0b5bb5; --accent-2:#c4272f;
-  --win:#1b8a4a; --loss:#c93a3a; --live:#c4272f;
-  --gold:#c9971c; --silver:#8a97a8; --bronze:#b06a3b;
-  --mn:#c4272f; --ct:#2f6fae; --tside:#b8790c; --flag-op:.36;
+  /* parchment palette: илгэн цаас, бор бэх, улаан хүрэн дээл, бүдэг алт, уулын цэнхэр саарал */
+  --bg:#EFE4C9; --bg-alt:#E3D3AE; --text:#3A2A1E; --text-soft:#6B5340; --primary:#8E3B2B; --primary-dk:#6E2B1F; --sand:#B8955A; --gray-deel:#A9A48F; --sky:#8D96A3;
+  --bg-glow-1:rgba(184,149,90,.22); --bg-glow-2:rgba(142,59,43,.07);
+  --panel:rgba(245,237,218,.82); --panel-solid:#F5EDDA; --panel-2:var(--bg-alt); --line:rgba(169,164,143,.6);
+  --fg:var(--text); --muted:var(--text-soft); --shadow:0 1px 2px rgba(58,42,30,.08),0 8px 24px rgba(58,42,30,.08);
+  --hltv:var(--primary); --vrs:#8a6a2e; --accent:var(--primary); --accent-2:var(--primary-dk);
+  --win:#4e7a32; --loss:var(--primary); --live:#a8321f;
+  --gold:#a8822f; --silver:#7d7f86; --bronze:#94572c;
+  --mn:var(--primary); --ct:#5d6878; --tside:#9a6a14; --flag-op:.28;
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Manrope",system-ui,"Segoe UI",Arial,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
@@ -499,7 +501,7 @@ body::after{opacity:.1}
 .empty.tsam::before{opacity:.8}
 :root[data-theme="light"] .hero::after,:root[data-theme="light"] .article::after{opacity:.6;background:linear-gradient(180deg,#c48f2a,#7a520c)}
 :root[data-theme="light"] body::before,:root[data-theme="light"] body::after{background:linear-gradient(180deg,#c48f2a,#7a520c)}
-:root[data-theme="light"]{--gold:linear-gradient(180deg,#c48f2a,#7a520c);--orn:#9a6a14}
+:root[data-theme="light"]{--gold:linear-gradient(180deg,#c9a66a,#8a6a2e);--orn:#8a6a2e}
 :root[data-theme="light"] h2::after{background:linear-gradient(90deg,#9a6a14,rgba(154,106,20,.15))}
 :root[data-theme="light"] .hero::before,:root[data-theme="light"] footer::before{background:linear-gradient(90deg,transparent,#9a6a14 15%,#c48f2a 50%,#9a6a14 85%,transparent)}
 :root[data-theme="light"] .hero::after,:root[data-theme="light"] .article::after{opacity:.95}
@@ -642,6 +644,21 @@ header.top::after{opacity:1;background:linear-gradient(180deg,#e0a93a,#b07a1a 55
 :root[data-theme="light"] header.top::after{background:linear-gradient(180deg,#c48f2a,#9a6a14 55%,#714a08)}
 footer::before{opacity:1;background:linear-gradient(180deg,#e0a93a,#b07a1a 55%,#8a5a0a)}
 :root[data-theme="light"] footer::before{background:linear-gradient(180deg,#c48f2a,#9a6a14 55%,#714a08)}
+/* parchment theme details */
+:root[data-theme="light"] nav.main a.on{background:var(--primary);color:#F5EDDA;box-shadow:none}
+:root[data-theme="light"] a.btn:hover,:root[data-theme="light"] button.on:hover{background:var(--primary-dk)}
+:root[data-theme="light"] .seg button.on,:root[data-theme="light"] .tabs button.on{background:var(--primary);color:#F5EDDA}
+:root[data-theme="light"] .rk .pos{color:var(--primary)}
+/* header cloud band removed on request */
+header.top::after{content:none!important;display:none!important}
+/* ornaments pulled inward: side meanders hug the content column; corner knots sit inside the box padding, clear of the text */
+@media (min-width:1260px){
+  .side-key.l{left:calc(50% - 560px - 34px)}
+  .side-key.r{right:calc(50% - 560px - 34px)}
+}
+.rk{padding-left:44px;padding-right:40px;background-position:left 6px top 6px,right 6px bottom 6px;background-size:30px 30px}
+.panel{background-position:left 6px top 6px,right 6px bottom 6px}
+@media (max-width:760px){.rk{padding-left:34px;padding-right:30px;background-size:24px 24px}}
 </style>
 
 </head>
