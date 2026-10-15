@@ -1,11 +1,11 @@
-// FragBoard collector: run on an open hltv.org page (DevTools console or a userscript).
+// ADIYA TV collector: run on an open hltv.org page (DevTools console or a userscript).
 // On a /matches/<id>/... page it pushes that match's scoreboard, log and radar every 2.5 s (only when something changed).
 // On any other hltv.org page it pushes the live-match list every 10 s.
 // Settings live in localStorage, never in this file:
 //   localStorage.FB_CFG = JSON.stringify({url:"https://<ref>.supabase.co", anonKey:"<anon key>", writerKey:"<writer key>"})
 (() => {
   const cfg = JSON.parse(localStorage.FB_CFG || '{}');
-  if (!cfg.url || !cfg.anonKey || !cfg.writerKey) return console.warn('FragBoard: FB_CFG missing');
+  if (!cfg.url || !cfg.anonKey || !cfg.writerKey) return console.warn('ADIYA TV: FB_CFG missing');
   const T = x => x ? x.textContent.replace(/\s+/g, ' ').trim() : '';
   const H = { apikey: cfg.anonKey, Authorization: 'Bearer ' + cfg.anonKey, 'x-fb-key': cfg.writerKey };
   const put = (k, v) => fetch(cfg.url + '/rest/v1/live?on_conflict=k', {
@@ -69,7 +69,7 @@
       const { updated, ...rest } = s; const sig = JSON.stringify(rest);
       if (sig !== last) { last = sig; put('m:' + s.id, s); }
     }, 2500);
-    console.log('FragBoard: pushing this match');
+    console.log('ADIYA TV: pushing this match');
   } else {
     let liveIds = [];
     const list = async () => {
@@ -104,6 +104,6 @@
       liveIds = ids;
     };
     list(); window.__fbTimer = setInterval(list, 10000);
-    console.log('FragBoard: pushing the live match list');
+    console.log('ADIYA TV: pushing the live match list');
   }
 })();
