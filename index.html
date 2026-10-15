@@ -816,6 +816,12 @@ h2::after{display:none!important}
 @media (min-width:1760px){
   :root{--wrap:1560px}
 }
+/* brackets never widen the page: each lane scrolls sideways inside its own box */
+.brk2,.brk{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%}
+.brk2>*,.bgroup,.blane{min-width:0}
+.blane{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+.brk{overflow-x:auto}
+@media (max-width:760px){.bcolumn{width:200px}.brk2{padding:12px}}
 </style>
 
 </head>
