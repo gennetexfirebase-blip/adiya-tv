@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<title>FragBoard CS2 Рэнк</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: glass top bar over a night-arena backdrop; one centered column (max 1120px); list rows for rankings, card grid for events, hero + tabs for profiles. Teams sit on faded flag backdrops. */
+:root{
+  --bg:#eef1f6; --bg-glow-1:rgba(42,111,196,.10); --bg-glow-2:rgba(176,122,18,.08);
+  --panel:rgba(255,255,255,.86); --panel-solid:#ffffff; --panel-2:#f2f5f9; --line:#dbe1ea;
+  --fg:#111823; --muted:#5b6678; --shadow:0 1px 2px rgba(16,24,35,.06),0 8px 24px rgba(16,24,35,.06);
+  --hltv:#2563c9; --vrs:#b2780c; --accent:#2563c9; --accent-2:#7c4dff;
+  --win:#1b8a4a; --loss:#c93a3a; --live:#e0362c;
+  --gold:#c9971c; --silver:#8a97a8; --bronze:#b06a3b;
+  --mn:#c8102e; --ct:#2f6fae; --tside:#b8790c; --flag-op:.42;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,"Segoe UI",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#080b10; --bg-glow-1:rgba(64,140,255,.16); --bg-glow-2:rgba(255,170,40,.07);
+  --panel:rgba(20,26,36,.72); --panel-solid:#131a24; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
+  --fg:#eef2f8; --muted:#8e9bb0; --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px rgba(0,0,0,.35);
+  --hltv:#5ea2ff; --vrs:#ffb547; --accent:#5ea2ff; --accent-2:#a78bfa;
+  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4d43;
+  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4d63; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.22;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#080b10; --bg-glow-1:rgba(64,140,255,.16); --bg-glow-2:rgba(255,170,40,.07);
+  --panel:rgba(20,26,36,.72); --panel-solid:#131a24; --panel-2:rgba(255,255,255,.045); --line:rgba(255,255,255,.08);
+  --fg:#eef2f8; --muted:#8e9bb0; --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px rgba(0,0,0,.35);
+  --hltv:#5ea2ff; --vrs:#ffb547; --accent:#5ea2ff; --accent-2:#a78bfa;
+  --win:#3ddc84; --loss:#ff6b6b; --live:#ff4d43;
+  --gold:#f2c14e; --silver:#b9c6d6; --bronze:#e0985f; --mn:#ff4d63; --ct:#5aa2e6; --tside:#f0b13a; --flag-op:.22;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{background-color:var(--bg);background-image:radial-gradient(900px 500px at 8% -10%,var(--bg-glow-1),transparent 70%),radial-gradient(800px 500px at 100% 0%,var(--bg-glow-2),transparent 70%);background-repeat:no-repeat;background-attachment:fixed;color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--line)}
+.top-in{max-width:1120px;margin:0 auto;padding-inline:16px;display:flex;align-items:center;gap:22px;height:62px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.brand i{display:inline-block;width:9px;height:22px;background:linear-gradient(180deg,var(--hltv),color-mix(in srgb,var(--hltv) 50%,var(--accent-2)));transform:skewX(-16deg);border-radius:2px;box-shadow:0 0 14px color-mix(in srgb,var(--hltv) 55%,transparent)}
+.brand i+i{background:linear-gradient(180deg,var(--vrs),color-mix(in srgb,var(--vrs) 60%,#ff6a3d));margin-left:-6px;box-shadow:0 0 14px color-mix(in srgb,var(--vrs) 45%,transparent)}
+nav.main{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+nav.main a{padding:6px 14px;border-radius:999px;color:var(--muted);font-weight:600;font-size:13px;display:inline-flex;align-items:center;transition:color .15s,background .15s}
+nav.main a:hover{color:var(--fg)}
+nav.main a.on{color:var(--fg);background:var(--panel-solid);box-shadow:0 1px 3px rgba(0,0,0,.18),0 0 0 1px var(--line)}
+.search{margin-left:auto;position:relative}
+.search input{width:220px;max-width:40vw;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);color:var(--fg);font:500 13px var(--f-body);transition:border-color .15s,box-shadow .15s}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.sres{position:absolute;right:0;top:46px;background:var(--panel-solid);border:1px solid var(--line);border-radius:var(--r);width:280px;max-height:340px;overflow:auto;box-shadow:var(--shadow);padding:4px}
+.sres a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:9px}
+.sres a:hover{background:var(--panel-2)}
+main{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:22px}
+h1,h2,h3{font-weight:700;text-wrap:balance;margin:0}
+h1{font-family:var(--f-display);font-size:30px;letter-spacing:.01em;line-height:1.15}
+h2{font-family:var(--f-display);font-size:15px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+h3{font-size:16px;font-family:var(--f-body)}
+.sub{color:var(--muted)}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;color:var(--muted);font:600 13px var(--f-body);padding:7px 15px;border-radius:999px;cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:var(--fg)}
+.seg button.on{background:var(--panel-solid);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.2),0 0 0 1px var(--line)}
+.row-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.logo{width:28px;height:28px;object-fit:contain;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+.logo.lg{width:96px;height:96px}
+.logo.sm{width:20px;height:20px;filter:none}
+.ph{display:inline-grid;place-items:center;background:var(--panel-2);border-radius:8px;color:var(--muted);font:700 10px var(--f-body);filter:none}
+/* flag backdrops */
+.flagged{position:relative;isolation:isolate;overflow:hidden}
+.flagbg{position:absolute;z-index:-1;pointer-events:none;background-size:cover;background-position:center;opacity:var(--flag-op)}
+.rk .flagbg{left:0;top:0;bottom:0;width:58%;-webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.55) 40%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.55) 40%,transparent 100%)}
+.hero .flagbg{inset:0;width:70%;filter:saturate(1.15);opacity:min(1,calc(var(--flag-op) * 1.5));-webkit-mask-image:linear-gradient(90deg,#000 10%,transparent 95%);mask-image:linear-gradient(90deg,#000 10%,transparent 95%)}
+.lm-score .flagbg.l,.livebar .flagbg.l{left:0;top:0;bottom:0;width:50%;-webkit-mask-image:linear-gradient(90deg,#000 0%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,transparent 100%)}
+.lm-score .flagbg.r,.livebar .flagbg.r{right:0;top:0;bottom:0;width:50%;-webkit-mask-image:linear-gradient(270deg,#000 0%,transparent 100%);mask-image:linear-gradient(270deg,#000 0%,transparent 100%)}
+.livebar .flagbg{width:35%!important}
+/* ranking list */
+.rank-list{display:grid;gap:6px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.rk{display:grid;grid-template-columns:62px 44px 40px minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px 18px;cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:12px;transition:transform .18s cubic-bezier(.2,.8,.2,1),border-color .18s,box-shadow .18s}
+.rk.nolink{cursor:default}
+.rk:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.rk .pos{font-family:var(--f-display);font-weight:700;font-size:20px;line-height:1}
+.rk .chg{font:700 11px var(--f-mono);text-align:center}
+.up{color:var(--win)}.down{color:var(--loss)}.flat{color:var(--muted)}
+.rk .nm{min-width:0}
+.rk .nm b{font-weight:800;font-size:16px;letter-spacing:-.01em}
+.rk .nm .pl{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk .pts{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;font:700 11px var(--f-mono);padding:4px 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;background:var(--panel-2)}
+.badge.h{color:var(--hltv);border-color:color-mix(in srgb,var(--hltv) 35%,transparent);background:color-mix(in srgb,var(--hltv) 10%,transparent)}
+.badge.v{color:var(--vrs);border-color:color-mix(in srgb,var(--vrs) 35%,transparent);background:color-mix(in srgb,var(--vrs) 10%,transparent)}
+.badge.live{color:var(--live);border-color:color-mix(in srgb,var(--live) 45%,transparent);background:color-mix(in srgb,var(--live) 12%,transparent);font-family:var(--f-body);font-weight:800;letter-spacing:.06em}
+.badge.mn{color:var(--mn);border-color:color-mix(in srgb,var(--mn) 45%,transparent);background:color-mix(in srgb,var(--mn) 10%,transparent);font-family:var(--f-body)}
+.rk.mnrow{border-color:color-mix(in srgb,var(--mn) 45%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--mn) 25%,transparent),0 0 30px color-mix(in srgb,var(--mn) 15%,transparent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;font-weight:500}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+/* events */
+.ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.ev{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;padding:16px;cursor:pointer;align-content:start;transition:transform .18s cubic-bezier(.2,.8,.2,1),border-color .18s}
+.ev:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.ev .logo{width:52px;height:52px}
+.ev h3{font-weight:700;font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;color:var(--muted);font-size:12px;align-items:center}
+.tlogos{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ev .tlogos .logo{width:22px;height:22px}
+.ev-list{overflow:hidden}
+.ev-list .evr{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 18px;border-top:1px solid var(--line);cursor:pointer;transition:background .15s}
+.ev-list .evr:first-child{border-top:0}
+.ev-list .evr:hover{background:var(--panel-2)}
+/* team / hero */
+.hero{overflow:hidden}
+.thead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;padding:28px 26px;align-items:center}
+.thead h1{font-size:40px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kpi{background:var(--panel-solid);padding:14px 18px}
+.kpi .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.kpi .v{font:700 22px var(--f-display);margin-top:2px}
+.kpi .v small{font:600 12px var(--f-body);color:var(--muted);margin-left:6px}
+.tabs{display:inline-flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px;overflow-x:auto;max-width:100%;justify-self:start}
+.tabs button{border:0;background:none;color:var(--muted);font:600 13px var(--f-body);padding:8px 16px;cursor:pointer;border-radius:999px;white-space:nowrap;transition:color .15s,background .15s}
+.tabs button:hover{color:var(--fg)}
+.tabs button.on{color:var(--fg);background:var(--panel-solid);box-shadow:0 1px 3px rgba(0,0,0,.2),0 0 0 1px var(--line)}
+.shots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.shot{text-align:center;padding:14px 8px 12px;transition:transform .18s cubic-bezier(.2,.8,.2,1),border-color .18s;overflow:hidden}
+.shot:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.shot img{width:104px;height:104px;object-fit:cover;object-position:top;border-radius:50%;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--accent) 25%,transparent),var(--panel-2) 70%);display:block;margin:0 auto 8px}
+.shot b{display:block;font-weight:800}
+.shot .r{font-size:11px;color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--panel-2)}
+td.r,th.r{text-align:right}
+.pcell{display:flex;align-items:center;gap:12px;min-width:170px}
+.pcell img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;background:var(--panel-2)}
+.st{font-size:10px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:999px;background:var(--panel-2);color:var(--muted)}
+.st.STARTER{color:var(--win);background:color-mix(in srgb,var(--win) 12%,transparent)}
+.mrow{display:grid;grid-template-columns:96px minmax(0,1fr) 70px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 18px;border-top:1px solid var(--line);transition:background .15s}
+.mrow:hover{background:var(--panel-2)}
+.mrow .t{display:flex;align-items:center;gap:8px;min-width:0;font-weight:600}
+.mrow .t span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .t.r{justify-content:flex-end;text-align:right}
+.mrow .sc{text-align:center;font:700 16px var(--f-mono)}
+.compact .mrow{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);padding:10px 14px}
+.compact .mrow .dt{grid-column:1/-1;font-size:12px}
+.compact .mrow .lk{display:none}
+.evhdr{padding:11px 18px;background:var(--panel-2);font-weight:700;font-size:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.evhdr:first-child{border-top:0;border-radius:var(--r) var(--r) 0 0}
+.w{color:var(--win)}.l{color:var(--loss)}
+.form{display:flex;gap:6px}
+.form span{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font:700 12px var(--f-mono);color:#fff}
+.form .W{background:var(--win)}.form .L{background:var(--loss)}
+.two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px}
+.two-even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.pad{padding:18px}
+.stack{display:grid;gap:12px;align-content:start}
+.ach{display:grid;grid-template-columns:100px minmax(0,1fr);gap:12px;padding:11px 18px;border-top:1px solid var(--line);align-items:center;transition:background .15s}
+.ach:first-child{border-top:0}
+.ach:hover{background:var(--panel-2)}
+.place{font:700 12px var(--f-mono)}
+.place.gold{color:var(--gold)}.place.silver{color:var(--silver)}.place.bronze{color:var(--bronze)}.place.black{color:var(--muted)}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:11px var(--f-mono)}
+.chart .grid{stroke:var(--line)}
+.empty{padding:32px 16px;text-align:center;color:var(--muted)}
+.ext{color:var(--accent);font-weight:700}
+.ext:hover{text-decoration:underline}
+footer{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 36px;color:var(--muted);font-size:12px}
+.back{color:var(--muted);font-size:13px;font-weight:600;justify-self:start}
+.back:hover{color:var(--fg)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rk:hover,.ev:hover,.shot:hover{transform:none}}
+/* live */
+.livecount{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--live);color:#fff;font:600 11px var(--f-mono);margin-left:4px}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--live);margin-right:6px;vertical-align:middle}
+@media (prefers-reduced-motion:no-preference){.pulse{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.25}}}
+.lm{display:grid;gap:0;overflow:hidden}
+.lm-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--panel-2);font-size:13px}
+.lm-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:center;padding:18px 16px}
+.lm-team{display:flex;align-items:center;gap:12px;min-width:0}
+.lm-team.r{flex-direction:row-reverse;text-align:right}
+.lm-team .logo{width:48px;height:48px}
+.lm-team b{font:600 20px var(--f-display);letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis}
+.lm-team .rk2{font-size:12px;color:var(--muted)}
+.lm-mid{text-align:center}
+.lm-mid .ser{font:600 34px var(--f-display);letter-spacing:.04em}
+.lm-mid .cur{font:500 13px var(--f-mono);color:var(--live)}
+.maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.map{background:var(--panel-solid);padding:12px 16px;display:grid;gap:2px;position:relative;isolation:isolate;overflow:hidden;min-height:84px}
+.map .mapart{position:absolute;z-index:-1;top:-30%;bottom:-30%;right:-6%;width:62%;background-size:contain;background-repeat:no-repeat;background-position:center;opacity:.5;filter:brightness(1.5) saturate(1.2);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 55%);mask-image:linear-gradient(90deg,transparent 0%,#000 55%);transition:opacity .2s,transform .4s}
+.map:hover .mapart{opacity:.75;transform:scale(1.04)}
+.map.now .mapart{opacity:.7}
+.map .mn{font-weight:600}
+.map .ms{font:600 18px var(--f-mono)}
+.map.now{background:color-mix(in srgb,var(--live) 8%,var(--panel))}
+.lm-foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;padding:14px 16px;border-top:1px solid var(--line);font-size:13px}
+.lm-foot ul{margin:4px 0 0;padding-left:18px;color:var(--muted)}
+.lineup-row{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:4px}
+.livebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-color:color-mix(in srgb,var(--live) 50%,var(--line))}
+.livebar .sc{font:600 18px var(--f-mono)}
+.upl .mrow{grid-template-columns:96px minmax(0,1fr) 40px minmax(0,1fr) minmax(0,1.2fr)}
+.upl .evn{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.stars{color:var(--vrs);font-size:11px;letter-spacing:1px}
+/* player */
+.phead{display:grid;grid-template-columns:160px minmax(0,1fr);gap:20px;padding:20px;align-items:end}
+.phead img.body{width:160px;height:160px;object-fit:cover;object-position:top;border-radius:10px;background:var(--panel-2)}
+.attrs{display:grid;gap:8px}
+.attr{display:grid;grid-template-columns:110px minmax(0,1fr) 36px;gap:10px;align-items:center;font-size:13px}
+.attr .bar{height:8px;border-radius:4px;background:var(--panel-2);overflow:hidden}
+.attr .bar i{display:block;height:100%;background:var(--hltv)}
+.trophy{display:flex;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line)}
+.trophy:first-child{border-top:0}
+/* match */
+/* scorebot: a deliberately dark, broadcast-style component in both themes */
+.scorebot{--sb-bg:#151b23;--sb-row:#1c242e;--sb-line:#2a3441;--sb-fg:#e8edf3;--sb-mut:#8796a8;--sb-ct:#3d7fc4;--sb-ct-bg:#2b5c8f;--sb-t:#e0a526;--sb-t-bg:#a37a1b;--sb-hp:#3f9a3a;--sb-red:#c0392b;
+  position:relative;background:var(--sb-bg);color:var(--sb-fg);border-radius:10px;overflow:hidden;border:1px solid var(--sb-line);isolation:isolate}
+.scorebot::before{content:attr(data-map);position:absolute;right:14px;bottom:-12px;font:700 64px/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;color:rgba(255,255,255,.04);z-index:-1;pointer-events:none;white-space:nowrap}
+.sb-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 14px;font-size:13px;color:var(--sb-mut)}
+.sb-top span:last-child{text-align:right}
+.sb-score{font:600 26px var(--f-display);letter-spacing:.04em}
+.sb-score .ct{color:var(--sb-ct)}.sb-score .t{color:var(--sb-t)}.sb-score i{font-style:normal;color:var(--sb-mut);margin:0 6px}
+.sbwrap{overflow-x:auto;padding:0 10px 8px}
+.sb{min-width:640px;width:100%;border-collapse:separate;border-spacing:0 3px}
+.sb th{color:#fff;font-size:12px;letter-spacing:0;text-transform:none;padding:7px 10px;border:0;font-weight:600}
+.sb.ct thead th{background:var(--sb-ct-bg)}.sb.t thead th{background:var(--sb-t-bg)}
+.sb thead th:first-child{border-radius:4px 0 0 4px}.sb thead th:last-child{border-radius:0 4px 4px 0}
+.sb th.tn{display:flex;align-items:center;gap:8px;font-size:14px;min-width:150px}
+.sb th.tn img{width:22px;height:22px;object-fit:contain}
+.sb th.ic,.sb td.ic{text-align:center;width:34px}
+.sb td{padding:6px 10px;border:0;background:var(--sb-row);font-size:13px;color:var(--sb-fg)}
+.sb.ct td.pn{box-shadow:inset 3px 0 0 var(--sb-ct)}.sb.t td.pn{box-shadow:inset 3px 0 0 var(--sb-t)}
+.sb td.pn{font-weight:600;white-space:nowrap}
+.sb td.pn a{color:inherit}
+.sb td.pn a:hover{text-decoration:underline}
+.sb tr.dead td{color:var(--sb-mut);background:rgba(28,36,46,.55)}
+.sb tr.dead td.pn{font-weight:400}
+.sb .kit{color:var(--sb-ct);vertical-align:-2px}
+.hpb{position:relative;display:block;width:64px;height:16px;background:#2b333d;border-radius:2px;overflow:hidden}
+.hpb i{position:absolute;inset:0 auto 0 0;background:var(--sb-hp)}
+.hpb em{position:relative;font:600 11px/16px var(--f-mono);font-style:normal;padding-left:4px;color:#fff}
+.dead .hpb i{background:transparent}.dead .hpb em{color:var(--sb-mut)}
+.wchip{display:inline-block;font:600 10px/1 var(--f-mono);letter-spacing:.03em;padding:3px 6px;border-radius:3px;background:rgba(255,255,255,.08);color:var(--sb-fg,var(--fg));white-space:nowrap}
+.sb-foot{padding:6px 14px 10px;font-size:11px;color:var(--sb-mut);text-align:right}
+.glog2{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:12px;max-height:440px;overflow-y:auto;overflow-x:hidden}
+.glog2::before{display:none}
+.le{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 9px;border-radius:6px;font-size:13px;font-weight:600;background:rgba(10,14,19,.85);border:2px solid var(--sb-line)}
+.le.kill{border-color:var(--sb-red)}
+.le.round.t{border-color:var(--sb-t)}.le.round.ct{border-color:var(--sb-ct)}
+.le.plant{border-color:var(--sb-t)}.le.defuse{border-color:var(--sb-ct)}
+.le.info{border-color:var(--sb-line);color:var(--sb-mut);font-weight:500}
+.le .lp.ct{color:#5aa2e6}.le .lp.t{color:#f0b13a}
+.le svg{vertical-align:-2px}
+.prob{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px}
+.prob .line{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--panel-2)}
+.prob .line i{display:block;height:100%}
+.logbox{display:grid}
+.lb-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--sb-line);background:linear-gradient(90deg,rgba(255,255,255,.04),transparent)}
+.lb-map{font:700 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.lb-head .rleg{margin-left:auto}
+.lb-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);height:480px}
+.lb-body.noradar{grid-template-columns:minmax(0,1fr)}
+.lb-body .glog2{max-height:none;height:100%;border-right:1px solid var(--sb-line);padding:14px 16px;scrollbar-width:thin}
+.radar{position:relative;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 50% 50%,rgba(94,162,255,.10),transparent 65%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px)}
+.rmap{position:relative;width:100%;max-height:100%}
+.rmap img{display:block;width:100%;height:100%;object-fit:contain;filter:brightness(1.55) contrast(1.1) drop-shadow(0 0 18px rgba(94,162,255,.25))}
+.kx{position:absolute;width:13px;height:13px;transform:translate(-50%,-50%);fill:none;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(0,0,0,.8))}
+.kx.ct{stroke:#5aa2e6}.kx.t{stroke:#f0b13a}
+.kx.old{opacity:.35}
+@media (prefers-reduced-motion:no-preference){.kx:not(.old){animation:kxpop .5s cubic-bezier(.2,1.4,.4,1)}@keyframes kxpop{from{transform:translate(-50%,-50%) scale(2.2);opacity:0}}}
+.rleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--sb-mut)}
+.rleg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.rleg i.ct{background:#5aa2e6}.rleg i.t{background:#f0b13a}
+@media (max-width:860px){.lb-body{grid-template-columns:minmax(0,1fr);height:auto}.lb-body .glog2{max-height:380px;border-right:0;border-bottom:1px solid var(--sb-line)}.lb-head .rleg{margin-left:0}}
+.katt{font:600 9px/1 var(--f-mono);padding:2px 4px;border-radius:3px;background:rgba(255,255,255,.12);color:#fff}
+.c-CT{color:var(--ct);font-weight:600}.c-T{color:var(--tside);font-weight:600}
+.streams{display:grid}
+.stream{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line)}
+.stream:first-child{border-top:0}
+.stream:hover{background:var(--panel-2)}
+.prov{font:600 11px var(--f-mono);padding:2px 7px;border-radius:4px;color:#fff;text-transform:uppercase}
+.prov.twitch{background:#7b4fd6}.prov.kick{background:#2f9e3a}.prov.youtube{background:#c4302b}.prov.other{background:var(--muted)}
+/* news */
+.news{display:grid}
+.article{padding:28px 32px;display:grid;gap:14px;max-width:820px}
+.article h1{font-size:28px;line-height:1.25}
+.article .lede{font-size:17px;font-weight:600;margin:0;max-width:65ch}
+.article .keys{margin:0;padding:12px 16px 12px 34px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);display:grid;gap:4px;font-weight:600}
+.article .keys li::marker{color:var(--accent)}
+.abody p{margin:0 0 12px;font-size:15.5px;line-height:1.75;max-width:68ch}
+.asrc{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+a.nitem{transition:background .15s}
+a.nitem:hover{background:var(--panel-2)}
+a.nitem:hover h3{color:var(--accent)}
+.nitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;padding:14px 16px;border-top:1px solid var(--line)}
+.nitem:first-child{border-top:0}
+.nitem h3{font-family:var(--f-body);font-size:16px;font-weight:600;letter-spacing:0}
+.nitem p{margin:0;color:var(--muted);max-width:70ch}
+.nitem .when{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+@media (max-width:760px){.phead{grid-template-columns:minmax(0,1fr)}.phead img.body{width:120px;height:120px}.nitem{grid-template-columns:minmax(0,1fr)}.nitem .when{text-align:left}.stream{grid-template-columns:minmax(0,1fr) auto}.stream .vw{display:none}}
+@media (max-width:760px){.upl .mrow{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr)}.upl .evn{grid-column:1/-1;text-align:left}.lm-team .logo{width:36px;height:36px}.lm-team b{font-size:16px}.lm-mid .ser{font-size:26px}}
+@media (max-width:760px){
+  .two{grid-template-columns:minmax(0,1fr)}
+  .shots{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rk{grid-template-columns:40px 30px 28px minmax(0,1fr);gap:8px;padding:10px 12px}
+  .rk .pts{grid-column:3/-1;justify-content:flex-start}
+  .mrow{grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);padding:9px 12px}
+  .mrow .dt{grid-column:1/-1;font-size:12px}
+  .mrow .lk{display:none}
+  .thead{grid-template-columns:minmax(0,1fr)}
+  .thead h1{font-size:28px}
+  nav.main a{padding:6px 8px}
+  .brand span{display:none}
+  .top-in{gap:10px}
+}
+@media (prefers-reduced-motion:no-preference){.rk,.ev,.evr{transition:background .12s,border-color .12s}}
+</style>
+
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="#ranking"><i></i><i></i><span>FragBoard</span></a>
+  <nav class="main">
+    <a href="#ranking" data-nav="ranking">Рэнкинг</a>
+    <a href="#events" data-nav="events">Тэмцээн</a>
+    <a href="#live" data-nav="live" class="navlive">Шууд <span class="livecount" id="livecount" hidden></span></a>
+    <a href="#news" data-nav="news">Мэдээ</a>
+  </nav>
+  <div class="search">
+    <input id="q" type="search" placeholder="Баг хайх…" autocomplete="off" aria-label="Баг хайх">
+    <div class="sres" id="sres" hidden></div>
+  </div>
+</div></header>
+<main id="app"><div class="empty">Ачаалж байна…</div></main>
+<footer id="foot"></footer>
+
+<script src="hltv-data.js"></script>
+<script>
+(function(){
+const D=window.HLTV_DATA;
+const app=document.getElementById('app');
+if(!D){app.innerHTML='<div class="empty">Өгөгдлийн файл (hltv-data.js) олдсонгүй.</div>';return}
+const H='https://www.hltv.org';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BLANK='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+const img=i=>{if(i==null||i<0)return '';if(D.imgData)return D.imgData[i]||'';const p=D.imgs[i];return /^https?:/.test(p)?p:'https://img-cdn.hltv.org/'+p};
+const pimg=i=>img(i)||BLANK;
+const FL=D.flags||{},TF=D.teamFlag||{},CC=D.countryCode||{};
+const flagOfTeam=(id,code)=>FL[code]||FL[TF[id]]||'';
+const flagOfCountry=n=>FL[CC[n]]||'';
+const fbg=(url,cls)=>url?`<span class="flagbg ${cls||''}" style="background-image:url('${url}')"></span>`:'';
+const TM=i=>{const t=D.tms[i];return t?{id:t[0],slug:t[1],name:t[2],logo:img(t[3])}:{id:0,name:'TBD',logo:''}};
+const EV=i=>{const e=D.ev[i];return e?{id:e[0],slug:e[1],name:e[2],logo:img(e[3]),start:e[4]?new Date(e[4]*6e4):null,end:e[5]?new Date(e[5]*6e4):null}:null};
+const teamsById={};Object.values(D.teams).forEach(t=>{teamsById[D.tms[t.t][0]]=t});
+const tIdxById={};D.tms.forEach((t,i)=>tIdxById[t[0]]=i);
+const rankById={};D.ranking.forEach(r=>rankById[D.tms[r[1]][0]]=r);
+const vrsById={};D.valve.forEach(v=>vrsById[D.tms[v[1]][0]]=v);
+const MONGOLZ=6248;
+const TZ='Asia/Ulaanbaatar';
+const fmtD=d=>d?d.toLocaleDateString('en-CA',{timeZone:TZ,month:'2-digit',day:'2-digit'}).replace('-','.'):'';
+const fmtDY=d=>d?d.toLocaleDateString('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).replace(/-/g,'.'):'';
+const fmtT=d=>d.toLocaleTimeString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
+const range=(a,b)=>!a?'':(fmtD(a)+(b&&fmtD(b)!==fmtD(a)?' – '+fmtD(b):''));
+const logo=(src,cls,alt)=>src?`<img class="logo ${cls||''}" src="${esc(src)}" alt="${esc(alt||'')}" loading="lazy">`:`<span class="logo ph ${cls||''}">${esc((alt||'?').slice(0,2))}</span>`;
+const chg=c=>{if(!c||c==='-')return '<span class="flat">–</span>';if(/NEW/i.test(c))return '<span class="up">ШИНЭ</span>';const n=+c;return n>0?`<span class="up">▲${n}</span>`:`<span class="down">▼${-n}</span>`};
+const teamHref=id=>teamsById[id]?'#team-'+id:null;
+const evById={};D.ev.forEach((e,i)=>evById[e[0]]=i);
+const regionMn={EU:'Европ',AM:'Америк',AS:'Ази'};
+const placeCls=p=>/^1st/.test(p)?'gold':/^2nd/.test(p)?'silver':/^3/.test(p)?'bronze':'black';
+const placeMn=p=>{if(!p)return '';return p.replace(/^1st$/,'1-р байр').replace(/^2nd$/,'2-р байр').replace(/^3rd$/,'3-р байр').replace(/^(\d+)-(\d+)th$/,'$1–$2-р байр').replace(/^(\d+)th$/,'$1-р байр').replace('1/4 final','1/4 финал').replace('1/2 final','1/2 финал').replace('Group stage','Хэсгийн шат')};
+
+document.getElementById('foot').innerHTML=`Өгөгдлийн эх сурвалж: HLTV.org ба Valve Regional Standings (VRS). HLTV рэнк: ${esc(D.hltvDate)}, шинэчилсэн: ${esc(D.updated)}. Цагийг Улаанбаатарын цагаар харуулав.`;
+
+/* ---------- ranking ---------- */
+let rankMode='hltv',rankReg='all';
+const REG=D.reg||{};
+const regOf=id=>REG[id]||(vrsById[id]?vrsById[id][3]:'');
+function viewRanking(){
+  const all=rankMode==='hltv'?D.ranking.map(r=>{const t=TM(r[1]);return {t,pos:r[0],change:r[3],pts:r[2],other:r[4],otherPts:r[5],region:r[6],players:r[7].map(p=>p[0])}})
+    :D.valve.map(v=>{const t=TM(v[1]);const hr=rankById[t.id];return {t,pos:v[0],pts:v[2],other:hr?hr[0]:null,region:v[3],players:v[4]}});
+  const cnt=r=>all.filter(x=>regOf(x.t.id)===r).length;
+  const rows=rankReg==='all'?all:all.filter(x=>regOf(x.t.id)===rankReg);
+  app.innerHTML=`${liveStrip()}
+  <div class="row-head">
+    <div><div class="eyebrow">Counter-Strike 2 · Дэлхийн рэнкинг</div><h1>${rankMode==='hltv'?'HLTV рэнк':'Valve рэнк (VRS)'}</h1>
+    <div class="sub">${rankMode==='hltv'?`HLTV-ийн долоо хоног бүрийн рэнк, ${esc(D.hltvDate)}. Сүүлийн 2 сарын үзүүлэлт, LAN тэмцээнүүд дээр үндэслэнэ.`:'Valve-ийн албан ёсны Regional Standings. Мэйжор болон томоохон тэмцээний урилгыг энэ рэнкээр тогтооно.'}</div></div>
+    <div class="seg" role="tablist"><button id="m-h" class="${rankMode==='hltv'?'on':''}">HLTV рэнк</button><button id="m-v" class="${rankMode==='valve'?'on':''}">Valve рэнк</button></div>
+  </div>
+  <div class="row-head"><div class="seg" id="regseg">${[['all','Бүх дэлхий',all.length],['EU','Европ',cnt('EU')],['AM','Америк',cnt('AM')],['AS','Ази',cnt('AS')]].map(([k,n,c])=>`<button data-r="${k}" class="${rankReg===k?'on':''}">${n} <span class="num sub">${c}</span></button>`).join('')}</div>${rankReg!=='all'?`<span class="sub">${esc(regionMn[rankReg])} бүсийн багууд, дэлхийн рэнкийн дарааллаар · бүсийн байр зүүн талд</span>`:''}</div>
+  <div class="legend"><span><i class="dot" style="background:var(--hltv)"></i>HLTV рэнк / оноо</span><span><i class="dot" style="background:var(--vrs)"></i>Valve (VRS) рэнк / оноо</span><span><i class="dot" style="background:var(--mn)"></i>Монгол баг</span></div>
+  <div class="panel rank-list">${rows.length?'':'<div class="empty">Энэ бүсэд баг алга.</div>'}${rows.map((r,ri)=>{
+    const mn=r.t.id===MONGOLZ;
+    const ob=rankMode==='hltv'
+      ?`<span class="badge h num">${r.pts} оноо</span>${r.other?`<span class="badge v num" title="Valve рэнк">VRS #${r.other}</span>`:'<span class="badge num" title="Valve рэнкийн эхний 60-д байхгүй">VRS –</span>'}`
+      :`<span class="badge v num">${r.pts} оноо</span>${r.region?`<span class="badge num">${esc(regionMn[r.region]||r.region)}</span>`:''}${r.other?`<span class="badge h num" title="HLTV рэнк">HLTV #${r.other}</span>`:''}`;
+    return `<div class="rk flagged ${mn?'mnrow':''} ${teamsById[r.t.id]?'':'nolink'}" data-id="${r.t.id}" ${teamsById[r.t.id]?'tabindex="0" role="link"':''}>${fbg(flagOfTeam(r.t.id))}
+      <div class="pos num" style="color:${rankMode==='hltv'?'var(--hltv)':'var(--vrs)'}">#${rankReg==='all'?r.pos:ri+1}${rankReg!=='all'?`<div class="sub" style="font:500 11px var(--f-mono)">дэлхий #${r.pos}</div>`:''}</div>
+      <div class="chg num">${rankMode==='hltv'?chg(r.change):''}</div>
+      ${logo(r.t.logo,'',r.t.name)}
+      <div class="nm"><b>${esc(r.t.name)}</b>${mn?' <span class="badge mn">MN</span>':''}<div class="pl">${r.players.map(esc).join(' · ')}</div></div>
+      <div class="pts">${ob}</div></div>`}).join('')}</div>`;
+  document.getElementById('m-h').onclick=()=>{rankMode='hltv';viewRanking()};
+  document.getElementById('m-v').onclick=()=>{rankMode='valve';viewRanking()};
+  app.querySelectorAll('#regseg button').forEach(b=>b.onclick=()=>{rankReg=b.dataset.r;viewRanking()});
+  app.querySelectorAll('.rk').forEach(el=>{const go=()=>openTeam(+el.dataset.id);el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter')go()}});
+}
+function openTeam(id){
+  if(teamsById[id])location.hash='team-'+id;
+
+}
+
+/* ---------- events ---------- */
+// which tracked teams play each event
+const evTeams={};
+Object.values(D.teams).forEach(t=>{const me=D.tms[t.t][0];
+  t.evUp.forEach(([ei])=>{(evTeams[D.ev[ei][0]]=evTeams[D.ev[ei][0]]||new Map()).set(me,null)});
+  t.evEnd.forEach(([ei,pl])=>{(evTeams[D.ev[ei][0]]=evTeams[D.ev[ei][0]]||new Map()).set(me,pl||null)});
+});
+const nameToId={};D.tms.forEach(t=>{if(!(t[2] in nameToId))nameToId[t[2]]=t[0]});
+let evMode='ongoing';
+function evCard(e){const ev=EV(e[0]);const ids=new Set([...(evTeams[ev.id]?.keys()||[]),...((e[9]||[]).map(n=>nameToId[n]).filter(Boolean))]);
+  const lg=[...ids].sort((a,b)=>(rankById[a]?.[0]||999)-(rankById[b]?.[0]||999)).slice(0,10).map(id=>{const t=TM(tIdxById[id]);return logo(t.logo,'sm',t.name).replace('<img','<img title="'+esc(t.name)+'"')}).join('');
+  return `<div class="panel ev" data-ev="${ev.id}" tabindex="0" role="link">${logo(ev.logo,'',ev.name)}<div style="min-width:0">
+    <h3>${esc(ev.name)}</h3>
+    <div class="meta"><span class="num">${range(ev.start,ev.end)}</span>${e[1]==='ongoing'?'<span class="badge live">ШУУД</span>':''}${e[3]||/LAN/i.test(e[8]||'')?'<span>LAN</span>':(e[8]?`<span>${esc(e[8]==='Online'?'Онлайн':e[8])}</span>`:'')}${e[4]?`<span>${esc(e[4])}</span>`:''}${e[6]&&e[6]!=='Other'?`<span class="num">${esc(e[6])}</span>`:''}${e[7]&&e[7]!=='TBA'?`<span>${esc(e[7])} баг</span>`:''}</div>
+    ${lg?`<div class="tlogos">${lg}</div>`:''}</div></div>`}
+function viewEvents(){
+  const on=D.evts.filter(e=>e[1]==='ongoing'),up=D.evts.filter(e=>e[1]!=='ongoing');
+  const big=up.filter(e=>e[2]),small=up.filter(e=>!e[2]);
+  let body='';
+  if(evMode==='ongoing')body=on.length?`<div class="ev-grid">${on.map(evCard).join('')}</div>`:'<div class="panel empty">Одоогоор явагдаж буй тэмцээн алга.</div>';
+  if(evMode==='upcoming')body=`<h2>Томоохон тэмцээнүүд</h2><div class="ev-grid">${big.map(evCard).join('')}</div><h2>Бусад удахгүй болох</h2><div class="ev-grid">${small.map(evCard).join('')}</div>`;
+  if(evMode==='past')body=`<div class="panel ev-list">${D.past.map(p=>{const ev=EV(p[0]);return `<div class="evr" data-ev="${ev.id}" tabindex="0" role="link">${logo(ev.logo,'',ev.name)}<div style="min-width:0"><b>${esc(ev.name)}</b><div class="meta"><span>${esc(p[1]||'')}</span>${p[5]?`<span>${esc(p[5]==='Online'?'Онлайн':p[5])}</span>`:''}${p[4]?`<span>${esc(p[4])} баг</span>`:''}${p[3]&&p[3]!=='Other'?`<span class="num">${esc(p[3])}</span>`:''}</div></div><div class="num sub">${range(ev.start,ev.end)}</div></div>`}).join('')}</div>`;
+  app.innerHTML=`<div class="row-head"><div><div class="eyebrow">HLTV дээрх тэмцээнүүд</div><h1>Тэмцээнүүд</h1><div class="sub">Тэмцээн дээр дарж ямар багууд оролцож буйг харна.</div></div>
+  <div class="seg"><button data-m="ongoing" class="${evMode==='ongoing'?'on':''}">Явагдаж буй (${on.length})</button><button data-m="upcoming" class="${evMode==='upcoming'?'on':''}">Удахгүй (${up.length})</button><button data-m="past" class="${evMode==='past'?'on':''}">Дууссан (${D.past.length})</button></div></div>${body}`;
+  app.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{evMode=b.dataset.m;viewEvents()});
+  bindEv();
+}
+function bindEv(){app.querySelectorAll('[data-ev]').forEach(el=>{const go=()=>location.hash='event-'+el.dataset.ev;el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter')go()}})}
+function bindTeams(){app.querySelectorAll('[data-team]').forEach(el=>{el.onclick=e=>{e.preventDefault();openTeam(+el.dataset.team)}})}
+
+function viewEvent(id){
+  const ei=evById[id];const ev=ei!=null?EV(ei):null;
+  if(!ev){app.innerHTML='<div class="panel empty">Тэмцээн олдсонгүй.</div>';return}
+  const row=D.evts.find(e=>D.ev[e[0]][0]===id),past=D.past.find(e=>D.ev[e[0]][0]===id);
+  const ids=new Map(evTeams[id]||[]);(row?.[9]||[]).forEach(n=>{const t=nameToId[n];if(t&&!ids.has(t))ids.set(t,null)});
+  // matches from tracked teams' data
+  const ms=[];const seen=new Set();
+  Object.values(D.teams).forEach(t=>{const me=t.t;
+    t.res.forEach(m=>{if(D.ev[m[1]]?.[0]===id){const k=m[5]||(me+'-'+m[2]+m[0]);if(seen.has(k))return;seen.add(k);ms.push({d:m[0],a:me,b:m[2],sa:m[3],sb:m[4],id:m[5],done:1})}});
+    t.up.forEach(m=>{if(D.ev[m[1]]?.[0]===id){const k=m[3];if(seen.has(k))return;seen.add(k);ms.push({d:m[0],a:me,b:m[2],id:m[3],done:0})}})});
+  ms.sort((x,y)=>y.d-x.d);
+  const list=[...ids.entries()].sort((a,b)=>(rankById[a[0]]?.[0]||999)-(rankById[b[0]]?.[0]||999));
+  const kind=row?(row[3]?'LAN':row[8]):past?past[5]:'';
+  app.innerHTML=`<a class="back" href="#events">← Тэмцээнүүд</a>
+  <div class="panel"><div class="thead">${logo(ev.logo,'lg',ev.name)}<div style="min-width:0"><div class="eyebrow">${row?.[1]==='ongoing'?'<span class="badge live">ШУУД</span> ':''}Тэмцээн</div><h1>${esc(ev.name)}</h1>
+   <div class="meta" style="font-size:13px"><span class="num">${fmtDY(ev.start)}${ev.end?' – '+fmtDY(ev.end):''}</span>${kind?`<span>${esc(kind==='Online'?'Онлайн':kind)}</span>`:''}${(row?.[4]||past?.[1])?`<span>${esc(row?.[4]||past?.[1])}</span>`:''}${(row?.[6]||past?.[3])&&(row?.[6]||past?.[3])!=='Other'?`<span class="num">Шагнал: ${esc(row?.[6]||past?.[3])}</span>`:''}${(row?.[7]||past?.[4])?`<span>${esc(row?.[7]||past?.[4])} баг</span>`:''}</div>
+   </div></div></div>
+  <div class="two"><div class="stack"><h2>Оролцогч багууд</h2>
+   ${list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Зөвхөн дэлхийн шилдэг 40 багийн мэдээллээс. Бүх оролцогчийг HLTV дээрээс харна уу.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
+  </div><div class="stack"><h2>Тоглолтууд</h2>${ms.length?`<div class="panel compact">${ms.map(m=>matchRow(m.a,m.b,m.sa,m.sb,m.d,m.id,m.done)).join('')}</div>`:'<div class="panel empty">Тоглолтын мэдээлэл алга.</div>'}</div></div>`;
+  bindTeams();
+}
+function matchRow(a,b,sa,sb,d,mid,done){
+  const ta=TM(a),tb=TM(b);const dt=new Date(d*6e4);const na=+sa,nb=+sb;
+  const ca=done?(na>nb?'w':na<nb?'l':''):'',cb=done?(nb>na?'w':nb<na?'l':''):'';
+  const lk=mid&&(MATCH[+String(mid).split('/')[0]]||(D.matches&&D.matches[String(mid).split('/')[0]]))?`<a class="ext lk" href="#match-${esc(String(mid).split('/')[0])}">Тоглолт →</a>`:'<span class="lk"></span>';
+  const tl=(t,r)=>{const h=teamHref(t.id);const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return h?`<a class="t ${r?'r':''}" href="${h}">${inner}</a>`:`<span class="t ${r?'r':''}">${inner}</span>`};
+  return `<div class="mrow"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)}</span>${tl(ta,1)}<span class="sc">${done?`<span class="${ca}">${esc(sa)}</span>:<span class="${cb}">${esc(sb)}</span>`:'<span class="sub">vs</span>'}</span>${tl(tb,0)}${lk}</div>`;
+}
+
+/* ---------- team ---------- */
+let teamTab='overview';
+const wk=s=>String(s||'').replace(/weeks?/,'д.х.');
+function rankChart(pts){
+  if(!pts||pts.length<2)return '<div class="empty">Рэнкийн түүх алга.</div>';
+  const W=640,Hh=220,L=36,R=12,T=14,B=28;
+  const vals=pts.flatMap(p=>[p[1],p[2]]).filter(v=>v!=null&&v>0);const max=Math.max(5,Math.ceil(Math.max(...vals)/5)*5);
+  const x=i=>L+i*(W-L-R)/(pts.length-1),y=v=>T+(v-1)*(Hh-T-B)/(max-1);
+  const line=(k,c)=>{let d='',pen=false;pts.forEach((p,i)=>{if(p[k]==null||p[k]<=0){pen=false;return}d+=(pen?'L':'M')+x(i).toFixed(1)+' '+y(p[k]).toFixed(1);pen=true});const li=pts.length-1;const end=pts[li][k]>0?`<circle cx="${x(li)}" cy="${y(pts[li][k])}" r="4" fill="${c}"/>`:'';return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/>${end}`};
+  const ticks=[1,...[0.25,0.5,0.75,1].map(f=>Math.round(1+f*(max-1)))].filter((v,i,a)=>a.indexOf(v)===i);
+  const step=Math.ceil(pts.length/6);
+  return `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Рэнкийн хөгжил">
+   ${ticks.map(v=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">#${v}</text>`).join('')}
+   ${pts.map((p,i)=>i%step===0||i===pts.length-1?`<text x="${x(i)}" y="${Hh-8}" text-anchor="${i===0?'start':i===pts.length-1?'end':'middle'}">${esc(p[0].replace(/^\d+ (\w+) \d\d(\d\d)$/,"$1 '$2"))}</text>`:'').join('')}
+   ${line(2,'var(--vrs)')}${line(1,'var(--hltv)')}</svg>`;
+}
+function viewTeam(id){
+  const t=teamsById[id];if(!t){app.innerHTML='<div class="panel empty">Баг олдсонгүй.</div>';return}
+  const me=TM(t.t);const r=rankById[id],v=vrsById[id];
+  const stat=k=>{for(const s in t.stats)if(s.startsWith(k))return t.stats[s];return ''};
+  const vrsTxt=stat('Valve');const vrsRank=v?v[0]:(vrsTxt.match(/#(\d+)/)||[])[1];
+  const tabs=[['overview','Тойм'],['roster','Ростер'],['matches','Тоглолтууд'],['events','Тэмцээнүүд'],['ach','Амжилт']];
+  let body='';
+  if(teamTab==='overview'){
+    const last=t.res.slice(0,5);
+    const ri=t.rankInfo||[];
+    body=`<div class="two"><div class="panel pad stack chart"><div class="row-head"><h2>Рэнкийн хөгжил</h2><div class="legend"><span><i class="dot" style="background:var(--hltv)"></i>HLTV</span><span><i class="dot" style="background:var(--vrs)"></i>Valve</span></div></div>
+      ${ri.length?`<div class="legend" style="font-size:13px">${ri.map(x=>`<span>${esc({'Current ranking':'Одоо','Peak':'Дээд','Time at peak':'Дээд түвшинд'}[x[0]]||x[0])}: <b class="num" style="color:var(--hltv)">${esc(wk(x[1]))}</b> / <b class="num" style="color:var(--vrs)">${esc(wk(x[2]))}</b></span>`).join('')}</div>`:''}
+      ${rankChart(t.chart)}<div class="sub" style="font-size:12px">Үндсэн бүрэлдэхүүний (core) сүүлийн жилийн долоо хоног тутмын рэнк.</div></div>
+     <div class="stack">
+      <div class="panel pad stack"><h3>Сүүлийн 5 тоглолт</h3><div class="form">${last.map(m=>{const w=+m[3]>+m[4];return `<span class="${w?'W':'L'}" title="${esc(TM(m[2]).name)} ${esc(m[3])}:${esc(m[4])}">${w?'W':'L'}</span>`}).join('')}</div>
+      ${(t.ms||[]).map(m=>`<div style="display:flex;justify-content:space-between;gap:8px"><span class="sub">${esc({'Current win streak':'Одоогийн ялалтын цуврал','Win rate':'Ялалтын хувь'}[m[1]]||m[1])}${m[2]?' ('+esc(m[2]==='Last 3 months'?'сүүлийн 3 сар':m[2])+')':''}</span><b class="num">${esc(m[0])}</b></div>`).join('')}</div>
+      <div class="panel compact"><div class="evhdr">Дараагийн тоглолт</div>${t.up.length?t.up.slice(0,3).map(m=>matchRow(t.t,m[2],'','',m[0],m[3],0)).join(''):'<div class="empty">Товлогдсон тоглолт алга.</div>'}</div>
+     </div></div>
+     <h2>Тоглогчид</h2><div class="shots">${t.roster.filter(p=>p[5]==='STARTER').map(p=>`<a class="panel shot" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="${esc(p[0])}" loading="lazy"><b>${esc(p[0])}</b><div class="r">${esc(p[4]||'')}${p[9]?' · '+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP')):''}</div></a>`).join('')}</div>`;
+  }
+  if(teamTab==='roster'){
+    const c=t.coach,cs=t.coachStats||[];
+    body=`${c?`<h2>Дасгалжуулагч</h2><div class="panel tbl-wrap"><table><thead><tr><th>Дасгалжуулагч</th><th>Багт</th><th class="r">Газрын зураг</th><th class="r">Цом</th><th class="r">Ялалт %</th></tr></thead><tbody><tr><td><b>${esc(c[0])}</b> <span class="sub">${esc(c[2]||'')}</span></td><td>${esc(cs[0]||'')}</td><td class="r num">${esc(cs[1]||'')}</td><td class="r num">${esc(cs[2]||'')}</td><td class="r num">${esc(cs[3]||'')}</td></tr></tbody></table></div>`:''}
+    <h2>Тоглогчид</h2><div class="panel tbl-wrap"><table><thead><tr><th>Тоглогч</th><th>Төлөв</th><th>Багт</th><th class="r">Газрын зураг</th><th class="r">Rating 3.0</th></tr></thead><tbody>
+    ${t.roster.map(p=>`<tr><td><a class="pcell" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="" loading="lazy"><span><b>${esc(p[0])}</b><br><span class="sub" style="font-size:12px">${esc((p[3]||'').replace(/'[^']*' /,''))} · ${esc(p[4]||'')}</span></span></a></td><td><span class="st ${esc(p[5])}">${esc({STARTER:'ҮНДСЭН',BENCHED:'СЭЛГЭЭ',SUBSTITUTE:'НӨӨЦ'}[p[5]]||p[5])}</span>${p[9]?' <span class="sub" style="font-size:12px">'+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP'))+'</span>':''}</td><td style="white-space:nowrap">${esc((p[6]||'').replace(/years?/,'жил').replace(/months?/,' сар').replace(/days?/,' өдөр'))}</td><td class="r num">${esc(p[7])}</td><td class="r num" style="color:${+p[8]>=1.05?'var(--win)':+p[8]<0.98?'var(--loss)':'var(--fg)'}">${esc(p[8])}</td></tr>`).join('')}
+    </tbody></table></div><div class="sub" style="font-size:12px">Статистик нь тоглогчийн энэ багт байсан бүх хугацаанд.</div>`;
+  }
+  if(teamTab==='matches'){
+    const grp=[];let cur=null;t.res.forEach(m=>{if(!cur||cur.e!==m[1]){cur={e:m[1],ms:[]};grp.push(cur)}cur.ms.push(m)});
+    const lm=liveOf(id);const lup=dedupe(LIVE?.up).filter(m=>(m.t1[0]===id||m.t2[0]===id)&&!t.up.some(u=>String(u[3]).startsWith(m.id+'/'))).sort((x,y)=>x.time-y.time);
+    body=`${lm?`<h2><span class="pulse"></span>Яг одоо</h2>${liveCard(lm)}`:''}${lup.length?`<h2>Өнөөдөр</h2><div class="panel upl">${lup.map(upRow).join('')}</div>`:''}<h2>Удахгүй болох тоглолтууд</h2>${t.up.length?`<div class="panel">${t.up.map(m=>`<div class="evhdr"><a href="#event-${D.ev[m[1]][0]}">${esc(EV(m[1]).name)}</a></div>`+matchRow(t.t,m[2],'','',m[0],m[3],0)).join('')}</div>`:`<div class="panel empty">${esc(me.name)}-д одоогоор товлогдсон тоглолт алга.</div>`}
+    <h2>Сүүлийн үр дүнгүүд</h2><div class="panel">${grp.map(g=>{const e=EV(g.e);const pl=t.resEvPlace&&t.resEvPlace[e.id];return `<div class="evhdr"><a href="#event-${e.id}">${esc(e.name.replace(/ - \S+$/,''))}</a>${pl?`<span class="place ${placeCls(pl)}">${esc(placeMn(pl))}</span>`:''}</div>${g.ms.map(m=>matchRow(t.t,m[2],m[3],m[4],m[0],m[5],1)).join('')}`}).join('')}</div>`;
+  }
+  if(teamTab==='events'){
+    const card=(ei,pl,teams)=>{const e=EV(ei);return `<div class="panel ev" data-ev="${e.id}" tabindex="0" role="link">${logo(e.logo,'',e.name)}<div style="min-width:0"><h3>${esc(e.name)}</h3><div class="meta"><span class="num">${range(e.start,e.end)}</span>${pl?`<span class="place ${placeCls(pl)}">${esc(placeMn(pl))}</span>`:''}</div>${teams&&teams.length?`<div class="tlogos">${teams.slice(0,10).map(n=>{const id=nameToId[n];const tt=id?TM(tIdxById[id]):{name:n};return logo(tt.logo,'sm',n)}).join('')}</div>`:''}</div></div>`};
+    body=`<h2>Явагдаж буй ба удахгүй</h2>${t.evUp.length?`<div class="ev-grid">${t.evUp.map(e=>card(e[0],'',e[1])).join('')}</div>`:'<div class="panel empty">Удахгүй болох тэмцээн бүртгэгдээгүй.</div>'}
+    <h2>Оролцсон тэмцээнүүд</h2><div class="ev-grid">${t.evEnd.map(e=>card(e[0],e[1])).join('')}</div>`;
+  }
+  if(teamTab==='ach'){
+    const list=a=>a.length?`<div class="panel">${a.map(x=>{const e=EV(x[2]);return `<a class="ach" href="#event-${e.id}"><span class="place ${esc(x[1])}">${esc(placeMn(x[0]))}</span><span>${esc(e.name)}</span></a>`}).join('')}</div>`:'<div class="panel empty">Бүртгэл алга.</div>';
+    const wins=t.achLan.filter(a=>/^1st/.test(a[0])).length;
+    body=`<div class="kpis panel" style="border-radius:10px"><div class="kpi"><div class="k">LAN аварга</div><div class="v num">${wins}</div></div><div class="kpi"><div class="k">Мэйжорт оролцсон</div><div class="v num">${t.achMajor.length}</div></div><div class="kpi"><div class="k">Мэйжор аварга</div><div class="v num">${t.achMajor.filter(a=>/^1st/.test(a[0])).length}</div></div></div>
+    <div class="two"><div class="stack"><h2>LAN амжилтууд</h2>${list(t.achLan)}</div><div class="stack"><h2>Мэйжор</h2>${list(t.achMajor)}</div></div>`;
+  }
+  const soc=(t.social||[]).map(u=>{const n=/twitter|x\.com/.test(u)?'X':/instagram/.test(u)?'Instagram':/youtube/.test(u)?'YouTube':/twitch/.test(u)?'Twitch':/facebook/.test(u)?'Facebook':/tiktok/.test(u)?'TikTok':'Сайт';return `<a class="ext" href="${esc(u)}" target="_blank" rel="noopener">${n} ↗</a>`}).join(' · ');
+  app.innerHTML=`<a class="back" href="#ranking">← Рэнкинг</a>${liveBar(id)}
+  <div class="panel hero flagged">${fbg(flagOfTeam(id)||flagOfCountry(t.country))}<div class="thead">${logo(me.logo,'lg',me.name)}<div style="min-width:0"><div class="eyebrow">${esc(t.country)}${id===MONGOLZ?' · <span class="badge mn">Монгол баг</span>':''}</div><h1>${esc(me.name)}</h1>
+    <div class="meta" style="font-size:13px;margin-top:4px">${soc}</div></div></div>
+   <div class="kpis">
+    <div class="kpi"><div class="k">HLTV рэнк</div><div class="v num" style="color:var(--hltv)">${r?'#'+r[0]:'–'}<small>${r?r[2]+' оноо':''}</small></div></div>
+    <div class="kpi"><div class="k">Valve рэнк (VRS)</div><div class="v num" style="color:var(--vrs)">${vrsRank?'#'+vrsRank:'–'}<small>${v?v[2]+' оноо':esc(vrsTxt.replace(/^#\d+/,''))}</small></div></div>
+    <div class="kpi"><div class="k">Дасгалжуулагч</div><div class="v" style="font-size:16px">${t.coach?esc((t.coach[0].match(/'([^']+)'/)||[])[1]||t.coach[0]):'–'}</div></div>
+    <div class="kpi"><div class="k">Дундаж нас</div><div class="v num">${esc(stat('Average')||'–')}</div></div>
+    <div class="kpi"><div class="k">Топ 30-д (долоо хоног)</div><div class="v num">${esc(stat('Weeks')||'–')}</div></div>
+   </div></div>
+  <div class="tabs" role="tablist">${tabs.map(([k,n])=>`<button data-t="${k}" class="${teamTab===k?'on':''}" role="tab">${n}</button>`).join('')}</div>
+  ${body}`;
+  app.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{teamTab=b.dataset.t;viewTeam(id)});
+  bindEv();
+}
+
+/* ---------- live ---------- */
+let LIVE=D.live||null;
+const dedupe=a=>{const s=new Set();return (a||[]).filter(m=>!s.has(m.id)&&s.add(m.id))};
+const LT=(pair)=>{const [id,name]=pair||[0,'TBD'];const i=tIdxById[id];const t=i!=null?TM(i):{id,name,logo:''};return {id,name:name||t.name,logo:t.logo}};
+const evNameOf=m=>m.evName||(evById[m.ev]!=null?D.ev[evById[m.ev]][2]:'');
+const ago=iso=>{if(!iso)return '';const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?'дөнгөж сая':m<60?m+' мин өмнө':m<1440?Math.round(m/60)+' цагийн өмнө':Math.round(m/1440)+' өдрийн өмнө'};
+const snapOf=id=>MATCH[id]||(D.matches&&D.matches[id])||null;
+// freshest current-map score: the scoreboard snapshot beats HLTV's match list
+function curOf(m){const s=snapOf(m.id);if(s&&s.teams&&s.teams.length&&s.ct!==''){const t1=s.teams.find(t=>t.name===m.t1[1]);const side=t1?t1.side:'CT';const a=side==='CT'?s.ct:s.t,b=side==='CT'?s.t:s.ct;const mn=(s.round||'').split(' - ')[1]||'';return {a,b,map:mn}}return {a:m.cur?.[0]??'-',b:m.cur?.[1]??'-',map:''}}
+const liveOf=id=>LIVE?(LIVE.live||[]).find(m=>m.t1[0]===id||m.t2[0]===id):null;
+const mapMn=s=>s==='-'?'–':s;
+const tLink=(t,inner)=>teamsById[t.id]?`<a href="#team-${t.id}">${inner}</a>`:inner;
+function liveCard(m){
+  const a=LT(m.t1),b=LT(m.t2);const ra=rankById[a.id],rb=rankById[b.id];
+  const lu=m.lineups||[];
+  const mapsHtml=(m.maps||[]).map((x,i)=>{const st=x.live?'<span class="pulse"></span>Явагдаж буй':x.w?'Дууссан':'Тоглогдоогүй';const pk=x.pick===1?a.name:x.pick===2?b.name:'Үлдсэн';
+    const art=D.radar&&D.radar[String(x.n||'').toLowerCase().replace(/\s+/g,'')];return `<div class="map ${x.live?'now':''}">${art?`<span class="mapart" style="background-image:url('${art.src}')"></span>`:''}<span class="mn">${i+1}. ${esc(x.n)}</span><span class="ms"><span class="${x.w===1?'w':x.w===2?'l':''}">${esc(mapMn(x.live?curOf(m).a:x.s1))}</span> : <span class="${x.w===2?'w':x.w===1?'l':''}">${esc(mapMn(x.live?curOf(m).b:x.s2))}</span></span><span class="sub" style="font-size:12px">${st} · ${esc(pk)} сонгосон</span></div>`}).join('');
+  const team=(t,r,side)=>`<div class="lm-team ${side}">${logo(t.logo,'',t.name)}<div style="min-width:0">${tLink(t,`<b>${esc(t.name)}</b>`)}<div class="rk2 num">${[r?'HLTV #'+r[0]:(lu[side?1:0]?.hltv?'HLTV '+esc(lu[side?1:0].hltv):''),vrsById[t.id]?'VRS #'+vrsById[t.id][0]:(lu[side?1:0]?.vrs?'VRS '+esc(lu[side?1:0].vrs):'')].filter(Boolean).join(' · ')}</div></div></div>`;
+  return `<div class="panel lm">
+   <div class="lm-top"><span><span class="badge live"><span class="pulse"></span>ШУУД</span> <a href="#event-${m.ev}"><b>${esc(evNameOf(m))}</b></a></span><span class="sub">${esc((m.bo||'').toUpperCase())}${m.lan?' · LAN':' · Онлайн'}</span></div>
+   <div class="lm-score flagged">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}${team(a,ra,'')}<div class="lm-mid"><div class="ser num">${esc(m.mw?.[0]??'0')} : ${esc(m.mw?.[1]??'0')}</div><div class="cur">${esc(curOf(m).map||'Одоогийн газрын зураг')} ${esc(curOf(m).a)}:${esc(curOf(m).b)}</div></div>${team(b,rb,'r')}</div>
+   ${mapsHtml?`<div class="maps">${mapsHtml}</div>`:''}
+   <div class="lm-foot">
+    ${lu.length?`<div><b>Бүрэлдэхүүн</b>${lu.map((l,i)=>`<div class="lineup-row"><span class="sub">${esc(i?b.name:a.name)}:</span>${l.players.map(p=>`${PL[p.id]?`<a class="ext" href="#player-${p.id}">${esc(p.nick)}</a>`:`<span>${esc(p.nick)}</span>`}`).join('')}</div>`).join('')}</div>`:''}
+    ${m.veto&&m.veto.length?`<details><summary><b>Газрын зургийн вето</b></summary><ul>${m.veto.map(v=>`<li>${esc(v.replace(/^\d+\.\s*/,'').replace(' removed ',' хассан: ').replace(' picked ',' сонгосон: ').replace(' was left over',' үлдсэн'))}</li>`).join('')}</ul></details>`:''}
+    <div>${m.info?`<div class="sub">${esc(m.info)}</div>`:''}<a class="ext lkm" href="#match-${m.id}"><b>Онооны самбар, лог, шууд дамжуулалт →</b></a></div>
+   </div></div>`;
+}
+function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
+  const tl=(t,r)=>{const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return teamsById[t.id]?`<a class="t ${r?'r':''}" href="#team-${t.id}">${inner}</a>`:`<span class="t ${r?'r':''}">${inner}</span>`};
+  return `<div class="mrow"><span class="dt num sub">${fmtD(dt)} ${fmtT(dt)} ${m.stars?`<span class="stars">${'★'.repeat(m.stars)}</span>`:''}</span>${tl(a,1)}<span class="sc sub" style="font-size:12px">${esc(m.bo||'vs')}</span>${tl(b,0)}<a class="evn" href="#event-${m.ev}">${esc(evNameOf(m))}</a></div>`}
+function viewLive(){
+  const lv=dedupe(LIVE?.live),up=dedupe(LIVE?.up).sort((x,y)=>x.time-y.time);
+  app.innerHTML=`<div class="row-head"><div><div class="eyebrow"><span class="pulse"></span>Шууд · HLTV</div><h1>Шууд тоглолтууд</h1>
+   <div class="sub">${LIVE?`Сүүлд шинэчилсэн: <span class="num">${esc(fmtDY(new Date(LIVE.updated)))} ${esc(fmtT(new Date(LIVE.updated)))}</span> (${ago(LIVE.updated)}). Шинэ оноо ирэхэд хуудас өөрөө шинэчлэгдэнэ.`:'Шууд мэдээлэл хараахан ирээгүй байна.'}</div></div></div>
+  ${lv.length?lv.map(liveCard).join(''):'<div class="panel empty">Яг одоо явагдаж буй тоглолт алга. Доорх удахгүй болох тоглолтуудыг харна уу.</div>'}
+  <h2>Удахгүй болох тоглолтууд</h2>
+  ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:'<div class="panel empty">Товлогдсон тоглолт алга.</div>'}`;
+}
+function liveBar(id){const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
+  return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Газрын зураг ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
+function liveStrip(){const lv=dedupe(LIVE?.live);if(!lv.length)return '';
+  return `<div class="stack">${lv.slice(0,3).map(m=>{const a=LT(m.t1),b=LT(m.t2);return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1),'l')}${fbg(flagOfTeam(b.id,m.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span>${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b>${logo(b.logo,'sm',b.name)}<span class="sub">${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Үзэх →</span></a>`}).join('')}</div>`}
+function setLive(data){LIVE=data;const n=dedupe(LIVE?.live).length;const c=document.getElementById('livecount');c.textContent=n;c.hidden=!n;rerender()}
+setLive(LIVE);
+(async()=>{try{const db=window.claude&&await window.claude.use('db');if(!db)return;db.doc('live/now').onSnapshot(s=>{if(s.exists)setLive(s.data())},()=>{});db.collection('matches').onSnapshot(qs=>{qs.docs.forEach(d=>{MATCH[d.id]=d.data()});rerender()},()=>{});db.doc('news/latest').onSnapshot(s=>{if(s.exists){NEWS=s.data();if(route.last==='news')rerender()}},()=>{})}catch(e){}})();
+
+/* ---------- players ---------- */
+const PL=D.players||{};
+function playerHref(id,nick){return PL[id]?'#player-'+id:`${H}/player/${id}/${String(nick||'').toLowerCase()}`}
+const attrMn={Firepower:'Галын хүч',Entrying:'Эхэлж орох',Trading:'Солилцоо',Opening:'Нээлтийн килл',Clutching:'Клатч',Sniping:'Снайпер',Utility:'Утилити'};
+const monMn=s=>String(s||'').replace(/Present/,'одоо').replace(/(\w{3}) (\d{4})/g,(m,mo,y)=>y+'.'+String(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(mo)+1).padStart(2,'0'));
+function viewPlayer(id){
+  const p=PL[id];if(!p){app.innerHTML='<div class="panel empty">Тоглогч олдсонгүй.</div>';return}
+  const team=p.team?TM(tIdxById[p.team[0]]??-1):null;
+  const tn=p.team?p.team[1]:'Багагүй';
+  const soc=(p.social||[]).map(u=>{const n=/twitter|x\.com/.test(u)?'X':/twitch/.test(u)?'Twitch':/faceit/.test(u)?'FACEIT':/instagram/.test(u)?'Instagram':/youtube/.test(u)?'YouTube':/kick/.test(u)?'Kick':'Сайт';return `<a class="ext" href="${esc(u)}" target="_blank" rel="noopener">${n} ↗</a>`}).join(' · ');
+  const r=+p.rating;
+  app.innerHTML=`${p.team&&teamsById[p.team[0]]?`<a class="back" href="#team-${p.team[0]}">← ${esc(tn)}</a>`:'<a class="back" href="#ranking">← Рэнкинг</a>'}
+  <div class="panel hero flagged">${fbg(flagOfCountry(p.country))}<div class="phead"><img class="body" src="${esc(pimg(p.img))}" alt="${esc(p.nick)}"><div style="min-width:0"><div class="eyebrow">${esc(p.country)}${p.age?' · '+esc(p.age)+' настай':''}</div><h1 style="font-size:40px">${esc(p.nick)}</h1><div class="sub" style="font-size:15px">${esc(p.real)}</div>
+   <div class="meta" style="font-size:13px;margin-top:8px">${soc}</div></div></div>
+   <div class="kpis">
+    <div class="kpi"><div class="k">Баг</div><div class="v" style="font-size:18px">${p.team&&teamsById[p.team[0]]?`<a href="#team-${p.team[0]}">${esc(tn)}</a>`:esc(tn)}</div></div>
+    <div class="kpi"><div class="k">Rating 3.0 <span class="sub">(${esc(p.period==='Past 3 months'?'сүүлийн 3 сар':p.period)})</span></div><div class="v num" style="color:${r>=1.1?'var(--win)':r&&r<0.98?'var(--loss)':'var(--fg)'}">${esc(p.rating||'–')}<small>${p.maps?p.maps+' map':''}</small></div></div>
+    <div class="kpi"><div class="k">Шагналын мөнгө</div><div class="v num">${esc(p.prize||'–')}</div></div>
+    <div class="kpi"><div class="k">MVP медаль</div><div class="v num">${p.mvps||0}</div></div>
+    <div class="kpi"><div class="k">Төрсөн</div><div class="v" style="font-size:16px">${esc(p.born||'–')}</div></div>
+   </div></div>
+  <div class="two"><div class="stack">
+    <div class="panel pad stack"><h2>Тоглох хэв маяг</h2><div class="sub" style="font-size:12px">HLTV-ийн 0–100 үнэлгээ, сүүлийн 3 сарын тоглолтоор.</div><div class="attrs">${Object.entries(p.attrs||{}).map(([k,v])=>`<div class="attr"><span>${esc(attrMn[k]||k)}</span><span class="bar"><i style="width:${+v}%"></i></span><b class="num">${+v}</b></div>`).join('')||'<div class="sub">Мэдээлэл алга.</div>'}</div></div>
+    <h2>Багийн түүх</h2><div class="panel tbl-wrap"><table><thead><tr><th>Хугацаа</th><th>Баг</th><th class="r">Цом</th></tr></thead><tbody>${(p.history||[]).map(h=>{const tt=tIdxById[h[1]]!=null?TM(tIdxById[h[1]]):{logo:''};const nm=`${logo(tt.logo,'sm',h[2])} ${esc(h[2])}`;return `<tr><td class="num" style="white-space:nowrap">${esc(monMn(h[0]))}</td><td>${teamsById[h[1]]?`<a href="#team-${h[1]}" style="display:flex;gap:8px;align-items:center">${nm}</a>`:`<span style="display:flex;gap:8px;align-items:center">${nm}</span>`}</td><td class="r num">${h[3]||''}</td></tr>`}).join('')}</tbody></table></div>
+  </div><div class="stack">
+    ${(p.top20||(p.majors||[]).length)?`<div class="panel pad stack"><h3>Онцлох амжилт</h3>${p.top20?`<div>HLTV Top 20: <b class="num">${esc(p.top20)}</b></div>`:''}${(p.majors||[]).map(m=>`<div>${esc(m.replace('Major winner','Мэйжор аварга').replace('Major MVP','Мэйжорын MVP'))}</div>`).join('')}</div>`:''}
+    <h2>Цомууд</h2>${(p.trophies||[]).length?`<div class="panel">${p.trophies.map(t=>`<a class="trophy" ${evById[t[0]]!=null?`href="#event-${t[0]}"`:''}><span class="place gold">1-р</span><span>${esc(t[1])}</span></a>`).join('')}</div>`:'<div class="panel empty">Цом алга.</div>'}
+  </div></div>`;
+}
+
+/* ---------- match (scorebot) ---------- */
+let MATCH={},matchSub=null,matchSubId=0;
+const wpnMn={ak47:'AK-47',awp:'AWP',m4a1_silencer:'M4A1-S',m4a1:'M4A4',deagle:'Deagle',glock:'Glock',usp_silencer:'USP-S',hkp2000:'P2000',galilar:'Galil',famas:'FAMAS',ssg08:'Scout',p250:'P250',tec9:'Tec-9',fiveseven:'Five-SeveN',cz75a:'CZ75',mac10:'MAC-10',mp9:'MP9',mp7:'MP7',ump45:'UMP',p90:'P90',sg556:'SG 553',aug:'AUG',hegrenade:'HE',inferno:'Молотов',molotov:'Молотов',incgrenade:'Инк.',knife:'Хутга',taser:'Zeus',revolver:'R8',xm1014:'XM1014',mag7:'MAG-7',nova:'Nova',negev:'Negev',m249:'M249',elite:'Dualies',buy:''};
+const wpn=w=>w?(wpnMn[w]??w.toUpperCase()):'';
+function watchMatch(id){}
+const ICO={
+ buy:'<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-label="Худалдан авалт"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 8H6.3"/><circle cx="10" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/></svg>',
+ hp:'<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-label="Амь"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>',
+ arm:'<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-label="Хуяг"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/></svg>',
+ kit:'<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-label="Defuse kit"><path d="M4 7h16v12H4zM9 4h6v3H9z"/></svg>',
+ bomb:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-label="Бөмбөг"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 4h8v3H8z"/></svg>'};
+const sideName=s=>s==='CT'?'CT':'T';
+function logLine(e){
+  const [k,txt,parts]=e;
+  const P=(x)=>x?`<span class="lp ${x[0]==='CT'?'ct':'t'}">${esc(x[1])}</span>`:'';
+  if(k==='start')return '<div class="le info">Раунд эхэллээ</div>';
+  if(k==='roundT'||k==='roundCT'){const m=txt.match(/\((\d+) - (\d+)\) - (.*)$/);const why={'Target bombed':'Бөмбөг дэлбэрсэн','Enemy eliminated':'Өрсөлдөгчийг устгасан','Bomb defused':'Бөмбөг саармагжуулсан','Target saved':'Цаг дууссан'}[m?m[3]:'']||(m?m[3]:'');const side=k==='roundT'?'T':'CT';return `<div class="le round ${side==='CT'?'ct':'t'}">Раунд дууслаа · Ялагч: <span class="lp ${side==='CT'?'ct':'t'}">${side}</span>${m?` (<span class="lp t">${m[1]}</span> - <span class="lp ct">${m[2]}</span>) · ${esc(why)}`:''}</div>`}
+  if(k==='plant'){const p=parts[0];const m=txt.match(/on (\w+) \((\d+)on(\d+)\)/);return `<div class="le plant">${P(p)} ${ICO.bomb} бөмбөг суулгалаа${m?` · ${esc(m[1])} (${m[2]} эсрэг ${m[3]})`:''}</div>`}
+  if(k==='defuse'){const p=parts[0];return `<div class="le defuse">${P(p)} бөмбөг саармагжууллаа</div>`}
+  if(k==='kill'){const w=(txt.match(/\[([^\]]+)\]/)||[])[1]||'';const at=[...txt.matchAll(/\((\w+)\)/g)].map(x=>x[1]);const pp=parts||[];const killer=pp[0],victim=pp[pp.length-1];const assist=pp.length>2?pp.slice(1,-1):[];
+    const tag={headshot:'HS',noscope:'NS',penetration:'WB',smoke:'SM',through_smoke:'SM',blind:'BL',inair:'AIR',flashassist:'FA'};
+    return `<div class="le kill">${P(killer)}${assist.map(a=>` + ${P(a)}`).join('')}<span class="wchip">${esc(wpn(w))}</span>${at.map(a=>`<span class="katt" title="${esc({headshot:'Толгой руу',noscope:'Ноускоуп',penetration:'Хана нэвтэлсэн',smoke:'Утаагаар',through_smoke:'Утаагаар',blind:'Сохор байхдаа',inair:'Агаараас',flashassist:'Флэшээр тусалсан'}[a]||a)}">${esc(tag[a]||a)}</span>`).join('')}${P(victim)}</div>`}
+  const m2=txt.match(/^(.+?) (committed suicide|quit the game|joined the game)$/);
+  if(m2)return `<div class="le info">${esc(m2[1])} ${{'committed suicide':'өөрийгөө устгалаа','quit the game':'тоглоомоос гарлаа','joined the game':'тоглоомд орлоо'}[m2[2]]}</div>`;
+  return `<div class="le info">${esc(txt)}</div>`;
+}
+function viewMatch(id){
+  watchMatch(id);
+  const s=MATCH[id]||(D.matches&&D.matches[id])||null;
+  const lm=LIVE?(LIVE.live||[]).find(m=>m.id===id):null;
+  const um=LIVE?(LIVE.up||[]).find(m=>m.id===id):null;
+  const base=lm||um;
+  if(!s&&!base){app.innerHTML=`<a class="back" href="#live">← Шууд</a><div class="panel empty">Энэ тоглолтын шууд мэдээлэл алга.</div>`;return}
+  const head=lm?liveCard(lm).replace(/<a class="ext lkm"[^>]*>[^<]*<\/a>/,''):base?`<div class="panel pad">${upRow(base)}</div>`:'';
+  const tLogo=n=>{const t=D.tms.find(x=>x[2]===n);return t?img(t[3]):''};
+  const mapName=s&&s.round?(s.round.split(' - ')[1]||''):'';
+  const sb=s&&s.teams&&s.teams.length?`<h2>Онооны самбар</h2>
+   <div class="scorebot" data-map="${esc(mapName)}">
+    <div class="sb-top"><span>R: ${esc((s.round||'').replace(' - ',' - '))}</span><span class="sb-score"><b class="ct">${esc(s.ct)}</b><i>:</i><b class="t">${esc(s.t)}</b></span><span>${esc(s.clock==='Round over'?'Раунд дууссан':s.clock||'')}</span></div>
+    ${s.teams.map(t=>`<div class="sbwrap"><table class="sb ${t.side==='CT'?'ct':'t'}"><thead><tr><th class="tn">${tLogo(t.name)?`<img src="${esc(tLogo(t.name))}" alt="">`:''}${esc(t.name)}</th><th class="ic" title="Зэвсэг">${ICO.buy}</th><th class="ic" title="Амь">${ICO.hp}</th><th class="ic" title="Хуяг">${ICO.arm}</th><th class="r">$</th><th class="r">K</th><th class="r">A</th><th class="r">D</th><th class="r">ADR</th></tr></thead><tbody>
+     ${t.players.map(p=>{const pid=Object.keys(PL).find(k=>PL[k].nick===p.n);const hp=Math.max(0,Math.min(100,+p.hp||0));return `<tr class="${p.dead||hp===0?'dead':''}"><td class="pn">${pid?`<a href="#player-${pid}">${esc(p.n)}</a>`:esc(p.n)}${p.kit?` <span class="kit">${ICO.kit}</span>`:''}</td><td>${p.w&&p.w!=='buy'?`<span class="wchip">${esc(wpn(p.w))}</span>`:''}</td><td><span class="hpb"><i style="width:${hp}%"></i><em>${hp}</em></span></td><td class="ic">${p.arm?ICO.arm:''}</td><td class="r num">${esc(p.$)}</td><td class="r num">${esc(p.k)}</td><td class="r num">${esc(p.a)}</td><td class="r num">${esc(p.d)}</td><td class="r num">${esc(p.adr)}</td></tr>`}).join('')}
+    </tbody></table></div>`).join('')}
+    <div class="sb-foot">Шинэчилсэн ${esc(fmtT(new Date(s.updated)))} (${ago(s.updated)})</div>
+   </div>`:'';
+  const hasProb=s&&s.prob&&[s.prob.t1,s.prob.t2,s.prob.ot].some(v=>parseFloat(v)>0);
+  const pr=hasProb?`<h2>Ялах магадлал</h2><div class="panel prob"><b>${esc(s.t1)} <span class="num" style="color:var(--ct)">${esc(s.prob.t1)}</span></b><span class="line"><i style="width:${parseFloat(s.prob.t1)||0}%;background:var(--ct)"></i>${s.prob.ot?`<i style="width:${parseFloat(s.prob.ot)||0}%;background:var(--line)" title="Нэмэлт цаг"></i>`:''}<i style="width:${parseFloat(s.prob.t2)||0}%;background:var(--tside)"></i></span><b><span class="num" style="color:var(--tside)">${esc(s.prob.t2)}</span> ${esc(s.t2)}</b></div>${s.prob.ot?`<div class="sub" style="font-size:12px">Нэмэлт цаг (${esc(s.prob.otl)}) руу орох магадлал: ${esc(s.prob.ot)}</div>`:''}`:'';
+  const rd=s&&s.radar&&D.radar&&D.radar[s.radar.map]&&D.radar[s.radar.map].src?D.radar[s.radar.map]:null;
+  const radar=rd?`<div class="radar"><div class="rmap" style="aspect-ratio:${rd.w}/${rd.h}"><img src="${esc(rd.src)}" alt="${esc(s.radar.map)} газрын зургийн радар">${(s.radar.kills||[]).map(k=>`<svg class="kx ${k[0]==='CT'?'ct':'t'} ${k[3]?'old':''}" viewBox="0 0 10 10" style="left:${(k[1]*100).toFixed(2)}%;top:${(k[2]*100).toFixed(2)}%" aria-hidden="true"><path d="M1.5 1.5 8.5 8.5M8.5 1.5 1.5 8.5"/></svg>`).join('')}</div></div>`:'';
+  const gl=s&&s.log&&s.log.length?`<h2>Тоглолтын лог ба радар</h2><div class="scorebot logbox"><div class="lb-head"><span class="lb-map">${esc(mapName)}</span><span class="sub">${esc(s.round?'Раунд '+s.round.split(' - ')[0]:'')}</span><span class="rleg"><span><i class="ct"></i>CT үхсэн</span><span><i class="t"></i>T үхсэн</span><span>бүдэг = өмнөх раунд</span></span></div><div class="lb-body ${radar?'':'noradar'}"><div class="glog2">${s.log.map(logLine).join('')}</div>${radar}</div></div>`:'';
+  const st=s&&s.streams&&s.streams.length?`<h2>Шууд дамжуулалт</h2><div class="panel streams">${s.streams.slice().sort((a,b)=>b.viewers-a.viewers).map(x=>`<a class="stream" href="${esc(x.url)}" target="_blank" rel="noopener"><span><b>${esc(x.name)}</b> <span class="sub" style="font-size:12px">${esc(x.flag)}</span></span><span class="vw num sub">${x.viewers?x.viewers.toLocaleString('en-US')+' үзэгч':''}</span><span class="prov ${['twitch','kick','youtube'].includes(x.prov)?x.prov:'other'}">${esc(x.prov||'link')} ↗</span></a>`).join('')}</div><div class="sub" style="font-size:12px">Видеог энэ хуудсанд суулгах боломжгүй тул дарахад Twitch, Kick, YouTube дээр нээгдэнэ.</div>`:'';
+  app.innerHTML=`<a class="back" href="#live">← Шууд</a>${head}
+   ${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}<div class="two two-even"><div class="stack">${pr}</div><div class="stack">${st}</div></div>`;
+}
+
+/* ---------- news ---------- */
+let NEWS=D.news||null;
+const flagMn={Europe:'Европ','North America':'Хойд Америк','South America':'Өмнөд Америк',Asia:'Ази',Oceania:'Номхон далай',Other:'Дэлхий',World:'Дэлхий'};
+function viewNews(){
+  const items=(NEWS&&NEWS.items)||[];
+  app.innerHTML=`<div class="row-head"><div><div class="eyebrow">HLTV.org-ийн мэдээ · Монголоор</div><h1>Мэдээ</h1><div class="sub">${NEWS?`Сүүлд шинэчилсэн: ${esc(fmtDY(new Date(NEWS.updated)))} ${esc(fmtT(new Date(NEWS.updated)))} (${ago(NEWS.updated)}). Гарчиг болон товч агуулгыг монгол хэлээр хөрвүүлсэн; бүтэн нийтлэлийг эх сурвалжаас уншина уу.`:'Мэдээ хараахан ирээгүй байна.'}</div></div></div>
+  <div class="panel news">${items.map(n=>`<a class="nitem" href="#news-${esc(n.href.split('/')[2])}"><div style="min-width:0"><h3>${esc(n.mn)}</h3>${n.sum?`<p>${esc(n.sum)}</p>`:''}<div class="meta" style="margin-top:6px"><span>${esc(flagMn[n.flag]||n.flag||'')}</span><span>Эх гарчиг: ${esc(n.en)}</span>${n.comments?`<span>${esc(n.comments)} сэтгэгдэл</span>`:''}</div></div><div class="when">${n.ts?esc(ago(n.ts)):''}</div></a>`).join('')||'<div class="empty">Мэдээ алга.</div>'}</div>`;
+}
+
+function viewNewsItem(id){
+  const items=(NEWS&&NEWS.items)||[];const n=items.find(x=>x.href.split('/')[2]===String(id));
+  if(!n){app.innerHTML='<a class="back" href="#news">← Мэдээ</a><div class="panel empty">Мэдээ олдсонгүй.</div>';return}
+  const d=n.detail||null;const idx=items.indexOf(n);const more=items.filter(x=>x!==n).slice(0,5);
+  app.innerHTML=`<a class="back" href="#news">← Мэдээ</a>
+  <article class="panel article"><div class="eyebrow">${esc(flagMn[n.flag]||n.flag||'')}${n.ts?' · '+esc(ago(n.ts)):''}${n.comments?' · '+esc(n.comments)+' сэтгэгдэл':''}</div>
+   <h1>${esc(n.mn)}</h1>${n.sum?`<p class="lede">${esc(n.sum)}</p>`:''}
+   ${d&&d.k&&d.k.length?`<ul class="keys">${d.k.map(k=>`<li>${esc(k)}</li>`).join('')}</ul>`:''}
+   <div class="abody">${d&&d.p?d.p.map(p=>`<p>${esc(p)}</p>`).join(''):'<p class="sub">Энэ мэдээний дэлгэрэнгүй тойм хараахан бэлэн болоогүй байна.</p>'}</div>
+   <div class="asrc">Эх сурвалж: HLTV.org · «${esc(n.en)}». Энэ бол эх нийтлэлийн монгол хэл дээрх товч тойм.</div>
+  </article>
+  ${more.length?`<h2>Бусад мэдээ</h2><div class="panel news">${more.map(x=>`<a class="nitem" href="#news-${esc(x.href.split('/')[2])}"><div style="min-width:0"><h3>${esc(x.mn)}</h3></div><div class="when">${x.ts?esc(ago(x.ts)):''}</div></a>`).join('')}</div>`:''}`;
+}
+
+/* ---------- search ---------- */
+const q=document.getElementById('q'),sres=document.getElementById('sres');
+q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(!s){sres.hidden=true;return}
+  const hits=D.tms.filter(t=>t[2].toLowerCase().includes(s)).sort((a,b)=>(rankById[a[0]]?.[0]||999)-(rankById[b[0]]?.[0]||999)).slice(0,10);
+  sres.innerHTML=hits.length?hits.map(t=>{const r=rankById[t[0]];return `<a href="#" data-team="${t[0]}">${logo(img(t[3]),'sm',t[2])}<span>${esc(t[2])}</span><span class="sub num" style="margin-left:auto;font-size:12px">${r?'#'+r[0]:''}</span></a>`}).join(''):'<div class="empty">Олдсонгүй</div>';
+  sres.hidden=false;
+  sres.querySelectorAll('[data-team]').forEach(a=>a.onclick=e=>{e.preventDefault();sres.hidden=true;q.value='';openTeam(+a.dataset.team)});
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))sres.hidden=true});
+
+/* ---------- router ---------- */
+function rerender(){if(!route.last)return;const y=window.scrollY;const h=route.last;if(h==='live'||h==='news'||/^(team|match)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y)}}
+function render(h){
+  let m;
+  if((m=h.match(/^team-(\d+)$/)))viewTeam(+m[1]);
+  else if((m=h.match(/^event-(\d+)$/)))viewEvent(+m[1]);
+  else if(h==='events')viewEvents();
+  else if(h==='live')viewLive();
+  else if(h==='news')viewNews();
+  else if((m=h.match(/^news-(\d+)$/)))viewNewsItem(+m[1]);
+  else if((m=h.match(/^match-(\d+)$/)))viewMatch(+m[1]);
+  else if((m=h.match(/^player-(\d+)$/)))viewPlayer(+m[1]);
+  else if(h==='valve'){rankMode='valve';viewRanking()}
+  else viewRanking();
+}
+function route(){
+  const h=location.hash.slice(1)||'ranking';
+  if(/^team-/.test(h)&&route.last!==h)teamTab='overview';
+  document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('on',h===a.dataset.nav||(a.dataset.nav==='ranking'&&/^(team|valve)/.test(h))||(a.dataset.nav==='events'&&/^event/.test(h))||(a.dataset.nav==='news'&&/^news/.test(h))||(a.dataset.nav==='live'&&/^match/.test(h))));
+  route.last=h;render(h);window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);route();
+})();
+</script>
+
+</body>
+</html>
