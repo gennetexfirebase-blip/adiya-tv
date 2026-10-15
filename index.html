@@ -198,6 +198,31 @@ td.r,th.r{text-align:right}
 .empty{padding:32px 16px;text-align:center;color:var(--muted)}
 .ext{color:var(--accent);font-weight:700}
 .ext:hover{text-decoration:underline}
+:root{--orn:var(--vrs);--khee:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2012%22%3E%3Cpath%20d%3D%22M0%2010.5H24M7%2010.5V1.5H17V7.5H11V4.5H14%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22square%22/%3E%3C/svg%3E");--ulzii:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%201.5%2022.5%2012%2012%2022.5%201.5%2012Z%22/%3E%3Cpath%20d%3D%22M8.5%205%2019%2015.5M5%208.5%2015.5%2019M15.5%205%205%2015.5M19%208.5%208.5%2019%22/%3E%3Cpath%20d%3D%22M12%201.5c2%200%203%201%203%203M22.5%2012c0%202-1%203-3%203M12%2022.5c-2%200-3-1-3-3M1.5%2012c0-2%201-3%203-3%22/%3E%3C/g%3E%3C/svg%3E");--ever:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M4%2060C4%2030%2018%2012%2040%2012c12%200%2018%207%2018%2014%200%208-6%2012-12%2012-6%200-9-4-9-8%200-4%203-6%206-6%22/%3E%3Cpath%20d%3D%22M4%2060c6-14%2016-22%2028-22%22/%3E%3Cpath%20d%3D%22M14%2060c4-8%2010-12%2018-12%205%200%208%203%208%206%22/%3E%3C/g%3E%3C/svg%3E")}
+/* Mongolian ornament layer: alkhan khee borders, ulzii knots, ever-scroll corners */
+.orn-strip{height:12px;background:var(--orn);opacity:.32;-webkit-mask:var(--khee) repeat-x left center/24px 12px;mask:var(--khee) repeat-x left center/24px 12px}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:12px;background:linear-gradient(90deg,transparent,var(--orn) 18%,var(--orn) 82%,transparent);opacity:.38;-webkit-mask:var(--khee) repeat-x left center/24px 12px;mask:var(--khee) repeat-x left center/24px 12px;pointer-events:none}
+h2{display:flex;align-items:center;gap:10px}
+h2::before{content:"";flex:none;width:15px;height:15px;background:var(--orn);-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat}
+h2::after{content:"";flex:1;height:10px;min-width:40px;background:var(--orn);opacity:.22;-webkit-mask:var(--khee) repeat-x left center/20px 10px;mask:var(--khee) repeat-x left center/20px 10px}
+.hero::after,.article::after{content:"";position:absolute;right:14px;top:14px;width:84px;height:84px;background:var(--orn);opacity:.16;-webkit-mask:var(--ever) center/contain no-repeat;mask:var(--ever) center/contain no-repeat;transform:scaleX(-1);pointer-events:none}
+.article{position:relative}
+.hero::before{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--orn);opacity:.25;-webkit-mask:var(--khee) repeat-x left center/20px 10px;mask:var(--khee) repeat-x left center/20px 10px;z-index:1;pointer-events:none}
+.ulzii-mark{display:inline-block;width:1em;height:1em;background:currentColor;-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat;vertical-align:-.12em}
+.brand .tv{position:relative}
+footer{position:relative;padding-top:28px!important}
+footer::before{content:"";position:absolute;left:16px;right:16px;top:0;height:12px;background:var(--orn);opacity:.3;-webkit-mask:var(--khee) repeat-x left center/24px 12px;mask:var(--khee) repeat-x left center/24px 12px}
+body::before{content:"";position:fixed;right:-120px;bottom:-120px;width:420px;height:420px;background:var(--orn);opacity:.035;-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat;pointer-events:none;z-index:0}
+main,footer{position:relative;z-index:1}
+/* collapsible lists */
+details.mlist>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 18px;font:500 15px var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+details.mlist>summary::-webkit-details-marker{display:none}
+details.mlist>summary::before{content:"";width:15px;height:15px;background:var(--orn);-webkit-mask:var(--ulzii) center/contain no-repeat;mask:var(--ulzii) center/contain no-repeat}
+details.mlist>summary .cnt{font:700 12px var(--f-mono);color:var(--muted);letter-spacing:0}
+details.mlist>summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
+details.mlist[open]>summary::after{transform:rotate(180deg)}
+details.mlist[open]>summary{border-bottom:1px solid var(--line)}
+details.mlist .mrow:first-child{border-top:0}
 footer{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 36px;color:var(--muted);font-size:12px}
 .back{color:var(--muted);font-size:13px;font-weight:600;justify-self:start}
 .back:hover{color:var(--fg)}
@@ -535,6 +560,7 @@ function viewEvents(){
 function bindEv(){app.querySelectorAll('[data-ev]').forEach(el=>{const go=()=>location.hash='event-'+el.dataset.ev;el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter')go()}})}
 function bindTeams(){app.querySelectorAll('[data-team]').forEach(el=>{el.onclick=e=>{e.preventDefault();openTeam(+el.dataset.team)}})}
 
+const qualMn=t=>String(t).replace('Open Registration','Нээлттэй бүртгэл').replace(/Open Qualifier/g,'Нээлттэй шалгаруулалт').replace(/Closed Qualifier/g,'Хаалттай шалгаруулалт').replace('Invited','Урилгаар').replace(/^VRS/,'VRS-ээр').replace('Regional Qualifier','Бүсийн шалгаруулалт').replace('Qualifier','Шалгаруулалт');
 function viewEvent(id){
   const ei=evById[id];const ev=ei!=null?EV(ei):null;
   if(!ev){app.innerHTML='<div class="panel empty">Тэмцээн олдсонгүй.</div>';return}
@@ -550,10 +576,10 @@ function viewEvent(id){
   const kind=row?(row[3]?'LAN':row[8]):past?past[5]:'';
   const det=D.evDetail&&D.evDetail[id];
   const partHtml=det&&det.teams.length?`<div class="parts">${det.teams.map(x=>{const t=x[0]>=0?TM(x[0]):{id:0,name:'TBD',logo:''};const mn=isMnTeam(t.id);
-      return `<a class="panel part ${mn?'mnpart':''}" href="${t.id?'#team-'+t.id:'#events'}">${logo(t.logo,'',t.name)}<div class="pmeta"><b>${esc(t.name)}</b>${mn?' <span class="badge mn">MN</span>':''}<div class="sub num" style="font-size:11px">${[x[1]?'HLTV '+esc(x[1]):'',x[2]?'VRS '+esc(x[2]):''].filter(Boolean).join(' · ')}</div>${x[3]?`<div class="sub" style="font-size:11px">${esc(x[3].replace('Invited','Урилгаар').replace('VRS','VRS-ээр'))}</div>`:''}<div class="pl">${(x[4]||[]).map(p=>`<span>${esc(p[0])}</span>`).join('')}</div></div></a>`}).join('')}</div>`:'';
+      return `<a class="panel part ${mn?'mnpart':''}" href="${t.id?'#team-'+t.id:'#events'}">${logo(t.logo,'',t.name)}<div class="pmeta"><b>${esc(t.name)}</b>${mn?' <span class="badge mn">MN</span>':''}<div class="sub num" style="font-size:11px">${[x[1]?'HLTV '+esc(x[1]):'',x[2]?'VRS '+esc(x[2]):''].filter(Boolean).join(' · ')}</div>${x[3]?`<div class="sub" style="font-size:11px">${esc(qualMn(x[3]))}</div>`:''}<div class="pl">${(x[4]||[]).map(p=>`<span>${esc(p[0])}</span>`).join('')}</div></div></a>`}).join('')}</div>`:'';
   const prizeHtml=det&&det.prizes.length?`<div class="panel tbl-wrap"><table><thead><tr><th>Байр</th><th>Шагнал</th><th>Баг</th></tr></thead><tbody>${det.prizes.map(x=>{const t=x[3]>=0?TM(x[3]):null;return `<tr><td>${['1st','2nd','3rd'].includes(x[0])?TROPHY(placeCls(x[0]),20):''} <b>${esc(placeMn(x[0])||x[0])}</b></td><td class="num">${esc(x[1])}${x[2]?` <span class="sub" style="font-size:11px">${esc(x[2].replace('Club share','Клубын хувь'))}</span>`:''}</td><td>${t?`<a href="#team-${t.id}" style="display:inline-flex;gap:8px;align-items:center">${logo(t.logo,'sm',t.name)}${esc(t.name)}</a>`:'<span class="sub">—</span>'}</td></tr>`}).join('')}</tbody></table></div>`:'';
   app.innerHTML=`<a class="back" href="#events">← Тэмцээнүүд</a>
-  <div class="panel"><div class="thead">${logo(ev.logo,'lg',ev.name)}<div style="min-width:0"><div class="eyebrow">${row?.[1]==='ongoing'?'<span class="badge live">ШУУД</span> ':''}Тэмцээн</div><h1>${esc(ev.name)}</h1>
+  <div class="panel hero"><div class="thead">${logo(ev.logo,'lg',ev.name)}<div style="min-width:0"><div class="eyebrow">${row?.[1]==='ongoing'?'<span class="badge live">ШУУД</span> ':''}Тэмцээн</div><h1>${esc(ev.name)}</h1>
    <div class="meta" style="font-size:13px"><span class="num">${fmtDY(ev.start)}${ev.end?' – '+fmtDY(ev.end):''}</span>${kind?`<span>${esc(kind==='Online'?'Онлайн':kind)}</span>`:''}${(row?.[4]||past?.[1])?`<span>${esc(row?.[4]||past?.[1])}</span>`:''}${(row?.[6]||past?.[3])&&(row?.[6]||past?.[3])!=='Other'?`<span class="num">Шагнал: ${esc(row?.[6]||past?.[3])}</span>`:''}${(row?.[7]||past?.[4])?`<span>${esc(row?.[7]||past?.[4])} баг</span>`:''}</div>
    </div></div></div>
   ${det?`<div class="kpis panel" style="border-radius:var(--r)"><div class="kpi"><div class="k">Шагналын сан</div><div class="v num" style="font-size:18px">${esc(det.prize||'–')}</div></div><div class="kpi"><div class="k">Багууд</div><div class="v num">${esc(det.teamsN||String(det.teams.length))}</div></div><div class="kpi"><div class="k">Байршил</div><div class="v" style="font-size:15px">${esc(det.loc||'–')}</div></div></div>`:''}
@@ -561,7 +587,7 @@ function viewEvent(id){
   ${prizeHtml?`<h2>Шагналын хуваарилалт</h2>${prizeHtml}`:''}
   <div class="two"><div class="stack">${partHtml?'':'<h2>Оролцогч багууд</h2>'}
    ${partHtml?'':list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Зөвхөн дэлхийн шилдэг 40 багийн мэдээллээс. Бүх оролцогчийг HLTV дээрээс харна уу.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
-  </div><div class="stack"><h2>Тоглолтууд</h2>${ms.length?`<div class="panel compact">${ms.map(m=>matchRow(m.a,m.b,m.sa,m.sb,m.d,m.id,m.done)).join('')}</div>`:'<div class="panel empty">Тоглолтын мэдээлэл алга.</div>'}</div></div>`;
+  </div><div class="stack">${ms.length?`<details class="panel compact mlist"><summary>Тоглолтууд <span class="cnt">${ms.length}</span></summary>${ms.map(m=>matchRow(m.a,m.b,m.sa,m.sb,m.d,m.id,m.done)).join('')}</details>`:'<div class="panel empty">Тоглолтын мэдээлэл алга.</div>'}</div></div>`;
   bindTeams();
 }
 function matchRow(a,b,sa,sb,d,mid,done){
