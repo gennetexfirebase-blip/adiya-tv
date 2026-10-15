@@ -272,7 +272,8 @@ footer{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 36px;c
 .lb-head .rleg{margin-left:auto}
 .lb-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);height:480px}
 .lb-body.noradar{grid-template-columns:minmax(0,1fr)}
-.lb-body .glog2{max-height:none;height:100%;border-right:1px solid var(--sb-line);padding:14px 16px;scrollbar-width:thin}
+.lb-body .glog2{max-height:none;height:100%;border-right:1px solid var(--sb-line);padding:14px 16px 28px;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain;-webkit-mask-image:linear-gradient(180deg,#000 85%,transparent);mask-image:linear-gradient(180deg,#000 85%,transparent)}
+.glog2::-webkit-scrollbar{display:none}
 .radar{position:relative;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 50% 50%,rgba(94,162,255,.10),transparent 65%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 32px)}
 .rmap{position:relative;width:100%;max-height:100%}
 .rmap img{display:block;width:100%;height:100%;object-fit:contain;filter:brightness(1.55) contrast(1.1) drop-shadow(0 0 18px rgba(94,162,255,.25))}
@@ -346,6 +347,7 @@ a.nitem:hover h3{color:var(--accent)}
 <main id="app"><div class="empty">Ачаалж байна…</div></main>
 <footer id="foot"></footer>
 
+<script src="config.js"></script>
 <script src="hltv-data.js"></script>
 <script>
 (function(){
@@ -712,6 +714,17 @@ function viewNewsItem(id){
   ${more.length?`<h2>Бусад мэдээ</h2><div class="panel news">${more.map(x=>`<a class="nitem" href="#news-${esc(x.href.split('/')[2])}"><div style="min-width:0"><h3>${esc(x.mn)}</h3></div><div class="when">${x.ts?esc(ago(x.ts)):''}</div></a>`).join('')}</div>`:''}`;
 }
 
+/* ---------- Supabase realtime (standalone site; skipped when config.js is absent) ---------- */
+(async()=>{const C=window.FB_SUPABASE;if(!C||!C.url||!C.anonKey)return;
+  try{
+    await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
+    const sb=window.supabase.createClient(C.url,C.anonKey);
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}};
+    sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
+    const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
+  }catch(e){console.warn('Supabase realtime unavailable',e)}
+})();
+
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');
 q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(!s){sres.hidden=true;return}
@@ -723,7 +736,7 @@ q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(!s){sres
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))sres.hidden=true});
 
 /* ---------- router ---------- */
-function rerender(){if(!route.last)return;const y=window.scrollY;const h=route.last;if(h==='live'||h==='news'||/^(team|match)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y)}}
+function rerender(){if(!route.last)return;const y=window.scrollY;const gl=document.querySelector('.glog2');const gy=gl?gl.scrollTop:0;const h=route.last;if(h==='live'||h==='news'||/^(team|match)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y);const g2=document.querySelector('.glog2');if(g2)g2.scrollTop=gy}}
 function render(h){
   let m;
   if((m=h.match(/^team-(\d+)$/)))viewTeam(+m[1]);
