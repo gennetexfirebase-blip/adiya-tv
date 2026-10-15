@@ -19,7 +19,7 @@
   --hltv:var(--primary); --vrs:#8a6a2e; --accent:var(--primary); --accent-2:var(--primary-dk);
   --win:#4e7a32; --loss:var(--primary); --live:#a8321f;
   --gold:#a8822f; --silver:#7d7f86; --bronze:#94572c;
-  --mn:var(--primary); --ct:#5d6878; --tside:#9a6a14; --flag-op:.28;
+  --mn:var(--primary); --ct:#5d6878; --tside:#9a6a14; --flag-op:.62;
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Manrope",system-ui,"Segoe UI",Arial,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
@@ -661,6 +661,7 @@ header.top::after{content:none!important;display:none!important}
 @media (max-width:760px){.rk{padding-left:34px;padding-right:30px;background-size:24px 24px}}
 /* no corner knots on small cards (participants, events, teams lists) — they crowd the logos */
 .parts>*,.ev-grid>*,.mnteams>*,.shots>*,.cabinet>*,.two>.panel .panel{background-image:none!important}
+:root[data-theme="light"] .flagbg{filter:saturate(1.35) contrast(1.05)}
 </style>
 
 </head>
