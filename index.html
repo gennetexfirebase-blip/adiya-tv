@@ -884,6 +884,11 @@ h2::after{display:none!important}
 .mb-wl{position:absolute;right:10px;font-size:11px;opacity:.85}
 .mb-strip.best{outline:2px solid var(--primary,#8E3B2B);outline-offset:1px}
 @media (max-width:860px){.mapbd{grid-template-columns:minmax(0,1fr)}}
+.rrow .sc{display:flex;gap:4px;justify-content:center;font-size:15px}
+.rrow .sc b{font-weight:800;color:var(--muted)}.rrow .sc b.w{color:var(--win)}
+.rrow .t.l span{opacity:.6}
+.resday{display:grid}
+.resday .evhdr{margin-top:6px}
 </style>
 
 </head>
@@ -1237,9 +1242,11 @@ function viewLive(){
   <details class="panel mlist upfold" id="upfold" ${(upOpen||!lv.length)?'open':''}><summary>Удахгүй болох тоглолтууд <span class="cnt">${(up.length||(liveMode==='all'?todayMatches().length:0))}</span></summary><div class="upfold-b">
   ${!up.length&&liveMode==='all'?(()=>{const t=todayMatches();return t.length?`<div class="panel upl">${t.map(upRow).join('')}</div><div class="sub" style="font-size:12px">Багуудын хуваариас. Цаг нь Улаанбаатарын цагаар.</div>`:''})():''}
   ${up.length?`<div class="panel upl">${up.map(upRow).join('')}</div><div class="sub" style="font-size:12px">★ нь HLTV-ийн тоглолтын ач холбогдлын үнэлгээ. Цаг нь Улаанбаатарын цагаар.</div>`:(liveMode==='all'&&todayMatches().length?'':`<div class="panel empty tsam">${liveMode==='mn'?'Монгол багуудын товлогдсон тоглолт одоогоор алга.':'Товлогдсон тоглолт алга.'}</div>`)}
-  </div></details>`;
+  </div></details>
+  ${resultsHtml(liveMode==='mn')}`;
   app.querySelectorAll('#liveseg button').forEach(b=>b.onclick=()=>{liveMode=b.dataset.l;viewLive()});
   const uf=document.getElementById('upfold');if(uf)uf.addEventListener('toggle',()=>{upOpen=uf.open});
+  const rf=document.getElementById('resfold');if(rf)rf.addEventListener('toggle',()=>{resOpen=rf.open});
 }
 let upOpen=false;
 function liveBar(id){if(liveOld())return '';const m=liveOf(id);if(!m)return '';const a=LT(m.t1),b=LT(m.t2);
@@ -1289,6 +1296,7 @@ function viewPlayer(id){
 /* ---------- match (scorebot) ---------- */
 let EVB={};
 let TMAP=Object.assign({},D.tmaps||{});
+let RES={};
 let MATCH={},matchSub=null,matchSubId=0;
 const wpnMn={ak47:'AK-47',awp:'AWP',m4a1_silencer:'M4A1-S',m4a1:'M4A4',deagle:'Deagle',glock:'Glock',usp_silencer:'USP-S',hkp2000:'P2000',galilar:'Galil',famas:'FAMAS',ssg08:'Scout',p250:'P250',tec9:'Tec-9',fiveseven:'Five-SeveN',cz75a:'CZ75',mac10:'MAC-10',mp9:'MP9',mp7:'MP7',ump45:'UMP',p90:'P90',sg556:'SG 553',aug:'AUG',hegrenade:'HE',inferno:'Молотов',molotov:'Молотов',incgrenade:'Инк.',knife:'Хутга',taser:'Zeus',revolver:'R8',xm1014:'XM1014',mag7:'MAG-7',nova:'Nova',negev:'Negev',m249:'M249',elite:'Dualies',buy:''};
 const wpn=w=>w?(wpnMn[w]??w.toUpperCase()):'';
@@ -1391,7 +1399,7 @@ function viewNewsItem(id){
   try{
     await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
     const sb=window.supabase.createClient(C.url,C.anonKey);
-    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('r:')){RES[r.k.slice(2)]=r.v;if(route.last==='live')rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
     sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
     const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
   }catch(e){console.warn('Supabase realtime unavailable',e)}
@@ -1548,6 +1556,24 @@ function mapCompareHtml(aId,bId,aName,bName){
    ${rows.map(r=>{const aw=r.a&&(!r.b||r.a.wr>r.b.wr),bw=r.b&&(!r.a||r.b.wr>r.a.wr);return `<div class="mc-row"><div class="mc-a ${aw?'up':''}">${cell(r.a)}<span class="mc-bar l"><i style="width:${r.a?r.a.wr:0}%"></i></span></div><div class="mc-n">${esc(r.n)}</div><div class="mc-b ${bw?'up':''}"><span class="mc-bar"><i style="width:${r.b?r.b.wr:0}%"></i></span>${cell(r.b)}</div></div>`}).join('')}
    <div class="mc-foot"><span>${ba?`${esc(aName)}: <b>${esc(ba.n)}</b>`:''}</span><span>${bb?`${esc(bName)}: <b>${esc(bb.n)}</b>`:''}</span></div>
    <div class="sub" style="font-size:12px">Хоёр багийн сүүлийн 3 сарын мапын ялалтын хувь. Тод нь тухайн мап дээр илүү сайн нь.</div></div>`}
+
+/* ---------- results of the last 14 days: collector rows 'r:<id>' first, team histories fill the rest ---------- */
+const DAY14=14*864e5;
+function recentResults(){
+  const out=new Map(),cut=Date.now()-DAY14;
+  Object.values(RES).forEach(r=>{const t=Date.parse(r.ended||0);if(t<cut)return;out.set(String(r.id),{id:r.id,t,ev:r.ev,evName:r.evName,a:LT(r.t1),b:LT(r.t2),s1:+r.s1||0,s2:+r.s2||0,maps:r.maps||[],bo:r.bo||''})});
+  Object.values(D.teams).forEach(t=>(t.res||[]).forEach(r=>{const at=r[0]*6e4;if(at<cut)return;const id=String(r[5]||'');if(!id||out.has(id))return;
+    const me=TM(t.t),op=TM(r[2]);const e=EV(r[1]);out.set(id,{id:+id,t:at,ev:e?e.id:0,evName:e?e.name:'',a:{id:me.id,name:me.name,logo:me.logo},b:{id:op.id,name:op.name,logo:op.logo},s1:+r[3],s2:+r[4],maps:[],bo:''})}));
+  return [...out.values()].sort((x,y)=>y.t-x.t)}
+function resultsHtml(mnOnly){
+  let L=recentResults();if(mnOnly)L=L.filter(m=>isMnTeam(m.a.id)||isMnTeam(m.b.id));
+  if(!L.length)return '';
+  const days=[];L.forEach(m=>{const d=ubDay(m.t);let g=days[days.length-1];if(!g||g.d!==d){g={d,t:m.t,ms:[]};days.push(g)}g.ms.push(m)});
+  const row=m=>{const aw=m.s1>m.s2,bw=m.s2>m.s1;const tl=(t,r,w)=>{const inner=r?`<span>${esc(t.name)}</span>${logo(t.logo,'sm',t.name)}`:`${logo(t.logo,'sm',t.name)}<span>${esc(t.name)}</span>`;return `<a class="t ${r?'r':''} ${w?'w':'l'}" href="#team-${t.id}">${inner}</a>`};
+    return `<div class="mrow rrow ${isMnTeam(m.a.id)||isMnTeam(m.b.id)?'mnm':''}"><span class="dt num sub">${fmtT(new Date(m.t))}</span>${tl(m.a,1,aw)}<span class="sc num"><b class="${aw?'w':''}">${m.s1}</b>:<b class="${bw?'w':''}">${m.s2}</b></span>${tl(m.b,0,bw)}<a class="evn" href="#event-${m.ev}">${esc(m.evName)}${m.maps.length?` · <span class="sub">${m.maps.map(x=>esc(x.n)+' '+esc(x.s1)+':'+esc(x.s2)).join(', ')}</span>`:''}</a></div>`};
+  return `<details class="panel mlist resfold" ${resOpen?'open':''} id="resfold"><summary>Сүүлийн 14 хоногийн үр дүн <span class="cnt">${L.length}</span></summary><div class="upfold-b">
+    ${days.map(g=>`<div class="resday"><div class="evhdr">${esc(fmtDY(new Date(g.t)))}</div>${g.ms.map(row).join('')}</div>`).join('')}</div></details>`}
+let resOpen=false;
 
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');

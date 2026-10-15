@@ -198,6 +198,21 @@
     console.log('COREX TV: pushing this match on every scoreboard change');
   } else {
     let liveIds = [];
+    const lastSeen = {};
+    // one request per finished match: read the final map scores from its page
+    const saveResult = async id => {
+      const m = lastSeen[id]; if (!m) return;
+      try {
+        const r = await fetch('/matches/' + m.path, { cache: 'no-store' }); if (!r.ok) return;
+        const maps = readMaps(new DOMParser().parseFromString(await r.text(), 'text/html')).filter(x => x.n && x.n !== 'TBA');
+        const won = n => maps.filter(x => x.w === n).length;
+        let s1 = won(1), s2 = won(2);
+        if (!s1 && !s2 && maps.length === 1) { s1 = +maps[0].s1 || 0; s2 = +maps[0].s2 || 0; }
+        await put('r:' + id, { id, path: m.path, ev: m.ev, evName: m.evName, t1: m.t1, t2: m.t2, bo: m.bo, lan: m.lan, stars: m.stars,
+          s1, s2, maps: maps.map(x => ({ n: x.n, s1: x.s1, s2: x.s2, w: x.w })), ended: new Date().toISOString() });
+      } catch (e) {}
+      delete lastSeen[id];
+    };
     const list = async () => {
       let d;
       try {
@@ -232,8 +247,9 @@
       const sig = JSON.stringify({ live, up });
       if (sig !== last) { last = sig; await put('now', { live, up, updated: new Date().toISOString() }); }
       const ids = live.map(m => m.id);
-      for (const old of liveIds) if (!ids.includes(old)) await del('m:' + old); // finished matches leave the table
-      liveIds = ids;
+      // finished matches: keep a small result row 'r:<id>' (14 days, cleaned up in the database), drop the heavy scoreboard
+      for (const old of liveIds) if (!ids.includes(old)) { await saveResult(old); await del('m:' + old); }
+      liveIds = ids; live.forEach(m => { lastSeen[m.id] = m; });
       // in a userscript on hltv.org/matches: keep a hidden same-origin frame per live match so its scoreboard streams too
       if (window.__fbFrames) {
         const want = new Set(live.map(m => String(m.id)));
