@@ -90,6 +90,27 @@
       clock: T(top?.querySelector('.timeText')), teams, log, prob, streams, radar, updated: new Date().toISOString() };
   }
 
+  // Event pages: capture the rendered bracket / group tables (structure-agnostic) plus any JSON HLTV embeds,
+  // so the site can redraw them. Sent as row 'e:<eventId>'.
+  const captureEvent = (doc, eid) => {
+    const clean = el => { const c = el.cloneNode(true);
+      c.querySelectorAll('script,style,svg,noscript').forEach(x => x.remove());
+      c.querySelectorAll('img').forEach(i => { const src = i.getAttribute('src') || ''; [...i.attributes].forEach(a => i.removeAttribute(a.name)); i.setAttribute('data-src', src); i.setAttribute('alt', ''); });
+      c.querySelectorAll('*').forEach(x => [...x.attributes].forEach(a => { if (!/^(class|href|data-[\w-]+|title)$/.test(a.name)) x.removeAttribute(a.name); }));
+      return c.outerHTML.replace(/\s+/g, ' '); };
+    const heads = [...doc.querySelectorAll('h2,h3,.headline,.standard-headline,.bracket-headline')].filter(h => /bracket|group|playoff|elimination|swiss|stage/i.test(h.textContent));
+    const blocks = [...new Set(heads.map(h => h.closest('.standard-box, section, .bracket-container, .groups-container, .event-bracket') || h.parentElement))].slice(0, 8);
+    const jsons = [...doc.querySelectorAll('*')].flatMap(el => [...el.attributes].filter(a => /json|bracket/i.test(a.name) && a.value.length > 50).map(a => ({ tag: el.className || el.tagName, attr: a.name, value: a.value.slice(0, 120000) }))).slice(0, 6);
+    return { id: eid, blocks: blocks.map(clean).map(h => h.slice(0, 150000)), jsons, updated: new Date().toISOString() };
+  };
+  if (/^\/events\/\d+/.test(location.pathname)) {
+    const eid = +location.pathname.split('/')[2];
+    let lastE = '';
+    const pushE = () => { const v = captureEvent(document, eid); const sig = JSON.stringify(v.blocks) + JSON.stringify(v.jsons); if (sig !== lastE && (v.blocks.length || v.jsons.length)) { lastE = sig; put('e:' + eid, v); } };
+    setTimeout(pushE, 3000); setInterval(pushE, 60000);
+    console.log('COREX TV: capturing this event bracket');
+    return;
+  }
   clearInterval(window.__fbTimer); if (window.__fbObs) window.__fbObs.disconnect(); let last = '';
   if (/^\/matches\/\d+/.test(location.pathname)) {
     // Push the moment HLTV's scorebot changes the page. Mutation callbacks are not throttled in background

@@ -127,6 +127,22 @@ h3{font-size:16px;font-family:var(--f-body)}
 .mnchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;border:1px solid color-mix(in srgb,var(--mn) 45%,var(--line));background:color-mix(in srgb,var(--mn) 10%,transparent);font-size:13px}
 .mnchip:hover{background:color-mix(in srgb,var(--mn) 18%,transparent)}
 .ev.mnev{border-color:color-mix(in srgb,var(--mn) 30%,var(--line))}
+.brk{padding:16px;overflow-x:auto;font-size:13px}
+.brk h2,.brk h3,.brk .headline,.brk .standard-headline{font:600 14px var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 10px;display:block}
+.brk h2::before,.brk h2::after{display:none}
+.brk img{width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:6px}
+.brk table{width:auto;min-width:420px;border-collapse:collapse;margin-bottom:14px}
+.brk td,.brk th{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+.brk a{color:var(--fg)}
+.brk a:hover{color:var(--accent)}
+.brk [class*="slot"],.brk [class*="match"]{border-radius:8px}
+.brk-empty{display:grid;gap:14px;justify-items:center}
+.brk-ghost{display:flex;gap:18px;opacity:.5;overflow-x:auto;max-width:100%}
+.bcol{display:grid;gap:10px;align-content:center;min-width:140px}
+.bcol b{font:600 12px var(--f-display);letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.bslot{display:grid;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+.bslot span{padding:6px 10px;font-weight:700;color:var(--muted)}
+.bslot span+span{border-top:1px solid var(--line)}
 .parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
 .part{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;transition:transform .18s,border-color .18s}
 .part:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -595,8 +611,9 @@ function viewEvent(id){
   ${det?`<div class="kpis panel" style="border-radius:var(--r)"><div class="kpi"><div class="k">Шагналын сан</div><div class="v num" style="font-size:18px">${esc(det.prize||'–')}</div></div><div class="kpi"><div class="k">Багууд</div><div class="v num">${esc(det.teamsN||String(det.teams.length))}</div></div><div class="kpi"><div class="k">Байршил</div><div class="v" style="font-size:15px">${esc(det.loc||'–')}</div></div></div>`:''}
   ${partHtml?`<h2>Оролцох багууд (${det.teams.length})</h2>${partHtml}`:''}
   ${prizeHtml?`<h2>Шагналын хуваарилалт</h2>${prizeHtml}`:''}
+  <h2>Хэсгийн шат ба хасагдах шат</h2>${bracketHtml(id)}
   <div class="two"><div class="stack">${partHtml?'':'<h2>Оролцогч багууд</h2>'}
-   ${partHtml?'':list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Зөвхөн дэлхийн шилдэг 40 багийн мэдээллээс. Бүх оролцогчийг HLTV дээрээс харна уу.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
+   ${partHtml?'':list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Бидэнд мэдээлэлтэй багуудаас.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
   </div><div class="stack">${ms.length?`<details class="panel compact mlist"><summary>Тоглолтууд <span class="cnt">${ms.length}</span></summary>${ms.map(m=>matchRow(m.a,m.b,m.sa,m.sb,m.d,m.id,m.done)).join('')}</details>`:'<div class="panel empty">Тоглолтын мэдээлэл алга.</div>'}</div></div>`;
   bindTeams();
 }
@@ -797,6 +814,7 @@ function viewPlayer(id){
 }
 
 /* ---------- match (scorebot) ---------- */
+let EVB={};
 let MATCH={},matchSub=null,matchSubId=0;
 const wpnMn={ak47:'AK-47',awp:'AWP',m4a1_silencer:'M4A1-S',m4a1:'M4A4',deagle:'Deagle',glock:'Glock',usp_silencer:'USP-S',hkp2000:'P2000',galilar:'Galil',famas:'FAMAS',ssg08:'Scout',p250:'P250',tec9:'Tec-9',fiveseven:'Five-SeveN',cz75a:'CZ75',mac10:'MAC-10',mp9:'MP9',mp7:'MP7',ump45:'UMP',p90:'P90',sg556:'SG 553',aug:'AUG',hegrenade:'HE',inferno:'Молотов',molotov:'Молотов',incgrenade:'Инк.',knife:'Хутга',taser:'Zeus',revolver:'R8',xm1014:'XM1014',mag7:'MAG-7',nova:'Nova',negev:'Negev',m249:'M249',elite:'Dualies',buy:''};
 const wpn=w=>w?(wpnMn[w]??w.toUpperCase()):'';
@@ -896,7 +914,7 @@ function viewNewsItem(id){
   try{
     await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
     const sb=window.supabase.createClient(C.url,C.anonKey);
-    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}};
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}};
     sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
     const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
   }catch(e){console.warn('Supabase realtime unavailable',e)}
@@ -929,6 +947,22 @@ function streamBlock(list,isLive){
 }
 document.addEventListener('click',e=>{const b=e.target.closest('button.stream[data-url]');if(!b)return;streamPick=b.dataset.url;rerender();document.querySelector('.featured')?.scrollIntoView({behavior:'smooth',block:'start'})});
 
+/* ---------- event bracket (captured from the event page, redrawn in our style) ---------- */
+function bracketHtml(id){
+  const b=EVB[id];
+  if(!b||!b.blocks||!b.blocks.length)return `<div class="panel empty brk-empty"><div class="brk-ghost">${['Нээлтийн тойрог','Дээд хагас шигшээ','Дээд финал'].map((r,i)=>`<div class="bcol"><b>${r}</b>${Array.from({length:4>>i||1},()=>'<div class="bslot"><span>?</span><span>?</span></div>').join('')}</div>`).join('')}</div><div>Энэ тэмцээний хэсгийн шат, хасагдах шатны мэдээлэл хараахан ирээгүй байна. Цуглуулагч тэмцээний хуудсыг уншмагц энд автоматаар гарна.</div></div>`;
+  const tpl=document.createElement('template');
+  tpl.innerHTML=b.blocks.join('');
+  // defence in depth: drop active content and every attribute outside a small allowlist
+  tpl.content.querySelectorAll('script,style,iframe,object,embed,link,meta,form,input,button,svg').forEach(x=>x.remove());
+  tpl.content.querySelectorAll('*').forEach(el=>[...el.attributes].forEach(at=>{if(!/^(class|href|title|data-src)$/.test(at.name))el.removeAttribute(at.name)}));
+  tpl.content.querySelectorAll('img[data-src]').forEach(i=>{if(!/^(\/|https:\/\/(img-cdn\.|www\.)hltv\.org\/)/.test(i.getAttribute('data-src')))i.remove()});
+  tpl.content.querySelectorAll('img[data-src]').forEach(i=>{const s=i.getAttribute('data-src');i.src=s.startsWith('/')?'https://www.hltv.org'+s:s;i.loading='lazy'});
+  tpl.content.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href');const t=h.match(/^\/team\/(\d+)/),m=h.match(/^\/matches\/(\d+)/),pl=h.match(/^\/player\/(\d+)/);a.setAttribute('href',t?'#team-'+t[1]:m?'#match-'+m[1]:pl?'#player-'+pl[1]:'#event-'+id)});
+  tpl.content.querySelectorAll('*').forEach(el=>{el.childNodes.forEach(n=>{if(n.nodeType===3){n.textContent=n.textContent.replace(/Upper Bracket/g,'Дээд хаалт').replace(/Lower Bracket/g,'Доод хаалт').replace(/Double Elimination Bracket/g,'Давхар хасагдах шат').replace(/Single Elimination Bracket/g,'Нэг хасагдах шат').replace(/Opening round/g,'Нээлтийн тойрог').replace(/Upper semi-finals/g,'Дээд хагас шигшээ').replace(/Upper final/g,'Дээд финал').replace(/Lower round (\d)/g,'Доод $1-р тойрог').replace(/Lower semi-finals/g,'Доод хагас шигшээ').replace(/Lower final/g,'Доод финал').replace(/Consolidation final/g,'Байр шалгаруулах финал').replace(/Grand final/g,'Их финал').replace(/Quarter-finals?/g,'Шөвгийн 8').replace(/Semi-finals?/g,'Хагас шигшээ').replace(/Group ([A-H])/g,'$1 хэсэг').replace(/Monday/g,'Даваа').replace(/Tuesday/g,'Мягмар').replace(/Wednesday/g,'Лхагва').replace(/Thursday/g,'Пүрэв').replace(/Friday/g,'Баасан').replace(/Saturday/g,'Бямба').replace(/Sunday/g,'Ням')}})});
+  return `<div class="panel brk">${tpl.innerHTML}</div><div class="sub" style="font-size:12px">Шинэчилсэн ${esc(fmtT(new Date(b.updated)))} (${ago(b.updated)})</div>`;
+}
+
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');
 q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(!s){sres.hidden=true;return}
@@ -940,7 +974,7 @@ q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();if(!s){sres
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))sres.hidden=true});
 
 /* ---------- router ---------- */
-function rerender(){if(!route.last)return;const y=window.scrollY;const gl=document.querySelector('.glog2');const gy=gl?gl.scrollTop:0;const h=route.last;if(h==='live'||h==='news'||/^(team|match)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y);const g2=document.querySelector('.glog2');if(g2)g2.scrollTop=gy}}
+function rerender(){if(!route.last)return;const y=window.scrollY;const gl=document.querySelector('.glog2');const gy=gl?gl.scrollTop:0;const h=route.last;if(h==='live'||h==='news'||/^(team|match|event)-/.test(h)||h==='ranking'||h==='valve'){render(h);window.scrollTo(0,y);const g2=document.querySelector('.glog2');if(g2)g2.scrollTop=gy}}
 function render(h){
   let m;
   if((m=h.match(/^team-(\d+)$/)))viewTeam(+m[1]);
