@@ -659,6 +659,8 @@ header.top::after{content:none!important;display:none!important}
 .rk{padding-left:44px;padding-right:40px;background-position:left 6px top 6px,right 6px bottom 6px;background-size:30px 30px}
 .panel{background-position:left 6px top 6px,right 6px bottom 6px}
 @media (max-width:760px){.rk{padding-left:34px;padding-right:30px;background-size:24px 24px}}
+/* no corner knots on small cards (participants, events, teams lists) — they crowd the logos */
+.parts>*,.ev-grid>*,.mnteams>*,.shots>*,.cabinet>*,.two>.panel .panel{background-image:none!important}
 </style>
 
 </head>
