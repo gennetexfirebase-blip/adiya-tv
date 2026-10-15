@@ -118,6 +118,13 @@ h3{font-size:16px;font-family:var(--f-body)}
 .mnchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;border:1px solid color-mix(in srgb,var(--mn) 45%,var(--line));background:color-mix(in srgb,var(--mn) 10%,transparent);font-size:13px}
 .mnchip:hover{background:color-mix(in srgb,var(--mn) 18%,transparent)}
 .ev.mnev{border-color:color-mix(in srgb,var(--mn) 30%,var(--line))}
+.parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.part{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;transition:transform .18s,border-color .18s}
+.part:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.part .logo{width:40px;height:40px}
+.part .pmeta{min-width:0}
+.part .pl{display:flex;flex-wrap:wrap;gap:2px 8px;margin-top:6px;font-size:12px;color:var(--muted)}
+.part.mnpart{border-color:color-mix(in srgb,var(--mn) 45%,var(--line))}
 .ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .ev{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;padding:16px;cursor:pointer;align-content:start;transition:transform .18s cubic-bezier(.2,.8,.2,1),border-color .18s}
 .ev:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -410,7 +417,9 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const BLANK='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const img=i=>{if(i==null||i<0)return '';if(D.imgData)return D.imgData[i]||'';const p=D.imgs[i];return /^https?:/.test(p)?p:'https://img-cdn.hltv.org/'+p};
 const pimg=i=>img(i)||BLANK;
-const MN_TEAMS=new Set((D.mnTeams||[]).concat([6248]));
+// Mongolian teams: known list, BC.Game, and any ranked team with 2+ Mongolian players
+const MN_TEAMS=new Set((D.mnTeams||[]).concat([6248,12878]));
+(D.ranking||[]).forEach(r=>{if((r[7]||[]).filter(p=>p[3]==='Mongolia').length>=2)MN_TEAMS.add(D.tms[r[1]][0])});
 const isMnTeam=id=>MN_TEAMS.has(+id)||(D.teamFlag&&D.teamFlag[id]==='MN');
 const isMnMatch=m=>isMnTeam(m.t1[0])||isMnTeam(m.t2[0])||m.f1==='MN'||m.f2==='MN';
 const FL=D.flags||{},TF=D.teamFlag||{},CC=D.countryCode||{};
@@ -487,7 +496,7 @@ Object.values(D.teams).forEach(t=>{const me=D.tms[t.t][0];
 });
 const nameToId={};D.tms.forEach(t=>{if(!(t[2] in nameToId))nameToId[t[2]]=t[0]});
 let evMode='ongoing';
-function evCard(e){const ev=EV(e[0]);const ids=new Set([...(evTeams[ev.id]?.keys()||[]),...((e[9]||[]).map(n=>nameToId[n]).filter(Boolean))]);
+function evCard(e){const ev=EV(e[0]);const det=D.evDetail&&D.evDetail[ev.id];const ids=new Set([...(det?det.teams.map(x=>x[0]>=0?D.tms[x[0]][0]:0).filter(Boolean):[]),...(evTeams[ev.id]?.keys()||[]),...((e[9]||[]).map(n=>nameToId[n]).filter(Boolean))]);
   const lg=[...ids].sort((a,b)=>(rankById[a]?.[0]||999)-(rankById[b]?.[0]||999)).slice(0,10).map(id=>{const t=TM(tIdxById[id]);return logo(t.logo,'sm',t.name).replace('<img','<img title="'+esc(t.name)+'"')}).join('');
   return `<div class="panel ev" data-ev="${ev.id}" tabindex="0" role="link">${logo(ev.logo,'',ev.name)}<div style="min-width:0">
     <h3>${esc(ev.name)}</h3>
@@ -539,12 +548,19 @@ function viewEvent(id){
   ms.sort((x,y)=>y.d-x.d);
   const list=[...ids.entries()].sort((a,b)=>(rankById[a[0]]?.[0]||999)-(rankById[b[0]]?.[0]||999));
   const kind=row?(row[3]?'LAN':row[8]):past?past[5]:'';
+  const det=D.evDetail&&D.evDetail[id];
+  const partHtml=det&&det.teams.length?`<div class="parts">${det.teams.map(x=>{const t=x[0]>=0?TM(x[0]):{id:0,name:'TBD',logo:''};const mn=isMnTeam(t.id);
+      return `<a class="panel part ${mn?'mnpart':''}" href="${t.id?'#team-'+t.id:'#events'}">${logo(t.logo,'',t.name)}<div class="pmeta"><b>${esc(t.name)}</b>${mn?' <span class="badge mn">MN</span>':''}<div class="sub num" style="font-size:11px">${[x[1]?'HLTV '+esc(x[1]):'',x[2]?'VRS '+esc(x[2]):''].filter(Boolean).join(' · ')}</div>${x[3]?`<div class="sub" style="font-size:11px">${esc(x[3].replace('Invited','Урилгаар').replace('VRS','VRS-ээр'))}</div>`:''}<div class="pl">${(x[4]||[]).map(p=>`<span>${esc(p[0])}</span>`).join('')}</div></div></a>`}).join('')}</div>`:'';
+  const prizeHtml=det&&det.prizes.length?`<div class="panel tbl-wrap"><table><thead><tr><th>Байр</th><th>Шагнал</th><th>Баг</th></tr></thead><tbody>${det.prizes.map(x=>{const t=x[3]>=0?TM(x[3]):null;return `<tr><td>${['1st','2nd','3rd'].includes(x[0])?TROPHY(placeCls(x[0]),20):''} <b>${esc(placeMn(x[0])||x[0])}</b></td><td class="num">${esc(x[1])}${x[2]?` <span class="sub" style="font-size:11px">${esc(x[2].replace('Club share','Клубын хувь'))}</span>`:''}</td><td>${t?`<a href="#team-${t.id}" style="display:inline-flex;gap:8px;align-items:center">${logo(t.logo,'sm',t.name)}${esc(t.name)}</a>`:'<span class="sub">—</span>'}</td></tr>`}).join('')}</tbody></table></div>`:'';
   app.innerHTML=`<a class="back" href="#events">← Тэмцээнүүд</a>
   <div class="panel"><div class="thead">${logo(ev.logo,'lg',ev.name)}<div style="min-width:0"><div class="eyebrow">${row?.[1]==='ongoing'?'<span class="badge live">ШУУД</span> ':''}Тэмцээн</div><h1>${esc(ev.name)}</h1>
    <div class="meta" style="font-size:13px"><span class="num">${fmtDY(ev.start)}${ev.end?' – '+fmtDY(ev.end):''}</span>${kind?`<span>${esc(kind==='Online'?'Онлайн':kind)}</span>`:''}${(row?.[4]||past?.[1])?`<span>${esc(row?.[4]||past?.[1])}</span>`:''}${(row?.[6]||past?.[3])&&(row?.[6]||past?.[3])!=='Other'?`<span class="num">Шагнал: ${esc(row?.[6]||past?.[3])}</span>`:''}${(row?.[7]||past?.[4])?`<span>${esc(row?.[7]||past?.[4])} баг</span>`:''}</div>
    </div></div></div>
-  <div class="two"><div class="stack"><h2>Оролцогч багууд</h2>
-   ${list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Зөвхөн дэлхийн шилдэг 40 багийн мэдээллээс. Бүх оролцогчийг HLTV дээрээс харна уу.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
+  ${det?`<div class="kpis panel" style="border-radius:var(--r)"><div class="kpi"><div class="k">Шагналын сан</div><div class="v num" style="font-size:18px">${esc(det.prize||'–')}</div></div><div class="kpi"><div class="k">Багууд</div><div class="v num">${esc(det.teamsN||String(det.teams.length))}</div></div><div class="kpi"><div class="k">Байршил</div><div class="v" style="font-size:15px">${esc(det.loc||'–')}</div></div></div>`:''}
+  ${partHtml?`<h2>Оролцох багууд (${det.teams.length})</h2>${partHtml}`:''}
+  ${prizeHtml?`<h2>Шагналын хуваарилалт</h2>${prizeHtml}`:''}
+  <div class="two"><div class="stack">${partHtml?'':'<h2>Оролцогч багууд</h2>'}
+   ${partHtml?'':list.length?`<div class="panel">${list.map(([tid,pl])=>{const t=TM(tIdxById[tid]);const r=rankById[tid],v=vrsById[tid];return `<a class="ach" href="#team-${tid}" data-team="${tid}"><span class="place ${pl?placeCls(pl):''}">${pl?esc(placeMn(pl)):(r?'<span class="badge h num">#'+r[0]+'</span>':'')}</span><span style="display:flex;gap:10px;align-items:center;min-width:0">${logo(t.logo,'sm',t.name)}<b>${esc(t.name)}</b><span class="sub num" style="margin-left:auto;font-size:12px">${r?'HLTV #'+r[0]:''}${v?' · VRS #'+v[0]:''}</span></span></a>`}).join('')}</div><div class="sub" style="font-size:12px">Зөвхөн дэлхийн шилдэг 40 багийн мэдээллээс. Бүх оролцогчийг HLTV дээрээс харна уу.</div>`:'<div class="panel empty">Шилдэг 40 багаас энэ тэмцээнд оролцох баг бүртгэгдээгүй байна.</div>'}
   </div><div class="stack"><h2>Тоглолтууд</h2>${ms.length?`<div class="panel compact">${ms.map(m=>matchRow(m.a,m.b,m.sa,m.sb,m.d,m.id,m.done)).join('')}</div>`:'<div class="panel empty">Тоглолтын мэдээлэл алга.</div>'}</div></div>`;
   bindTeams();
 }
