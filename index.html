@@ -727,22 +727,55 @@ h2::after{display:none!important}
 @media (max-width:760px){.h2h-row{grid-template-columns:60px minmax(0,1fr) 50px}.h2h-row>.sub:last-child{display:none}.h2h-sc{font-size:24px}}
 .tname{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .nflag{height:.72em;width:auto;aspect-ratio:4/3;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.18);flex:none}
-/* script switch */
-.script-btn{width:auto;padding:0 10px;font:700 13px var(--f-body)}
-.script-btn .sb-m{font-family:"Noto Sans Mongolian",serif;font-size:15px}
-.script-btn .sb-c{display:none}
-:root[data-script="mong"] .script-btn .sb-m{display:none}
-:root[data-script="mong"] .script-btn .sb-c{display:inline}
-:root[data-script="mong"] body{font-family:var(--f-body),"Noto Sans Mongolian",serif}
-:root[data-script="mong"] h1,:root[data-script="mong"] h2,:root[data-script="mong"] h3{font-family:var(--f-display),"Noto Sans Mongolian",serif;text-transform:none;letter-spacing:.02em}
-:root[data-script="mong"] nav.main a,:root[data-script="mong"] .seg button,:root[data-script="mong"] .eyebrow{text-transform:none;letter-spacing:.02em}
+/* ================= old Mongolian book look (light theme) ================= */
+:root[data-theme="light"]{--seal:#8E3B2B;--ink:#3A2A1E;--rule:rgba(107,83,64,.55)}
+:root[data-theme="light"] header.top{border-top:4px solid var(--seal);border-bottom:3px double var(--rule)}
+:root[data-theme="light"] h1{font-family:"PT Serif",Georgia,serif;font-weight:700;color:var(--ink)}
+:root[data-theme="light"] h2{font-family:"PT Serif",Georgia,serif;font-weight:700;font-size:17px;letter-spacing:.06em;color:var(--seal);gap:10px}
+:root[data-theme="light"] h2::before{display:block;content:"";width:9px;height:9px;background:var(--seal);transform:rotate(45deg);-webkit-mask:none;mask:none;flex:none}
+:root[data-theme="light"] h2::after{display:block!important;content:"";flex:1;height:0;border-top:1px solid var(--rule);background:none;-webkit-mask:none;mask:none;opacity:1;min-width:30px}
+:root[data-theme="light"] .eyebrow{font-family:"PT Serif",Georgia,serif;color:var(--seal);letter-spacing:.14em}
+/* panels as sutra pages: square corners, double ink frame */
+:root[data-theme="light"] .panel,:root[data-theme="light"] .rank-list.panel{border-radius:2px;border:1px solid var(--rule);box-shadow:inset 0 0 0 3px var(--panel),inset 0 0 0 4px rgba(107,83,64,.3)}
+:root[data-theme="light"] .rk .pos{font-family:"PT Serif",Georgia,serif;color:var(--seal)!important}
+:root[data-theme="light"] .badge{border-radius:2px}
+/* controls: square, red seal for the active one */
+:root[data-theme="light"] nav.main,:root[data-theme="light"] .seg,:root[data-theme="light"] .tabs,:root[data-theme="light"] .search input,:root[data-theme="light"] .theme-btn,:root[data-theme="light"] .devby{border-radius:2px}
+:root[data-theme="light"] nav.main a,:root[data-theme="light"] .seg button,:root[data-theme="light"] .tabs button{border-radius:1px;font-family:"PT Serif",Georgia,serif}
+:root[data-theme="light"] nav.main a.on,:root[data-theme="light"] .seg button.on,:root[data-theme="light"] .tabs button.on{background:var(--seal);color:#F7F0DF;box-shadow:inset 0 0 0 2px var(--seal),inset 0 0 0 3px rgba(247,240,223,.5)}
+:root[data-theme="light"] footer{border-top:3px double var(--rule);font-family:"PT Serif",Georgia,serif}
+.mapstats{padding:16px;display:grid;gap:12px}
+.ms-best{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:10px 12px;border-radius:8px;background:color-mix(in srgb,var(--win) 10%,transparent);border:1px solid color-mix(in srgb,var(--win) 35%,transparent)}
+.ms-best b{font-size:20px}
+.ms-list{display:grid}
+.ms-row{display:grid;grid-template-columns:96px minmax(0,1fr) 48px 64px 60px;gap:10px;align-items:center;padding:8px 2px;border-top:1px solid var(--line);font-size:13px}
+.ms-row:first-child{border-top:0}
+.ms-n{font-weight:800}
+.ms-bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--loss) 25%,transparent);overflow:hidden}
+.ms-bar i,.mc-bar i{display:block;height:100%;background:var(--win)}
+.ms-wr{font-weight:800;text-align:right}
+.ms-wl,.ms-p{text-align:right}
+.ms-row.best .ms-n{color:var(--win)}
+.mapcmp{padding:16px;display:grid;gap:4px}
+.mc-head{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);gap:10px;padding-bottom:8px;font-size:14px}
+.mc-head .sub{text-align:center}.mc-head .r{text-align:right}
+.mc-row{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr);gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.mc-n{text-align:center;font-weight:800}
+.mc-a,.mc-b{display:flex;align-items:center;gap:8px;min-width:0}
+.mc-a{justify-content:flex-end}
+.mc-a .num:not(.sub),.mc-b .num:not(.sub){font-weight:800;min-width:38px;text-align:center}
+.mc-a.up .num:not(.sub),.mc-b.up .num:not(.sub){color:var(--win)}
+.mc-bar{flex:1;max-width:160px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--loss) 22%,transparent);overflow:hidden;display:flex}
+.mc-bar.l{justify-content:flex-end}
+.mc-foot{display:flex;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid var(--line);font-size:13px}
+@media (max-width:760px){.ms-row{grid-template-columns:80px minmax(0,1fr) 44px 52px}.ms-p{display:none}.mc-row,.mc-head{grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr)}.mc-bar{display:none}}
 </style>
 
 </head>
 <body>
 
 <header class="top"><div class="top-in">
-  <a class="brand" href="#ranking" aria-label="COREX TV нүүр"><svg class="emblem" viewBox="0 0 350 350" aria-hidden="true"><defs><linearGradient id="lg-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b5f8f"/><stop offset=".55" stop-color="#062b45"/><stop offset="1" stop-color="#01080f"/></linearGradient></defs><rect width="350" height="350" rx="72" fill="url(#lg-bg)"/><path fill="#00b2f0" d="M148 72H283L245 140H175L135 210H68Z"/><path fill="#00b2f0" d="M135 210H272L232 278H97Z"/></svg><span class="wm"><span class="wm-main">corex<span class="tv">tv</span></span><span class="wm-sub">Монгол киберспорт</span></span><span class="mgl" lang="mn-Mong" aria-hidden="true">ᠮᠣᠩᠭᠣᠯ</span></a>
+  <a class="brand" href="#ranking" aria-label="COREX TV нүүр"><svg class="emblem" viewBox="0 0 350 350" aria-hidden="true"><defs><linearGradient id="lg-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b5f8f"/><stop offset=".55" stop-color="#062b45"/><stop offset="1" stop-color="#01080f"/></linearGradient></defs><rect width="350" height="350" rx="72" fill="url(#lg-bg)"/><path fill="#00b2f0" d="M148 72H283L245 140H175L135 210H68Z"/><path fill="#00b2f0" d="M135 210H272L232 278H97Z"/></svg><span class="wm"><span class="wm-main">corex<span class="tv">tv</span></span><span class="wm-sub">Монгол киберспорт</span></span></a>
   <nav class="main">
     <a href="#ranking" data-nav="ranking">Ранкинг</a>
     <a href="#events" data-nav="events">Тэмцээн</a>
@@ -753,7 +786,6 @@ h2::after{display:none!important}
     <input id="q" type="search" placeholder="Баг хайх…" autocomplete="off" aria-label="Баг хайх">
     <div class="sres" id="sres" hidden></div>
   </div>
-  <button class="theme-btn script-btn notr" id="scriptBtn" type="button" aria-label="Монгол бичиг / кирилл" title="Монгол бичиг / Кирилл"><span class="sb-m" lang="mn-Mong">ᠮᠣᠩ</span><span class="sb-c">Кирилл</span></button>
   <button class="theme-btn" id="themeBtn" type="button" aria-label="Өнгөний горим солих" title="Цагаан / хар горим"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button>
   <a class="devby" href="https://www.instagram.com/helloworld.mn/" target="_blank" rel="noopener" aria-label="Хөгжүүлсэн: helloworld.mn (Instagram)">
     <span class="devby-l">Хөгжүүлсэн</span>
@@ -974,6 +1006,7 @@ function viewTeam(id){
       ${(t.ms||[]).map(m=>`<div style="display:flex;justify-content:space-between;gap:8px"><span class="sub">${esc({'Current win streak':'Одоогийн ялалтын цуврал','Win rate':'Ялалтын хувь'}[m[1]]||m[1])}${m[2]?' ('+esc(m[2]==='Last 3 months'?'сүүлийн 3 сар':m[2])+')':''}</span><b class="num">${esc(m[0])}</b></div>`).join('')}</div>
       <div class="panel compact"><div class="evhdr">Дараагийн тоглолт</div>${t.up.length?t.up.slice(0,3).map(m=>matchRow(t.t,m[2],'','',m[0],m[3],0)).join(''):'<div class="empty">Товлогдсон тоглолт алга.</div>'}</div>
      </div></div>
+     ${mapStatsHtml(id)}
      <h2>Тоглогчид</h2><div class="shots">${t.roster.filter(p=>p[5]==='STARTER').map(p=>`<a class="panel shot" href="#player-${esc(String(p[1]).split('/')[0])}"><img src="${esc(pimg(p[2]))}" alt="${esc(p[0])}" loading="lazy"><b>${esc(p[0])}</b><div class="r">${esc(cMn(p[4]))}${p[9]?' · '+esc(p[9].replace('In-game leader','IGL').replace('Main AWPer','AWP')):''}</div></a>`).join('')}</div>`;
   }
   if(teamTab==='roster'){
@@ -1136,6 +1169,7 @@ function viewPlayer(id){
 
 /* ---------- match (scorebot) ---------- */
 let EVB={};
+let TMAP={};
 let MATCH={},matchSub=null,matchSubId=0;
 const wpnMn={ak47:'AK-47',awp:'AWP',m4a1_silencer:'M4A1-S',m4a1:'M4A4',deagle:'Deagle',glock:'Glock',usp_silencer:'USP-S',hkp2000:'P2000',galilar:'Galil',famas:'FAMAS',ssg08:'Scout',p250:'P250',tec9:'Tec-9',fiveseven:'Five-SeveN',cz75a:'CZ75',mac10:'MAC-10',mp9:'MP9',mp7:'MP7',ump45:'UMP',p90:'P90',sg556:'SG 553',aug:'AUG',hegrenade:'HE',inferno:'Молотов',molotov:'Молотов',incgrenade:'Инк.',knife:'Хутга',taser:'Zeus',revolver:'R8',xm1014:'XM1014',mag7:'MAG-7',nova:'Nova',negev:'Negev',m249:'M249',elite:'Dualies',buy:''};
 const wpn=w=>w?(wpnMn[w]??w.toUpperCase()):'';
@@ -1202,7 +1236,8 @@ function viewMatch(id){
   const st=streamBlock(s&&s.streams,isLiveNow);
   const pa=base?LT(base.t1):{id:nameToId[s?.t1],name:s?.t1},pb=base?LT(base.t2):{id:nameToId[s?.t2],name:s?.t2};
   const hh=h2hHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
-  const dyn=`${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}${pr}${hh}`;
+  const mc=mapCompareHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
+  const dyn=`${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}${pr}${hh}${mc}`;
   const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+((s&&s.streams||[]).map(x=>x.url).join(','));
   const ex=document.getElementById('mstream');
   if(ex&&ex.dataset.key===skey&&document.getElementById('mdyn')){document.getElementById('mhead').innerHTML=head;document.getElementById('mdyn').innerHTML=dyn;return}
@@ -1237,7 +1272,7 @@ function viewNewsItem(id){
   try{
     await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
     const sb=window.supabase.createClient(C.url,C.anonKey);
-    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}};
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
     sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
     const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
   }catch(e){console.warn('Supabase realtime unavailable',e)}
@@ -1287,27 +1322,6 @@ function bracketHtml(id,ms){
   return `<div class="panel brk">${tpl.innerHTML}</div><div class="sub" style="font-size:12px">Шинэчилсэн ${esc(fmtT(new Date(b.updated)))} (${ago(b.updated)})</div>`;
 }
 
-/* ---------- script switch: Cyrillic <-> traditional Mongolian script (letter-level transliteration) ---------- */
-(function(){
-  let mong=false;try{mong=localStorage.getItem('corex-script')==='mong'}catch(e){}
-  const btn=document.getElementById('scriptBtn');
-  btn.addEventListener('click',()=>{try{localStorage.setItem('corex-script',mong?'cyr':'mong')}catch(e){}location.reload()});
-  if(!mong)return;
-  document.documentElement.setAttribute('data-script','mong');
-  const PAIRS=[['ий','ᠢ'],['ый','ᠢ'],['ии','ᠢ'],['аа','ᠠ'],['оо','ᠣ'],['уу','ᠤ'],['үү','ᠦ'],['өө','ᠥ'],['ээ','ᠡ'],['ай','ᠠᠢ'],['ой','ᠣᠢ'],['уй','ᠤᠢ'],['үй','ᠦᠢ'],['эй','ᠡᠢ'],['яа','ᠶᠠ'],['ёо','ᠶᠣ'],['юу','ᠶᠤ'],['юү','ᠶᠦ'],['еэ','ᠶᠡ']];
-  const ONE={а:'ᠠ',б:'ᠪ',в:'ᠸ',г:'ᠭ',д:'ᠳ',е:'ᠶᠡ',ё:'ᠶᠣ',ж:'ᠵ',з:'ᠽ',и:'ᠢ',й:'ᠢ',к:'ᠺ',л:'ᠯ',м:'ᠮ',н:'ᠨ',о:'ᠣ',ө:'ᠥ',п:'ᠫ',р:'ᠷ',с:'ᠰ',т:'ᠲ',у:'ᠤ',ү:'ᠦ',ф:'ᠹ',х:'ᠬ',ц:'ᠼ',ч:'ᠴ',ш:'ᠱ',щ:'ᠱ',ъ:'',ы:'ᠢ',ь:'ᠢ',э:'ᠡ',ю:'ᠶᠦ',я:'ᠶᠠ'};
-  const CYR=/[А-Яа-яЁёӨөҮү]/;
-  const tr=t=>t.replace(/[А-Яа-яЁёӨөҮү]+/g,w=>{w=w.toLowerCase();let o='';for(let i=0;i<w.length;){const two=w.slice(i,i+2);const p=PAIRS.find(x=>x[0]===two);if(p){o+=p[1];i+=2}else{o+=ONE[w[i]]??w[i];i++}}return o});
-  const SKIP=new Set(['SCRIPT','STYLE','TEXTAREA','INPUT','CODE']);
-  const keep=n=>{const e=n.nodeType===1?n:n.parentNode;return e&&e.closest&&e.closest('.notr')};
-  const walk=root=>{if(keep(root))return;if(root.nodeType===3){if(CYR.test(root.data))root.data=tr(root.data);return}
-    if(root.nodeType!==1||SKIP.has(root.tagName))return;
-    ['placeholder','title','aria-label','alt'].forEach(a=>{const v=root.getAttribute&&root.getAttribute(a);if(v&&CYR.test(v))root.setAttribute(a,tr(v))});
-    const it=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;const list=[];while(n=it.nextNode())if(CYR.test(n.data)&&!SKIP.has(n.parentNode.tagName)&&!keep(n))list.push(n);list.forEach(x=>x.data=tr(x.data));
-    root.querySelectorAll('[placeholder],[title],[aria-label],[alt]').forEach(el=>['placeholder','title','aria-label','alt'].forEach(a=>{const v=el.getAttribute(a);if(v&&CYR.test(v))el.setAttribute(a,tr(v))}))};
-  walk(document.body);document.title='ᠺᠣᠷᠧᠺᠰ TV';
-  new MutationObserver(ms=>ms.forEach(m=>{if(m.type==='characterData'){if(CYR.test(m.target.data)&&!keep(m.target))m.target.data=tr(m.target.data)}else m.addedNodes.forEach(walk)})).observe(document.body,{childList:true,subtree:true,characterData:true});
-})();
 document.getElementById('themeBtn').addEventListener('click',()=>{const r=document.documentElement;const t=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',t);try{localStorage.setItem('corex-theme',t)}catch(e){}});
 
 /* ---------- today: events running today and matches scheduled today (from stored schedules) ---------- */
@@ -1381,6 +1395,32 @@ function oppTable(t){const g={};(t.res||[]).forEach(r=>{const o=TM(r[2]);if(!o.i
   return `<h2>Өрсөлдөгчидтэй харьцаа</h2><div class="panel tbl-wrap"><table><thead><tr><th>Баг</th><th class="r">Хожсон</th><th class="r">Хожигдсон</th><th class="r">Хувь</th></tr></thead><tbody>
    ${rows.map(x=>`<tr><td><a class="pcell" href="#team-${x.o.id}">${logo(x.o.logo,'sm',x.o.name)}<b>${esc(x.o.name)}</b></a></td><td class="r num" style="color:var(--win)">${x.w}</td><td class="r num" style="color:var(--loss)">${x.l}</td><td class="r num">${Math.round(x.w/(x.w+x.l)*100)}%</td></tr>`).join('')}
    </tbody></table></div><div class="sub" style="font-size:12px">Сүүлийн 16 тоглолтоор.</div>`}
+
+/* ---------- team map stats (rows 'tm:<teamId>' from the collector; last 3 months on HLTV) ---------- */
+const mapRows=id=>{const v=TMAP[id];if(!v||!v.maps)return [];
+  return v.maps.map(m=>{const n=(+m.w||0)+(+m.d||0)+(+m.l||0);return {n:m.n,w:+m.w||0,d:+m.d||0,l:+m.l||0,p:n,wr:n?Math.round((+m.w||0)/n*100):0,fk:m.fk,fd:m.fd}}).filter(m=>m.p>0)};
+const bestMap=rows=>{const ok=rows.filter(m=>m.p>=3);const pool=ok.length?ok:rows;return pool.slice().sort((a,b)=>b.wr-a.wr||b.p-a.p)[0]};
+const mapPeriod=v=>v&&v.from?`${esc(v.from)} – ${esc(v.to)}`:'бүх хугацаа';
+const mapEmpty=`<div class="panel empty">Мапын статистик хараахан ирээгүй байна. HLTV дээр энэ багийн хуудсыг нээхэд COREX TV collector автоматаар илгээнэ.</div>`;
+function mapStatsHtml(id){
+  const rows=mapRows(id);if(!rows.length)return `<h2>Мап</h2>${mapEmpty}`;
+  const best=bestMap(rows);rows.sort((a,b)=>b.p-a.p||b.wr-a.wr);
+  return `<h2>Мап</h2><div class="panel mapstats">
+   <div class="ms-best"><span class="sub">Хамгийн сайн мап</span><b>${esc(best.n)}</b><span class="num">${best.wr}% · ${best.w}-${best.l} (${best.p} мап)</span></div>
+   <div class="ms-list">${rows.map(m=>`<div class="ms-row ${m===best?'best':''}"><span class="ms-n">${esc(m.n)}</span><span class="ms-bar"><i style="width:${m.wr}%"></i></span><span class="num ms-wr">${m.wr}%</span><span class="num sub ms-wl">${m.w}-${m.d?m.d+'-':''}${m.l}</span><span class="num sub ms-p">${m.p} мап</span></div>`).join('')}</div>
+   <div class="sub" style="font-size:12px">Хугацаа: ${mapPeriod(TMAP[id])}. Хувь нь хожсон мапын эзлэх хувь.</div></div>`}
+function mapCompareHtml(aId,bId,aName,bName){
+  if(!aId||!bId)return '';const A=mapRows(aId),B=mapRows(bId);
+  if(!A.length&&!B.length)return `<h2>Мапын харьцуулалт</h2>${mapEmpty.replace('энэ багийн хуудсыг','энэ тоглолтын хуудсыг')}`;
+  const names=[...new Set([...A,...B].map(m=>m.n))];const get=(L,n)=>L.find(m=>m.n===n);
+  const rows=names.map(n=>({n,a:get(A,n),b:get(B,n)})).sort((x,y)=>((y.a?.p||0)+(y.b?.p||0))-((x.a?.p||0)+(x.b?.p||0)));
+  const cell=(m,side)=>m?`<span class="num">${m.wr}%</span><span class="sub num">${m.w}-${m.l}</span>`:`<span class="sub">—</span>`;
+  const ba=bestMap(A),bb=bestMap(B);
+  return `<h2>Мапын харьцуулалт</h2><div class="panel mapcmp">
+   <div class="mc-head"><b>${esc(aName)}</b><span class="sub">Мап</span><b class="r">${esc(bName)}</b></div>
+   ${rows.map(r=>{const aw=r.a&&(!r.b||r.a.wr>r.b.wr),bw=r.b&&(!r.a||r.b.wr>r.a.wr);return `<div class="mc-row"><div class="mc-a ${aw?'up':''}">${cell(r.a)}<span class="mc-bar l"><i style="width:${r.a?r.a.wr:0}%"></i></span></div><div class="mc-n">${esc(r.n)}</div><div class="mc-b ${bw?'up':''}"><span class="mc-bar"><i style="width:${r.b?r.b.wr:0}%"></i></span>${cell(r.b)}</div></div>`}).join('')}
+   <div class="mc-foot"><span>${ba?`${esc(aName)}: <b>${esc(ba.n)}</b>`:''}</span><span>${bb?`${esc(bName)}: <b>${esc(bb.n)}</b>`:''}</span></div>
+   <div class="sub" style="font-size:12px">Хоёр багийн сүүлийн 3 сарын мапын ялалтын хувь. Тод нь тухайн мап дээр илүү сайн нь.</div></div>`}
 
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');
