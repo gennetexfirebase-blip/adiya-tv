@@ -891,6 +891,8 @@ h2::after{display:none!important}
 .resday .evhdr{margin-top:6px}
 .bt.tbd{opacity:.55}
 .bt .logo.ph{display:grid;place-items:center;font-size:10px}
+.bm.live{border-color:var(--live);box-shadow:0 0 0 1px var(--live)}
+.bm.live .bm-h a{color:var(--live);display:inline-flex;align-items:center;gap:5px}
 </style>
 
 </head>
@@ -1221,7 +1223,7 @@ function liveCard(m){
    <div class="lm-foot">
     ${lu.length?`<div><b>Бүрэлдэхүүн</b>${lu.map((l,i)=>`<div class="lineup-row"><span class="sub">${esc(i?b.name:a.name)}:</span>${l.players.map(p=>`${PL[p.id]?`<a class="ext" href="#player-${p.id}">${esc(p.nick)}</a>`:`<span>${esc(p.nick)}</span>`}`).join('')}</div>`).join('')}</div>`:''}
     ${m.veto&&m.veto.length?`<details><summary><b>Мапын вето</b></summary><ul>${m.veto.map(v=>`<li>${esc(v.replace(/^\d+\.\s*/,'').replace(' removed ',' хассан: ').replace(' picked ',' сонгосон: ').replace(' was left over',' үлдсэн'))}</li>`).join('')}</ul></details>`:''}
-    <div>${m.info?`<div class="sub">${esc(m.info)}</div>`:''}<a class="ext lkm" href="#match-${m.id}"><b>${m.src==='panda'?(m.streams&&m.streams.length?'Шууд дамжуулалт →':'Дэлгэрэнгүй →'):'Онооны самбар, лог, шууд дамжуулалт →'}</b></a></div>
+    <div>${m.info?`<div class="sub">${esc(infoMn(m.info))}</div>`:''}<a class="ext lkm" href="#match-${m.id}"><b>${m.src==='panda'?(m.streams&&m.streams.length?'Шууд дамжуулалт →':'Дэлгэрэнгүй →'):'Онооны самбар, лог, шууд дамжуулалт →'}</b></a></div>
    </div></div>`;
 }
 function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
@@ -1345,8 +1347,9 @@ function logLine(e){
 function viewMatch(id){
   watchMatch(id);
   const s=MATCH[id]||(D.matches&&D.matches[id])||null;
-  const lm=LIVE?(LIVE.live||[]).find(m=>m.id===id):null;
-  const um=LIVE?(LIVE.up||[]).find(m=>m.id===id):null;
+  const pool=f=>[LIVE,PN,HL].filter(Boolean).map(x=>(x[f]||[]).find(m=>m.id===id)).find(Boolean)||null;
+  const lm=pool('live');
+  const um=lm?null:pool('up');
   const base=lm||um;
   if(!s&&!base){app.innerHTML=`<a class="back" href="#live">← Шууд</a><div class="panel empty">Энэ тоглолтын шууд мэдээлэл алга.</div>`;return}
   const head=lm?liveCard(lm).replace(/<a class="ext lkm"[^>]*>[^<]*<\/a>/,''):base?`<div class="panel pad">${upRow(base)}</div>`:'';
@@ -1367,12 +1370,16 @@ function viewMatch(id){
   const radar=rd?`<div class="radar"><div class="rmap" style="aspect-ratio:${rd.w}/${rd.h}"><img src="${esc(rd.src)}" alt="${esc(s.radar.map)} мапын радар">${(s.radar.kills||[]).map(k=>`<svg class="kx ${k[0]==='CT'?'ct':'t'} ${k[3]?'old':''}" viewBox="0 0 10 10" style="left:${(k[1]*100).toFixed(2)}%;top:${(k[2]*100).toFixed(2)}%" aria-hidden="true"><path d="M1.5 1.5 8.5 8.5M8.5 1.5 1.5 8.5"/></svg>`).join('')}</div></div>`:'';
   const gl=s&&s.log&&s.log.length?`<h2>Тоглолтын лог ба радар</h2><div class="scorebot logbox"><div class="lb-head"><span class="lb-map">${esc(mapName)}</span><span class="sub">${esc(s.round?'Раунд '+s.round.split(' - ')[0]:'')}</span><span class="rleg"><span><i class="ct"></i>CT үхсэн</span><span><i class="t"></i>T үхсэн</span><span>бүдэг = өмнөх раунд</span></span></div><div class="lb-body ${radar?'':'noradar'}"><div class="glog2">${s.log.map(logLine).join('')}</div>${radar}</div></div>`:'';
   const isLiveNow=!!(LIVE&&(LIVE.live||[]).some(m=>m.id===id))&&liveFresh();
-  const st=streamBlock((s&&s.streams)||(base&&base.streams),isLiveNow);
+  /* streams even without the HLTV tab: the PandaScore copy of the same match (matched by team names) carries them */
+  const pmatch=(()=>{if(base&&base.src==='panda')return base;const n1=base?LT(base.t1).name:s&&s.t1,n2=base?LT(base.t2).name:s&&s.t2;if(!n1||!n2||!PN)return null;const k1=nameKey(n1),k2=nameKey(n2);
+    return (PN.live||[]).concat(PN.up||[]).find(m=>{const a=nameKey(m.t1[1]),b=nameKey(m.t2[1]);return (a===k1&&b===k2)||(a===k2&&b===k1)})||null})();
+  const strs=(s&&s.streams&&s.streams.length?s.streams:null)||(base&&base.streams&&base.streams.length?base.streams:null)||(pmatch&&pmatch.streams)||[];
+  const st=streamBlock(strs,isLiveNow||!!(pmatch&&(PN.live||[]).includes(pmatch)));
   const pa=base?LT(base.t1):{id:nameToId[s?.t1],name:s?.t1},pb=base?LT(base.t2):{id:nameToId[s?.t2],name:s?.t2};
   const hh=h2hHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
   const mc=mapCompareHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
-  const dyn=`${sb||(base&&base.src==='panda'?'<div class="panel empty">Энэ тоглолтын онооны самбар, лог HLTV collector ажиллаж байх үед гарна. Цувралын оноо дээр шууд шинэчлэгдэж байна.</div>':'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>')}${gl}${pr}${hh}${mc}`;
-  const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+(((s&&s.streams)||(base&&base.streams)||[]).map(x=>x.url).join(','));
+  const dyn=`${sb||(base&&base.src==='panda'?'<div class="panel empty">Энэ тоглолтын онооны самбар, лог HLTV collector ажиллаж байх үед гарна. Цувралын оноо дээр шууд шинэчлэгдэж байна.</div>':'<div class="panel empty">Онооны самбар, лог HLTV collector ажиллаж байх үед гарна. Тоглолтыг дээрх шууд дамжуулалтаар үзэж, цувралын оноог дээр хараарай.</div>')}${gl}${pr}${hh}${mc}`;
+  const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+(strs.map(x=>x.url).join(','));
   const ex=document.getElementById('mstream');
   if(ex&&ex.dataset.key===skey&&document.getElementById('mdyn')){document.getElementById('mhead').innerHTML=head;document.getElementById('mdyn').innerHTML=dyn;return}
   app.innerHTML=`<a class="back" href="#live">← Шууд</a><div id="mhead" class="stack">${head}</div><div id="mstream" class="stack" data-key="${esc(skey)}">${st}</div><div id="mdyn" class="stack" style="gap:22px">${dyn}</div>`;
@@ -1406,7 +1413,7 @@ function viewNewsItem(id){
   try{
     await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
     const sb=window.supabase.createClient(C.url,C.anonKey);
-    const apply=r=>{if(!r||!r.k)return;if(r.k==='now'){HL=r.v;pickLive()}else if(r.k==='pnow'){PN=r.v;pickLive()}else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('r:')){RES[r.k.slice(2)]=r.v;if(route.last==='live')rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now'){HL=r.v;pickLive()}else if(r.k==='pnow'){PN=r.v;pickLive();if(/^match-9\d{8}$/.test(route.last||''))rerender()}else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('r:')){RES[r.k.slice(2)]=r.v;if(route.last==='live')rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
     sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
     const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
   }catch(e){console.warn('Supabase realtime unavailable',e)}
@@ -1589,18 +1596,48 @@ const BNAME={'Single Elimination Bracket':'Плей-офф','3rd Place Decider M
 const rMn=n=>RNAME[n]||n;
 const BTYPE={SingleElimination:'Шууд хасах шат',DoubleElimination4:'Давхар хасах (GSL)',DoubleElimination8:'Давхар хасах шат',DoubleElimination16:'Давхар хасах шат'};
 const LANEMN={up:'Дээд хаалт',lo:'Доод хаалт',gf:'Финал',cf:'3-р байр','':''};
+/* fill a saved bracket from whatever is newest: HLTV's own score, then any finished result, then a live match;
+   TBD places take the winner/loser of the slot that feeds them */
+function resolveBracket(b){
+  const byId={};b.rounds.forEach(r=>r.slots.forEach(sl=>byId[sl.id]=sl));
+  const known=t=>t&&t.name&&!/^(tbd|\?)$/i.test(t.name)&&!(t.id===0&&!t.logo&&/winner|loser|seed|group|tbd/i.test(t.name));
+  const lv=dedupe(LIVE?.live||[]);const rs=recentResults();const memo={};
+  const same=(x,y)=>x&&y&&nameKey(x.name)===nameKey(y.name);
+  const solve=id=>{if(memo[id])return memo[id];const sl=byId[id];if(!sl)return null;memo[id]={...sl};const o=memo[id];
+    o.t=[0,1].map(i=>{const t=sl.t&&sl.t[i];if(known(t))return t;const f=sl.from&&sl.from[i];if(!f)return t;const src=solve(f[0]);if(!src||!src.w)return t;return src.t[f[1]==='W'?src.w-1:2-src.w]||t});
+    if(!o.s&&known(o.t[0])&&known(o.t[1])){
+      const since=(sl.time||0)-12*3600e3;
+      const r=rs.find(m=>m.t>=since&&((same(m.a,o.t[0])&&same(m.b,o.t[1]))||(same(m.a,o.t[1])&&same(m.b,o.t[0]))));
+      if(r){const flip=same(r.a,o.t[1]);const a=flip?r.s2:r.s1,b=flip?r.s1:r.s2;if(a!==b){o.s=[a,b];o.w=a>b?1:2;o.done=1}}
+      if(!o.s){const m=lv.find(m=>(sl.mid&&m.id===sl.mid)||((same(LT(m.t1),o.t[0])&&same(LT(m.t2),o.t[1]))||(same(LT(m.t1),o.t[1])&&same(LT(m.t2),o.t[0]))));
+        if(m){const flip=same(LT(m.t1),o.t[1]);const mw=m.mw||['0','0'];o.s=[flip?mw[1]:mw[0],flip?mw[0]:mw[1]];o.live=m.id;o.w=0}}}
+    return o};
+  return {...b,rounds:b.rounds.map(r=>({...r,slots:r.slots.map(sl=>solve(sl.id)||sl)}))}}
 function jsonBracket(brk){
+  brk=brk.map(resolveBracket);
   const team=(t,sc,win,lose)=>{if(!t)t={id:0,name:'TBD',logo:''};const known=t.id&&tIdxById[t.id]!=null;const tm=known?TM(tIdxById[t.id]):null;const lg=(tm&&tm.logo)||t.logo;
     const inner=`${lg?`<img class="logo sm" src="${esc(lg)}" alt="" loading="lazy">`:'<span class="logo sm ph">?</span>'}<span>${esc(t.name||'TBD')}</span><b class="num">${sc==null?'':esc(sc)}</b>`;
     return t.id?`<a class="bt ${win?'win':''} ${lose?'lose':''}" href="#team-${t.id}">${inner}</a>`:`<span class="bt tbd">${inner}</span>`};
-  const box=sl=>{const dt=sl.time?new Date(sl.time):null;const done=!!sl.s;
-    return `<div class="bm"><div class="bm-h"><span class="num">${dt?fmtD(dt)+' '+fmtT(dt):''}</span>${sl.mid?`<a href="#match-${sl.mid}">${done?'Дууссан':sl.bo?'BO'+sl.bo:'Тоглолт'}</a>`:''}</div>${team(sl.t[0],sl.s?sl.s[0]:null,sl.w===1,sl.w===2)}${team(sl.t[1],sl.s?sl.s[1]:null,sl.w===2,sl.w===1)}</div>`};
+  const box=sl=>{const dt=sl.time?new Date(sl.time):null;const done=!!sl.s&&!sl.live;
+    return `<div class="bm ${sl.live?'live':''}"><div class="bm-h"><span class="num">${dt?fmtD(dt)+' '+fmtT(dt):''}</span>${sl.live?`<a href="#match-${sl.live}"><span class="pulse"></span>ШУУД</a>`:sl.mid?`<a href="#match-${sl.mid}">${done?'Дууссан':sl.bo?'BO'+sl.bo:'Тоглолт'}</a>`:''}</div>${team(sl.t[0],sl.s?sl.s[0]:null,sl.w===1,sl.w===2)}${team(sl.t[1],sl.s?sl.s[1]:null,sl.w===2,sl.w===1)}</div>`};
   const lanes=b=>{const ls=[...new Set(b.rounds.map(r=>r.lane))];return ls.map(l=>{const rs=b.rounds.filter(r=>r.lane===l);
     return `<div class="blane">${LANEMN[l]?`<div class="blane-t">${LANEMN[l]}</div>`:''}<div class="bcols">${rs.map(r=>`<div class="bcolumn"><div class="bcol-t">${esc(rMn(r.name))}</div>${r.slots.map(box).join('')}</div>`).join('')}</div></div>`}).join('')};
   const adv=b=>{if(!/DoubleElimination4/.test(b.type))return '';const out=[],up=[];b.rounds.forEach(r=>r.slots.forEach(sl=>{if(!sl.w)return;const W=sl.t[sl.w-1],Lz=sl.t[2-sl.w];if(sl.win&&!/ToNextRound|ToLower|EventWinner/.test(sl.win)&&W)up.push(W.name);if(/Eliminated/.test(sl.lose)&&Lz)out.push(Lz.name)}));
     return (up.length?`<span class="badv">Гарсан: ${up.map(esc).join(', ')}</span>`:'')+(out.length?`<span class="bout">Хасагдсан: ${out.map(esc).join(', ')}</span>`:'')};
   return `<div class="panel brk2">${brk.map(b=>`<div class="bgroup"><div class="bgroup-h"><b>${esc(BNAME[b.name]||(/^Group /.test(b.name)?b.name.replace(/^Group /,'')+' хэсэг':b.name))}</b><span class="sub" style="font-size:12px">${esc(BTYPE[b.type]||'')}</span>${adv(b)}</div>${lanes(b)}</div>`).join('')}
    <div class="sub" style="font-size:12px">HLTV-ийн тэмцээний шатнаас. Тоглолт дуусах бүрт шинэчлэгдэнэ.</div></div>`}
+
+/* HLTV's match-info line ("Best of 3 (LAN) * Group B opening match") in Mongolian */
+function infoMn(t){
+  const R=[[/Best of (\d+)/gi,(_,n)=>n+' мапын цуврал'],[/\(LAN\)/g,'(LAN)'],[/\(Online\)/gi,'(онлайн)'],
+    [/Group ([A-Z])\b/g,'$1 хэсгийн'],[/opening match/gi,'нээлтийн тоглолт'],[/winners'? match/gi,'хожигчдын тоглолт'],[/elimination match/gi,'хасагдах тоглолт'],
+    [/decider match/gi,'шийдвэрлэх тоглолт'],[/upper bracket final/gi,'дээд хаалтын финал'],[/lower bracket final/gi,'доод хаалтын финал'],
+    [/upper bracket semi-?final/gi,'дээд хаалтын хагас шигшээ'],[/lower bracket/gi,'доод хаалт'],[/upper bracket/gi,'дээд хаалт'],
+    [/quarter-?final/gi,'шөвгийн 8'],[/semi-?final/gi,'хагас шигшээ'],[/grand final/gi,'их финал'],[/\bfinal\b/gi,'финал'],
+    [/Winner qualifies for (.+?)\./gi,'Хожсон баг $1-д шалгарна.'],[/Loser is eliminated\.?/gi,'Хожигдсон баг хасагдана.'],
+    [/Winner advances to (.+?)\./gi,'Хожсон баг $1 руу шалгарна.'],[/Loser (moves|goes) to (.+?)\./gi,'Хожигдсон баг $2 руу орно.'],
+    [/\bround (\d+)\b/gi,'$1-р тойрог'],[/\bmatch\b/gi,'тоглолт'],[/\s\*\s/g,' · ']];
+  return R.reduce((x,[a,b])=>x.replace(a,b),String(t||''))}
 
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');

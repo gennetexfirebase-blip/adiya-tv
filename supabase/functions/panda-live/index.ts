@@ -47,12 +47,13 @@ Deno.serve(async () => {
     up = u.filter((m: any) => Date.parse(m.begin_at || m.scheduled_at) < Date.now() + 36 * 3600e3).map(shape);
   } catch (_) { /* keep going with live only */ }
   try {
-    const past = await api("/csgo/matches/past?filter[status]=finished&per_page=30&sort=-begin_at");
+    const past = await api("/csgo/matches/past?per_page=40&sort=-modified_at");
     for (const m of past) {
-      if (!m.end_at || Date.parse(m.end_at) < Date.now() - 14 * 864e5 || m.status !== "finished") continue;
+      const at = m.end_at || m.begin_at || m.scheduled_at;
+      if (!at || Date.parse(at) < Date.now() - 14 * 864e5 || m.status !== "finished" || !(m.opponents || []).length) continue;
       const s = shape(m);
       await put("r:p" + m.id, { id: s.id, src: "panda", ev: 0, evName: s.evName, t1: s.t1, t2: s.t2, bo: s.bo, lan: false,
-        s1: +s.mw[0], s2: +s.mw[1], maps: [], ended: m.end_at });
+        s1: +s.mw[0], s2: +s.mw[1], maps: [], ended: at });
     }
   } catch (_) { /* results are best effort */ }
   while (Date.now() - started < 54000) {

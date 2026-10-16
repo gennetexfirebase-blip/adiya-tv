@@ -116,7 +116,8 @@
         const mu = s.matchup || {}, sc = mu.score;
         return { id: s.slotId?.id || '', mid: mu.match?.matchId || 0, time: mu.match?.startTime || 0, bo: mu.match?.numberOfMaps || 0,
           t: [slotTeam(mu.team1), slotTeam(mu.team2)], s: sc ? [sc.team1Score, sc.team2Score] : null, w: sc ? (sc.team1Winner ? 1 : 2) : 0,
-          win: s.winnerType?.type || '', lose: s.loserType?.type || '' };
+          win: s.winnerType?.type || '', lose: s.loserType?.type || '',
+          from: [s.slotEntry1, s.slotEntry2].map(e => e && e.slotId ? [e.slotId.id, /Loser/i.test(e.type || '') ? 'L' : 'W'] : null) };
       });
       if (slots.length) rounds.push({ name: r.roundName?.name || '', lane, slots });
     };
