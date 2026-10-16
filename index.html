@@ -889,6 +889,8 @@ h2::after{display:none!important}
 .rrow .t.l span{opacity:.6}
 .resday{display:grid}
 .resday .evhdr{margin-top:6px}
+.bt.tbd{opacity:.55}
+.bt .logo.ph{display:grid;place-items:center;font-size:10px}
 </style>
 
 </head>
@@ -933,7 +935,7 @@ const pimg=i=>img(i)||BLANK;
 const MN_TEAMS=new Set((D.mnTeams||[]).concat([6248,12878]));
 (D.ranking||[]).forEach(r=>{if((r[7]||[]).filter(p=>p[3]==='Mongolia').length>=2)MN_TEAMS.add(D.tms[r[1]][0])});
 const isMnTeam=id=>MN_TEAMS.has(+id)||(D.teamFlag&&D.teamFlag[id]==='MN');
-const isMnMatch=m=>isMnTeam(m.t1[0])||isMnTeam(m.t2[0])||m.f1==='MN'||m.f2==='MN';
+const isMnMatch=m=>isMnTeam(m.t1[0]||(LT(m.t1).id))||isMnTeam(m.t2[0]||(LT(m.t2).id))||m.f1==='MN'||m.f2==='MN';
 const CMN={"Mongolia": "Монгол", "Russia": "Орос", "Ukraine": "Украин", "Belarus": "Беларусь", "Kazakhstan": "Казахстан", "Brazil": "Бразил", "Argentina": "Аргентин", "Chile": "Чили", "Uruguay": "Уругвай", "Peru": "Перу", "Colombia": "Колумб", "Mexico": "Мексик", "United States": "АНУ", "Canada": "Канад", "France": "Франц", "Germany": "Герман", "Denmark": "Дани", "Sweden": "Швед", "Norway": "Норвеги", "Finland": "Финланд", "Estonia": "Эстони", "Latvia": "Латви", "Lithuania": "Литва", "Poland": "Польш", "Czech Republic": "Чех", "Czechia": "Чех", "Slovakia": "Словак", "Hungary": "Унгар", "Romania": "Румын", "Bulgaria": "Болгар", "Serbia": "Серби", "Bosnia and Herzegovina": "Босни", "Croatia": "Хорват", "Slovenia": "Словени", "Montenegro": "Монтенегро", "North Macedonia": "Хойд Македон", "Albania": "Албани", "Kosovo": "Косово", "Greece": "Грек", "Turkey": "Турк", "Israel": "Израиль", "Portugal": "Португал", "Spain": "Испани", "Italy": "Итали", "Switzerland": "Швейцари", "Austria": "Австри", "Belgium": "Бельги", "Netherlands": "Нидерланд", "United Kingdom": "Их Британи", "Ireland": "Ирланд", "China": "Хятад", "Japan": "Япон", "South Korea": "Өмнөд Солонгос", "Korea": "Солонгос", "Taiwan": "Тайвань", "Hong Kong": "Хонконг", "Singapore": "Сингапур", "Malaysia": "Малайз", "Indonesia": "Индонез", "Thailand": "Тайланд", "Vietnam": "Вьетнам", "Philippines": "Филиппин", "India": "Энэтхэг", "Pakistan": "Пакистан", "Bangladesh": "Бангладеш", "Australia": "Австрали", "New Zealand": "Шинэ Зеланд", "Saudi Arabia": "Саудын Араб", "United Arab Emirates": "АНЭУ", "Jordan": "Иордан", "Lebanon": "Ливан", "Egypt": "Египет", "South Africa": "Өмнөд Африк", "Morocco": "Марокко", "Tunisia": "Тунис", "Uzbekistan": "Узбекистан", "Kyrgyzstan": "Киргиз", "Georgia": "Гүрж", "Armenia": "Армен", "Azerbaijan": "Азербайжан", "Moldova": "Молдав", "Iceland": "Исланд", "Malta": "Мальта", "Cyprus": "Кипр", "Luxembourg": "Люксембург", "Europe": "Европ", "Asia": "Ази", "Other": "Дэлхий", "World": "Дэлхий", "North America": "Хойд Америк", "South America": "Өмнөд Америк", "Oceania": "Далайн орнууд", "CIS": "ТУХН", "Venezuela": "Венесуэл", "Paraguay": "Парагвай", "Bolivia": "Боливи", "Ecuador": "Эквадор", "Guatemala": "Гватемал", "Costa Rica": "Коста Рика", "Dominican Republic": "Доминикан", "Puerto Rico": "Пуэрто Рико", "Iran": "Иран", "Iraq": "Ирак", "Syria": "Сири", "Kuwait": "Кувейт", "Qatar": "Катар", "Tajikistan": "Тажикистан", "Turkmenistan": "Туркменистан", "Afghanistan": "Афганистан", "Nepal": "Балба", "Sri Lanka": "Шри Ланка", "Myanmar": "Мьянмар", "Cambodia": "Камбож", "Laos": "Лаос", "Macau": "Макао"};
 const cMn=n=>CMN[n]||n||'';
 const FL=D.flags||{},TF=D.teamFlag||{},CC=D.countryCode||{};
@@ -1190,7 +1192,8 @@ function viewTeamLite(id){
 /* ---------- live ---------- */
 let LIVE=D.live||null;
 const dedupe=a=>{const s=new Set();return (a||[]).filter(m=>!s.has(m.id)&&s.add(m.id))};
-const LT=(pair)=>{const [id,name]=pair||[0,'TBD'];const i=tIdxById[id];const t=i!=null?TM(i):{id,name,logo:''};return {id,name:name||t.name,logo:t.logo}};
+const nameKey=n=>String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const LT=(pair)=>{let [id,name,lg]=pair||[0,'TBD'];if(!id&&name){const k=nameKey(name);const hit=D.tms.find(t=>nameKey(t[2])===k);if(hit)id=hit[0]}const i=tIdxById[id];const t=i!=null?TM(i):{id,name,logo:''};return {id,name:name||t.name,logo:t.logo||lg||''}};
 const evNameOf=m=>m.evName||(evById[m.ev]!=null?D.ev[evById[m.ev]][2]:'');
 const ago=iso=>{if(!iso)return '';const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?'дөнгөж сая':m<60?m+' мин өмнө':m<1440?Math.round(m/60)+' цагийн өмнө':Math.round(m/1440)+' өдрийн өмнө'};
 const snapOf=id=>MATCH[id]||(D.matches&&D.matches[id])||null;
@@ -1253,6 +1256,10 @@ function liveBar(id){if(liveOld())return '';const m=liveOf(id);if(!m)return '';c
   return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span><b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b><span class="sub">Мап ${esc(m.mw?.[0]??0)}:${esc(m.mw?.[1]??0)} · ${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Дэлгэрэнгүй →</span></a>`}
 function liveStrip(){if(liveOld())return '';const lv=dedupe(LIVE?.live);if(!lv.length)return '';
   return `<div class="stack">${lv.slice(0,3).map(m=>{const a=LT(m.t1),b=LT(m.t2);return `<a class="panel livebar flagged" href="#match-${m.id}">${fbg(flagOfTeam(a.id,m.f1||snapOf(m.id)?.f1),'l')}${fbg(flagOfTeam(b.id,m.f2||snapOf(m.id)?.f2),'r')}<span class="badge live"><span class="pulse"></span>ШУУД</span>${logo(a.logo,'sm',a.name)}<b>${esc(a.name)}</b><span class="sc num">${esc(curOf(m).a)} : ${esc(curOf(m).b)}</span><b>${esc(b.name)}</b>${logo(b.logo,'sm',b.name)}<span class="sub">${esc(evNameOf(m))}</span><span class="ext" style="margin-left:auto">Үзэх →</span></a>`}).join('')}</div>`}
+let HL=null,PN=null;
+const feedFresh=x=>!!x&&Date.now()-Date.parse(x.updated||0)<3*60e3;
+function pickLive(){const v=feedFresh(HL)?HL:feedFresh(PN)?PN:(HL&&PN?(Date.parse(HL.updated)>Date.parse(PN.updated)?HL:PN):(HL||PN));if(v&&v!==LIVE)setLive(v)}
+setInterval(pickLive,30000);
 function setLive(data){LIVE=data;const n=dedupe(LIVE?.live).length;const c=document.getElementById('livecount');c.textContent=n;c.hidden=!n;rerender()}
 setLive(LIVE);
 (async()=>{try{const db=window.claude&&await window.claude.use('db');if(!db)return;db.doc('live/now').onSnapshot(s=>{if(s.exists)setLive(s.data())},()=>{});db.collection('matches').onSnapshot(qs=>{qs.docs.forEach(d=>{MATCH[d.id]=d.data()});rerender()},()=>{});db.doc('news/latest').onSnapshot(s=>{if(s.exists){NEWS=s.data();if(route.last==='news')rerender()}},()=>{})}catch(e){}})();
@@ -1360,12 +1367,12 @@ function viewMatch(id){
   const radar=rd?`<div class="radar"><div class="rmap" style="aspect-ratio:${rd.w}/${rd.h}"><img src="${esc(rd.src)}" alt="${esc(s.radar.map)} мапын радар">${(s.radar.kills||[]).map(k=>`<svg class="kx ${k[0]==='CT'?'ct':'t'} ${k[3]?'old':''}" viewBox="0 0 10 10" style="left:${(k[1]*100).toFixed(2)}%;top:${(k[2]*100).toFixed(2)}%" aria-hidden="true"><path d="M1.5 1.5 8.5 8.5M8.5 1.5 1.5 8.5"/></svg>`).join('')}</div></div>`:'';
   const gl=s&&s.log&&s.log.length?`<h2>Тоглолтын лог ба радар</h2><div class="scorebot logbox"><div class="lb-head"><span class="lb-map">${esc(mapName)}</span><span class="sub">${esc(s.round?'Раунд '+s.round.split(' - ')[0]:'')}</span><span class="rleg"><span><i class="ct"></i>CT үхсэн</span><span><i class="t"></i>T үхсэн</span><span>бүдэг = өмнөх раунд</span></span></div><div class="lb-body ${radar?'':'noradar'}"><div class="glog2">${s.log.map(logLine).join('')}</div>${radar}</div></div>`:'';
   const isLiveNow=!!(LIVE&&(LIVE.live||[]).some(m=>m.id===id))&&liveFresh();
-  const st=streamBlock(s&&s.streams,isLiveNow);
+  const st=streamBlock((s&&s.streams)||(base&&base.streams),isLiveNow);
   const pa=base?LT(base.t1):{id:nameToId[s?.t1],name:s?.t1},pb=base?LT(base.t2):{id:nameToId[s?.t2],name:s?.t2};
   const hh=h2hHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
   const mc=mapCompareHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
   const dyn=`${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}${pr}${hh}${mc}`;
-  const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+((s&&s.streams||[]).map(x=>x.url).join(','));
+  const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+(((s&&s.streams)||(base&&base.streams)||[]).map(x=>x.url).join(','));
   const ex=document.getElementById('mstream');
   if(ex&&ex.dataset.key===skey&&document.getElementById('mdyn')){document.getElementById('mhead').innerHTML=head;document.getElementById('mdyn').innerHTML=dyn;return}
   app.innerHTML=`<a class="back" href="#live">← Шууд</a><div id="mhead" class="stack">${head}</div><div id="mstream" class="stack" data-key="${esc(skey)}">${st}</div><div id="mdyn" class="stack" style="gap:22px">${dyn}</div>`;
@@ -1399,7 +1406,7 @@ function viewNewsItem(id){
   try{
     await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});
     const sb=window.supabase.createClient(C.url,C.anonKey);
-    const apply=r=>{if(!r||!r.k)return;if(r.k==='now')setLive(r.v);else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('r:')){RES[r.k.slice(2)]=r.v;if(route.last==='live')rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
+    const apply=r=>{if(!r||!r.k)return;if(r.k==='now'){HL=r.v;pickLive()}else if(r.k==='pnow'){PN=r.v;pickLive()}else if(r.k==='news'){NEWS=r.v;rerender()}else if(r.k.startsWith('m:')){MATCH[r.k.slice(2)]=r.v;rerender()}else if(r.k.startsWith('e:')){EVB[r.k.slice(2)]=r.v;if(route.last==='event-'+r.k.slice(2))rerender()}else if(r.k.startsWith('r:')){RES[r.k.slice(2)]=r.v;if(route.last==='live')rerender()}else if(r.k.startsWith('tm:')){TMAP[r.k.slice(3)]=r.v;if(/^(team|match)-/.test(route.last||''))rerender()}};
     sb.channel('fb-live').on('postgres_changes',{event:'*',schema:'public',table:'live'},p=>{if(p.eventType==='DELETE'){const k=p.old&&p.old.k;if(k&&k.startsWith('m:'))delete MATCH[k.slice(2)];rerender()}else apply(p.new)}).subscribe();
     const {data}=await sb.from('live').select('k,v');(data||[]).forEach(apply);
   }catch(e){console.warn('Supabase realtime unavailable',e)}
@@ -1435,6 +1442,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button.stream[da
 /* ---------- event bracket (captured from the event page, redrawn in our style) ---------- */
 function bracketHtml(id,ms){
   const b=EVB[id];
+  if(b&&b.brk&&b.brk.length)return jsonBracket(b.brk);
   if((!b||!b.blocks||!b.blocks.length)&&ms&&ms.length)return builtBracket(ms);
   if(!b||!b.blocks||!b.blocks.length)return `<div class="panel empty brk-empty"><div class="brk-ghost">${['Нээлтийн тойрог','Дээд хагас шигшээ','Дээд финал'].map((r,i)=>`<div class="bcol"><b>${r}</b>${Array.from({length:4>>i||1},()=>'<div class="bslot"><span>?</span><span>?</span></div>').join('')}</div>`).join('')}</div><div>Энэ тэмцээний хэсгийн шат, хасагдах шатны мэдээлэл хараахан ирээгүй байна. Цуглуулагч тэмцээний хуудсыг уншмагц энд автоматаар гарна.</div></div>`;
   const tpl=document.createElement('template');
@@ -1574,6 +1582,25 @@ function resultsHtml(mnOnly){
   return `<details class="panel mlist resfold" ${resOpen?'open':''} id="resfold"><summary>Сүүлийн 14 хоногийн үр дүн <span class="cnt">${L.length}</span></summary><div class="upfold-b">
     ${days.map(g=>`<div class="resday"><div class="evhdr">${esc(fmtDY(new Date(g.t)))}</div>${g.ms.map(row).join('')}</div>`).join('')}</div></details>`}
 let resOpen=false;
+
+/* ---------- brackets from HLTV's own bracket JSON (rows 'e:<id>' with .brk) ---------- */
+const RNAME={'Opening round':'Нээлтийн тойрог','Quarter-finals':'Шөвгийн 8','Semi-finals':'Хагас шигшээ','Grand final':'Их финал','Grand Final':'Их финал','Final':'Финал','Upper bracket final':'Дээд хаалтын финал','Upper final':'Дээд хаалтын финал','Lower bracket final':'Доод хаалтын финал','Lower final':'Доод хаалтын финал','Elimination match':'Хасагдах тоглолт','Decider match':'Шийдвэрлэх тоглолт','Winners\' match':'Хожигчдын тоглолт','Upper semi-finals':'Дээд хагас шигшээ','Lower round 1':'Доод тойрог 1','Lower round 2':'Доод тойрог 2','Round of 16':'Шөвгийн 16','3rd place decider':'3-р байрын тоглолт','Consolidation final':'3-р байрын тоглолт','Tiebreaker':'Тайбрейк','Final match':'Финал','Semifinals':'Хагас шигшээ','Quarterfinals':'Шөвгийн 8'};
+const BNAME={'Single Elimination Bracket':'Плей-офф','3rd Place Decider Match':'3-р байрын тоглолт','Playoffs':'Плей-офф','Playoff Bracket':'Плей-офф'};
+const rMn=n=>RNAME[n]||n;
+const BTYPE={SingleElimination:'Шууд хасах шат',DoubleElimination4:'Давхар хасах (GSL)',DoubleElimination8:'Давхар хасах шат',DoubleElimination16:'Давхар хасах шат'};
+const LANEMN={up:'Дээд хаалт',lo:'Доод хаалт',gf:'Финал',cf:'3-р байр','':''};
+function jsonBracket(brk){
+  const team=(t,sc,win,lose)=>{if(!t)t={id:0,name:'TBD',logo:''};const known=t.id&&tIdxById[t.id]!=null;const tm=known?TM(tIdxById[t.id]):null;const lg=(tm&&tm.logo)||t.logo;
+    const inner=`${lg?`<img class="logo sm" src="${esc(lg)}" alt="" loading="lazy">`:'<span class="logo sm ph">?</span>'}<span>${esc(t.name||'TBD')}</span><b class="num">${sc==null?'':esc(sc)}</b>`;
+    return t.id?`<a class="bt ${win?'win':''} ${lose?'lose':''}" href="#team-${t.id}">${inner}</a>`:`<span class="bt tbd">${inner}</span>`};
+  const box=sl=>{const dt=sl.time?new Date(sl.time):null;const done=!!sl.s;
+    return `<div class="bm"><div class="bm-h"><span class="num">${dt?fmtD(dt)+' '+fmtT(dt):''}</span>${sl.mid?`<a href="#match-${sl.mid}">${done?'Дууссан':sl.bo?'BO'+sl.bo:'Тоглолт'}</a>`:''}</div>${team(sl.t[0],sl.s?sl.s[0]:null,sl.w===1,sl.w===2)}${team(sl.t[1],sl.s?sl.s[1]:null,sl.w===2,sl.w===1)}</div>`};
+  const lanes=b=>{const ls=[...new Set(b.rounds.map(r=>r.lane))];return ls.map(l=>{const rs=b.rounds.filter(r=>r.lane===l);
+    return `<div class="blane">${LANEMN[l]?`<div class="blane-t">${LANEMN[l]}</div>`:''}<div class="bcols">${rs.map(r=>`<div class="bcolumn"><div class="bcol-t">${esc(rMn(r.name))}</div>${r.slots.map(box).join('')}</div>`).join('')}</div></div>`}).join('')};
+  const adv=b=>{if(!/DoubleElimination4/.test(b.type))return '';const out=[],up=[];b.rounds.forEach(r=>r.slots.forEach(sl=>{if(!sl.w)return;const W=sl.t[sl.w-1],Lz=sl.t[2-sl.w];if(sl.win&&!/ToNextRound|ToLower|EventWinner/.test(sl.win)&&W)up.push(W.name);if(/Eliminated/.test(sl.lose)&&Lz)out.push(Lz.name)}));
+    return (up.length?`<span class="badv">Гарсан: ${up.map(esc).join(', ')}</span>`:'')+(out.length?`<span class="bout">Хасагдсан: ${out.map(esc).join(', ')}</span>`:'')};
+  return `<div class="panel brk2">${brk.map(b=>`<div class="bgroup"><div class="bgroup-h"><b>${esc(BNAME[b.name]||(/^Group /.test(b.name)?b.name.replace(/^Group /,'')+' хэсэг':b.name))}</b><span class="sub" style="font-size:12px">${esc(BTYPE[b.type]||'')}</span>${adv(b)}</div>${lanes(b)}</div>`).join('')}
+   <div class="sub" style="font-size:12px">HLTV-ийн тэмцээний шатнаас. Тоглолт дуусах бүрт шинэчлэгдэнэ.</div></div>`}
 
 /* ---------- search ---------- */
 const q=document.getElementById('q'),sres=document.getElementById('sres');

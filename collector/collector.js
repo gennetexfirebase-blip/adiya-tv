@@ -103,6 +103,36 @@
     const jsons = [...doc.querySelectorAll('*')].flatMap(el => [...el.attributes].filter(a => /json|bracket/i.test(a.name) && a.value.length > 50).map(a => ({ tag: el.className || el.tagName, attr: a.name, value: a.value.slice(0, 120000) }))).slice(0, 6);
     return { id: eid, blocks: blocks.map(clean).map(h => h.slice(0, 150000)), jsons, updated: new Date().toISOString() };
   };
+  // ---- event brackets from HLTV's own bracket JSON (data-slotted-bracket-json): compact rounds/slots for the site
+  const LANE = k => /^upper/i.test(k) ? 'up' : /^lower/i.test(k) ? 'lo' : /^grand/i.test(k) ? 'gf' : /^consol/i.test(k) ? 'cf' : '';
+  const slotTeam = t => !t ? null : /Known/.test(t.type || '') ? { id: t.id?.teamId || 0, name: t.name || '', logo: t.logo?.dayLogoURL || '' }
+    : { id: 0, name: t.description || 'TBD', logo: '' };
+  const parseBrackets = doc => [...doc.querySelectorAll('[data-slotted-bracket-json]')].map(el => {
+    let j; try { j = JSON.parse(el.getAttribute('data-slotted-bracket-json')); } catch (e) { return null; }
+    const rounds = [];
+    const addRound = (r, lane) => {
+      if (!r || typeof r !== 'object') return;
+      const slots = Object.keys(r).filter(k => /^slot\d+$/.test(k)).sort((a, b) => +a.slice(4) - +b.slice(4)).map(k => r[k]).filter(s => s && !s.hidden).map(s => {
+        const mu = s.matchup || {}, sc = mu.score;
+        return { id: s.slotId?.id || '', mid: mu.match?.matchId || 0, time: mu.match?.startTime || 0, bo: mu.match?.numberOfMaps || 0,
+          t: [slotTeam(mu.team1), slotTeam(mu.team2)], s: sc ? [sc.team1Score, sc.team2Score] : null, w: sc ? (sc.team1Winner ? 1 : 2) : 0,
+          win: s.winnerType?.type || '', lose: s.loserType?.type || '' };
+      });
+      if (slots.length) rounds.push({ name: r.roundName?.name || '', lane, slots });
+    };
+    if (Array.isArray(j.rounds)) j.rounds.forEach(r => addRound(r, ''));
+    else Object.keys(j).forEach(k => { if (j[k] && typeof j[k] === 'object' && (j[k].roundName || Object.keys(j[k]).some(x => /^slot\d+$/.test(x)))) addRound(j[k], LANE(k)); });
+    return rounds.length ? { name: j.name || '', type: (j.type || '').split('.').pop(), rounds } : null;
+  }).filter(Boolean);
+  const pushBrackets = async (eid, path) => {
+    try {
+      const r = await fetch(path || '/events/' + eid + '/x', { cache: 'no-store' }); if (!r.ok) return 0;
+      const b = parseBrackets(new DOMParser().parseFromString(await r.text(), 'text/html'));
+      if (b.length) await put('e:' + eid, { id: eid, brk: b, updated: new Date().toISOString() });
+      return b.length;
+    } catch (e) { return 0; }
+  };
+  window.__fbPushBrackets = pushBrackets;
   // ---- team map stats: one HLTV stats request per team per 12 h (marked before the request, so a block is never retried) ----
   const TM_TTL = 12 * 3600e3;
   const ymd = d => d.toISOString().slice(0, 10);
@@ -155,7 +185,8 @@
   if (/^\/events\/\d+/.test(location.pathname)) {
     const eid = +location.pathname.split('/')[2];
     let lastE = '';
-    const pushE = () => { const v = captureEvent(document, eid); const sig = JSON.stringify(v.blocks) + JSON.stringify(v.jsons); if (sig !== lastE && (v.blocks.length || v.jsons.length)) { lastE = sig; put('e:' + eid, v); } };
+    const brk = parseBrackets(document); if (brk.length) put('e:' + eid, { id: eid, brk, updated: new Date().toISOString() });
+    const pushE = () => { if (parseBrackets(document).length) return; const v = captureEvent(document, eid); const sig = JSON.stringify(v.blocks) + JSON.stringify(v.jsons); if (sig !== lastE && (v.blocks.length || v.jsons.length)) { lastE = sig; put('e:' + eid, v); } };
     setTimeout(pushE, 3000); setInterval(pushE, 60000);
     console.log('COREX TV: capturing this event bracket');
     return;
@@ -259,6 +290,13 @@
       // finished matches: keep a small result row 'r:<id>' (14 days, cleaned up in the database), drop the heavy scoreboard
       for (const old of liveIds) if (!ids.includes(old)) { await saveResult(old); await del('m:' + old); }
       liveIds = ids; live.forEach(m => { lastSeen[m.id] = m; });
+      if (window.top === window) {
+        window.__fbBrkAt = window.__fbBrkAt || {};
+        for (const ev of [...new Set(live.map(m => m.ev).filter(Boolean))]) {
+          if (Date.now() - (window.__fbBrkAt[ev] || 0) < 10 * 60e3) continue;
+          window.__fbBrkAt[ev] = Date.now(); await pushBrackets(ev);
+        }
+      }
       // in a userscript on hltv.org/matches: keep a hidden same-origin frame per live match so its scoreboard streams too
       if (window.__fbFrames) {
         const want = new Set(live.map(m => String(m.id)));
