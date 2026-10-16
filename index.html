@@ -1221,7 +1221,7 @@ function liveCard(m){
    <div class="lm-foot">
     ${lu.length?`<div><b>Бүрэлдэхүүн</b>${lu.map((l,i)=>`<div class="lineup-row"><span class="sub">${esc(i?b.name:a.name)}:</span>${l.players.map(p=>`${PL[p.id]?`<a class="ext" href="#player-${p.id}">${esc(p.nick)}</a>`:`<span>${esc(p.nick)}</span>`}`).join('')}</div>`).join('')}</div>`:''}
     ${m.veto&&m.veto.length?`<details><summary><b>Мапын вето</b></summary><ul>${m.veto.map(v=>`<li>${esc(v.replace(/^\d+\.\s*/,'').replace(' removed ',' хассан: ').replace(' picked ',' сонгосон: ').replace(' was left over',' үлдсэн'))}</li>`).join('')}</ul></details>`:''}
-    <div>${m.info?`<div class="sub">${esc(m.info)}</div>`:''}<a class="ext lkm" href="#match-${m.id}"><b>Онооны самбар, лог, шууд дамжуулалт →</b></a></div>
+    <div>${m.info?`<div class="sub">${esc(m.info)}</div>`:''}<a class="ext lkm" href="#match-${m.id}"><b>${m.src==='panda'?(m.streams&&m.streams.length?'Шууд дамжуулалт →':'Дэлгэрэнгүй →'):'Онооны самбар, лог, шууд дамжуулалт →'}</b></a></div>
    </div></div>`;
 }
 function upRow(m){const a=LT(m.t1),b=LT(m.t2);const dt=new Date(m.time*6e4);
@@ -1371,7 +1371,7 @@ function viewMatch(id){
   const pa=base?LT(base.t1):{id:nameToId[s?.t1],name:s?.t1},pb=base?LT(base.t2):{id:nameToId[s?.t2],name:s?.t2};
   const hh=h2hHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
   const mc=mapCompareHtml(pa.id||nameToId[pa.name],pb.id||nameToId[pb.name],pa.name,pb.name);
-  const dyn=`${sb||'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>'}${gl}${pr}${hh}${mc}`;
+  const dyn=`${sb||(base&&base.src==='panda'?'<div class="panel empty">Энэ тоглолтын онооны самбар, лог HLTV collector ажиллаж байх үед гарна. Цувралын оноо дээр шууд шинэчлэгдэж байна.</div>':'<div class="panel empty">Онооны самбар хараахан ирээгүй байна.</div>')}${gl}${pr}${hh}${mc}`;
   const skey=id+'|'+(streamPick||'')+'|'+(st?st.length>0:0)+'|'+(((s&&s.streams)||(base&&base.streams)||[]).map(x=>x.url).join(','));
   const ex=document.getElementById('mstream');
   if(ex&&ex.dataset.key===skey&&document.getElementById('mdyn')){document.getElementById('mhead').innerHTML=head;document.getElementById('mdyn').innerHTML=dyn;return}

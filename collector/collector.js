@@ -306,6 +306,8 @@
           const f = document.createElement('iframe');
           f.dataset.fbMatch = String(m.id); f.src = '/matches/' + m.path;
           f.style.cssText = 'position:fixed;left:0;bottom:0;width:640px;height:480px;opacity:0;pointer-events:none;border:0;z-index:-1';
+          // when the collector was pasted/injected (no userscript), run the same code inside each match frame too
+          f.addEventListener('load', () => { try { if (window.__fbSrc && !f.contentWindow.__fbObs) f.contentWindow.eval(window.__fbSrc); } catch (e) {} });
           document.body.appendChild(f);
         }
       }
